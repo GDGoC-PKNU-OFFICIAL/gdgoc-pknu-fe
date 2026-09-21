@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 예시 파일은 커밋되어야 한다 (gitignore 는 줄 끝 주석을 지원하지 않는다)
+!.env.local.example
 
 # vercel
 .vercel
