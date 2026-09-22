@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * 브랜드 토큰 (PRD 3-2). Tailwind v4 는 CSS-first 설정이라 tailwind.config.ts 가 없다.
+ * 여기 @theme 에 둔 값이 bg-brand-blue · text-ink-muted 같은 유틸리티로 생성된다.
+ *
+ * 다크 모드는 MVP 제외(PRD 8-1) → prefers-color-scheme 분기를 두지 않는다.
+ */
+@theme {
+  /* Google 4색 — 로고 · 카테고리 · 강조에만 쓴다 */
+  --color-brand-blue: #4285f4;
+  --color-brand-red: #ea4335;
+  --color-brand-yellow: #fbbc04;
+  --color-brand-green: #34a853;
+
+  /* 본문 · 면 */
+  --color-ink: #1f1f1f;
+  --color-ink-muted: #5f6368;
+  --color-line: #e3e5e8;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6f7f9;
+
+  /* 한글은 Geist 에 없으므로 OS 기본 한글 폰트로 넘어간다 */
+  --font-sans:
+    var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui,
+    sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    @apply bg-surface font-sans text-ink;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* 모바일 전체 화면 메뉴(<dialog>)가 열려 있는 동안 뒤 페이지 스크롤 잠금 */
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  /* 고정 Header 아래로 앵커(#code-of-conduct 등)가 숨지 않게 */
+  :target {
+    scroll-margin-top: 5rem;
+  }
 }
