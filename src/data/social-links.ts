@@ -29,6 +29,3 @@ export const SOCIAL_LINKS = [
     href: "https://www.instagram.com/gdg.pknu/",
   },
 ] as const satisfies readonly SocialLink[];
-
-/** About 의 Discord 참여 CTA 가 쓰는 초대 링크 — Footer 와 같은 주소를 쓴다 */
-export const DISCORD_INVITE_URL = SOCIAL_LINKS[1].href;

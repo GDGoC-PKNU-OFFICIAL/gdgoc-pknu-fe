@@ -3,13 +3,10 @@ import { type Metadata } from "next";
 import PageHeader from "@/components/common/PageHeader";
 import PromiseSection from "@/components/common/PromiseSection";
 import SectionHeader from "@/components/common/SectionHeader";
-import SocialIcon from "@/components/layout/SocialIcon";
-import { buttonStyles } from "@/components/ui/Button";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ABOUT_HEADER, ACTIVITIES, IDENTITY } from "@/data/about";
 import { FAQ } from "@/data/faq";
 import { RULES } from "@/data/rules";
-import { DISCORD_INVITE_URL } from "@/data/social-links";
 
 export const metadata: Metadata = {
   title: "About",
@@ -21,6 +18,7 @@ const CONTAINER = "mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8";
 
 // P-01 About (IA 4장). 전부 src/data 의 정적 콘텐츠라 API 호출이 없다.
 // "지원 모집 중" 항목은 두지 않는다 — 모집 여부는 홈 히어로 배너로만 안내한다.
+// IA 4장 P-01 #7 Discord CTA 는 팀 결정으로 제외했다 — Discord 는 Footer 아이콘으로만 안내한다.
 export default function AboutPage() {
   return (
     <>
@@ -90,28 +88,6 @@ export default function AboutPage() {
               </p>
             </details>
           ))}
-        </div>
-      </section>
-
-      {/* 7. Discord CTA */}
-      <section aria-labelledby="discord-title" className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-16 text-center md:px-8">
-          <h2
-            id="discord-title"
-            className="text-2xl font-bold tracking-tight break-keep md:text-3xl"
-          >
-            Discord 에서 소식을 가장 먼저 받아 보세요
-          </h2>
-          <a
-            href={DISCORD_INVITE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonStyles({ size: "lg" })}
-          >
-            <SocialIcon channel="discord" className="size-5" />
-            Discord 참여하기
-            <span className="sr-only">(새 탭에서 열림)</span>
-          </a>
         </div>
       </section>
     </>
