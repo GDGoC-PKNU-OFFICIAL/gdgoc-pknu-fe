@@ -22,7 +22,8 @@ export default function PromiseSection({ page }: PromiseSectionProps) {
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8">
         <SectionHeader badge={promise.badge} title={promise.title} titleId={titleId} />
-        <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {/* auto-rows-fr: 줄이 나뉘어도(예: 4개 → 3 + 1) 모든 칸 높이를 가장 높은 칸에 맞춘다 */}
+        <ol className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
           {promise.items.map((item, index) => (
             <li key={item.title} className="flex gap-4 rounded-2xl bg-surface p-6">
               <span aria-hidden="true" className="text-lg font-bold text-brand-blue tabular-nums">

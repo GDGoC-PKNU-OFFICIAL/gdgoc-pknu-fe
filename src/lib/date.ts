@@ -10,7 +10,7 @@
 //   - 캘린더의 오늘 강조 · 초기 월처럼 정확해야 하는 곳은 클라이언트에서 "마운트 후"(useEffect) 계산한다.
 //     렌더 중에 서버 · 클라이언트가 각각 계산하면 자정 전후로 값이 달라져 hydration mismatch 가 난다.
 
-import type { IsoDate, YearMonth } from "@/types/api";
+import type { IsoDate, MonthPeriod, YearMonth } from "@/types/api";
 
 export const KST_TIME_ZONE = "Asia/Seoul";
 
@@ -65,4 +65,12 @@ export function parseYearMonth(value: YearMonth): { year: number; month: number 
 /** (year, month) → "YYYY.MM" — 캘린더 월 이동 결과를 다시 문자열로 */
 export function formatYearMonth(year: number, month: number): YearMonth {
   return `${year}.${String(month).padStart(2, "0")}`;
+}
+
+/**
+ * 프로젝트 · 스터디 기간 표시. end 가 없으면 진행 중 (IA 10-1 "2026.03 – 진행 중").
+ * @example formatMonthPeriod({ start: "2025.03", end: "2025.06" }) // "2025.03 – 2025.06"
+ */
+export function formatMonthPeriod({ start, end }: MonthPeriod): string {
+  return `${start} – ${end ?? "진행 중"}`;
 }
