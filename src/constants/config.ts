@@ -15,3 +15,9 @@ export const REVALIDATE_SECONDS = 1800;
  * 이 시간을 넘기면 요청을 끊고 에러를 던진다 → ISR 재생성이면 기존 페이지가 유지된다.
  */
 export const PUBLIC_API_TIMEOUT_MS = 35_000;
+
+/**
+ * BFF(app/api/admin/**) → Spring 요청 타임아웃. 관리자도 콜드 스타트를 직접 겪으므로 공개 API 와 같은 기준이다.
+ * 관리자 화면은 그동안 "서버를 깨우는 중입니다. 최대 30초 걸릴 수 있습니다." 를 보여 준다 (IA 8-5).
+ */
+export const ADMIN_API_TIMEOUT_MS = 35_000;
