@@ -25,6 +25,13 @@ export const ADMIN_ROUTES = {
 /** 로그인 후 돌아갈 경로를 담는 쿼리 키 — /admin/login?next=/admin/projects (IA 8-2) */
 export const ADMIN_NEXT_PARAM = "next";
 
+/**
+ * 로그인 화면으로 보낸 이유 — /admin/login?reason=expired (IA 6-1 · 8-5).
+ * 만료일 때만 붙인다. 로그인 폼이 "로그인이 만료되었습니다. 다시 로그인해 주세요." 를 보여 준다.
+ */
+export const ADMIN_REASON_PARAM = "reason";
+export const ADMIN_REASON_EXPIRED = "expired";
+
 /** About 의 동아리 강령 앵커 — 홈 약속 섹션 "동아리 강령 전체 보기" 링크 대상 (IA 3-4) */
 export const CODE_OF_CONDUCT_ID = "code-of-conduct";
 
