@@ -10,9 +10,20 @@
 //   - 캘린더의 오늘 강조 · 초기 월처럼 정확해야 하는 곳은 클라이언트에서 "마운트 후"(useEffect) 계산한다.
 //     렌더 중에 서버 · 클라이언트가 각각 계산하면 자정 전후로 값이 달라져 hydration mismatch 가 난다.
 
-import type { IsoDate, MonthPeriod, YearMonth } from "@/types/api";
+import type { IsoDate, IsoDateTime, MonthPeriod, YearMonth } from "@/types/api";
 
 export const KST_TIME_ZONE = "Asia/Seoul";
+
+/** KST 는 서머타임이 없어 오프셋이 항상 +09:00 이다 */
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+/**
+ * 임의의 시각을 API 명세 1-4 일시 형식 "YYYY-MM-DDTHH:mm:ss+09:00" 으로 변환한다 (Spring 응답과 같은 모양).
+ * 9시간 민 시각을 UTC 로 읽고 오프셋만 붙이므로 실행 환경의 타임존과 무관하다. 밀리초는 버린다.
+ */
+export function toKstDateTime(instant: Date): IsoDateTime {
+  return `${new Date(instant.getTime() + KST_OFFSET_MS).toISOString().slice(0, 19)}+09:00`;
+}
 
 const kstDateParts = new Intl.DateTimeFormat("en-US", {
   timeZone: KST_TIME_ZONE,
