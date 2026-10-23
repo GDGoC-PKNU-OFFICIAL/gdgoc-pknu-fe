@@ -13,6 +13,18 @@ export const PUBLIC_ROUTES = {
 
 export type PublicRoute = (typeof PUBLIC_ROUTES)[keyof typeof PUBLIC_ROUTES];
 
+/**
+ * 관리자 경로 (PRD 4-1). 도메인별 목록 · 폼 경로는 해당 화면을 만들 때 추가한다.
+ * proxy.ts 의 matcher 는 빌드 때 정적으로 읽히므로 이 상수를 쓰지 못하고 리터럴을 쓴다.
+ */
+export const ADMIN_ROUTES = {
+  dashboard: "/admin",
+  login: "/admin/login",
+} as const;
+
+/** 로그인 후 돌아갈 경로를 담는 쿼리 키 — /admin/login?next=/admin/projects (IA 8-2) */
+export const ADMIN_NEXT_PARAM = "next";
+
 /** About 의 동아리 강령 앵커 — 홈 약속 섹션 "동아리 강령 전체 보기" 링크 대상 (IA 3-4) */
 export const CODE_OF_CONDUCT_ID = "code-of-conduct";
 
