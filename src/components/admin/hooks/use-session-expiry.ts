@@ -8,30 +8,12 @@
 
 import { useEffect, useRef } from "react";
 
-import {
-  ADMIN_NEXT_PARAM,
-  ADMIN_REASON_EXPIRED,
-  ADMIN_REASON_PARAM,
-  ADMIN_ROUTES,
-} from "@/constants/routes";
+import { redirectToLogin } from "@/components/admin/lib/redirect-to-login";
 import { useToast } from "@/hooks/use-toast";
 import { getSession } from "@/lib/api/admin-api";
 import { ApiError } from "@/lib/api/api-error";
 
 const WARNING_BEFORE_MS = 10 * 60 * 1000;
-
-/**
- * 전체 페이지 이동으로 로그인에 보낸다. 클라이언트 라우터 이동은 캐시된 관리자 화면을 보여 줄 수 있고,
- * 전체 이동이어야 proxy.ts 가 다시 돌아 만료 쿠키를 지운다.
- * expired 면 로그인 폼이 만료 안내를 보여 주도록 reason 을 붙인다 (쿠키가 처음부터 없던 경우는 붙이지 않는다).
- */
-function redirectToLogin(expired: boolean) {
-  const { pathname, search } = window.location;
-  const loginUrl = new URL(ADMIN_ROUTES.login, window.location.origin);
-  loginUrl.searchParams.set(ADMIN_NEXT_PARAM, `${pathname}${search}`);
-  if (expired) loginUrl.searchParams.set(ADMIN_REASON_PARAM, ADMIN_REASON_EXPIRED);
-  window.location.assign(loginUrl);
-}
 
 export function useSessionExpiry() {
   const toast = useToast();
