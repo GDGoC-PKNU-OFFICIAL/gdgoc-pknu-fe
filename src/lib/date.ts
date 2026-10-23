@@ -43,6 +43,26 @@ export function toKstDate(instant: Date): IsoDate {
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
+const kstTimeParts = new Intl.DateTimeFormat("en-US", {
+  timeZone: KST_TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** 임의의 시각을 KST "HH:mm" 으로 — 관리자 폼 "임시 저장됨 · 14:32" (IA 8-6) */
+export function formatKstTime(instant: Date): string {
+  const parts = kstTimeParts.formatToParts(instant);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("hour")}:${get("minute")}`;
+}
+
+/** 임의의 시각을 KST "YYYY-MM-DD HH:mm" 으로 — 관리자 목록 수정일 · 임시 저장 복원 확인 문구 */
+export function formatKstDateTime(instant: Date): string {
+  return `${toKstDate(instant)} ${formatKstTime(instant)}`;
+}
+
 /** 오늘(KST) "YYYY-MM-DD" */
 export function todayKst(): IsoDate {
   return toKstDate(new Date());
