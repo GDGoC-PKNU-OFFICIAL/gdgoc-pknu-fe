@@ -13,6 +13,45 @@ export const PUBLIC_ROUTES = {
 
 export type PublicRoute = (typeof PUBLIC_ROUTES)[keyof typeof PUBLIC_ROUTES];
 
+/**
+ * 관리자 경로 (PRD 4-1). 등록 · 수정 폼 경로(/new · /[id]/edit)는 해당 화면을 만들 때 추가한다.
+ * proxy.ts 의 matcher 는 빌드 때 정적으로 읽히므로 이 상수를 쓰지 못하고 리터럴을 쓴다.
+ */
+export const ADMIN_ROUTES = {
+  dashboard: "/admin",
+  login: "/admin/login",
+  projects: "/admin/projects",
+  studies: "/admin/studies",
+  events: "/admin/events",
+  members: "/admin/members",
+  settings: "/admin/settings",
+} as const;
+
+export type AdminRoute = (typeof ADMIN_ROUTES)[keyof typeof ADMIN_ROUTES];
+
+/**
+ * 관리자 사이드바 메뉴 (IA 8-1). 배열 순서 = 화면 순서 = 공개 GNB 순서 (PRD 4-1).
+ * 대시보드는 하위 경로가 전부 /admin/... 이라 정확히 일치할 때만 활성으로 본다 (exact).
+ */
+export const ADMIN_NAV_ITEMS = [
+  { label: "대시보드", href: ADMIN_ROUTES.dashboard, exact: true },
+  { label: "프로젝트", href: ADMIN_ROUTES.projects, exact: false },
+  { label: "스터디", href: ADMIN_ROUTES.studies, exact: false },
+  { label: "일정", href: ADMIN_ROUTES.events, exact: false },
+  { label: "멤버", href: ADMIN_ROUTES.members, exact: false },
+  { label: "사이트 설정", href: ADMIN_ROUTES.settings, exact: false },
+] as const satisfies readonly { label: string; href: AdminRoute; exact: boolean }[];
+
+/** 로그인 후 돌아갈 경로를 담는 쿼리 키 — /admin/login?next=/admin/projects (IA 8-2) */
+export const ADMIN_NEXT_PARAM = "next";
+
+/**
+ * 로그인 화면으로 보낸 이유 — /admin/login?reason=expired (IA 6-1 · 8-5).
+ * 만료일 때만 붙인다. 로그인 폼이 "로그인이 만료되었습니다. 다시 로그인해 주세요." 를 보여 준다.
+ */
+export const ADMIN_REASON_PARAM = "reason";
+export const ADMIN_REASON_EXPIRED = "expired";
+
 /** About 의 동아리 강령 앵커 — 홈 약속 섹션 "동아리 강령 전체 보기" 링크 대상 (IA 3-4) */
 export const CODE_OF_CONDUCT_ID = "code-of-conduct";
 
