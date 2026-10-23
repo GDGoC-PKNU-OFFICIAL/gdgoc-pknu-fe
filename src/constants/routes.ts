@@ -14,13 +14,15 @@ export const PUBLIC_ROUTES = {
 export type PublicRoute = (typeof PUBLIC_ROUTES)[keyof typeof PUBLIC_ROUTES];
 
 /**
- * 관리자 경로 (PRD 4-1). 등록 · 수정 폼 경로(/new · /[id]/edit)는 해당 화면을 만들 때 추가한다.
+ * 관리자 경로 (PRD 4-1). 등록 폼(/new)은 해당 화면을 만들 때 추가한다.
+ * 수정 폼은 id 가 들어가므로 상수가 아니라 `${목록 경로}/${id}/${ADMIN_EDIT_SEGMENT}` 로 만든다.
  * proxy.ts 의 matcher 는 빌드 때 정적으로 읽히므로 이 상수를 쓰지 못하고 리터럴을 쓴다.
  */
 export const ADMIN_ROUTES = {
   dashboard: "/admin",
   login: "/admin/login",
   projects: "/admin/projects",
+  projectsNew: "/admin/projects/new",
   studies: "/admin/studies",
   events: "/admin/events",
   members: "/admin/members",
@@ -28,6 +30,9 @@ export const ADMIN_ROUTES = {
 } as const;
 
 export type AdminRoute = (typeof ADMIN_ROUTES)[keyof typeof ADMIN_ROUTES];
+
+/** 수정 폼 경로의 마지막 세그먼트 — /admin/projects/{id}/edit (IA 1-2) */
+export const ADMIN_EDIT_SEGMENT = "edit";
 
 /**
  * 관리자 사이드바 메뉴 (IA 8-1). 배열 순서 = 화면 순서 = 공개 GNB 순서 (PRD 4-1).
