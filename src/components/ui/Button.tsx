@@ -6,6 +6,8 @@ const VARIANT_CLASSES = {
   primary: "bg-brand-blue text-white hover:bg-brand-blue/90",
   secondary: "border border-line bg-surface text-ink hover:bg-surface-muted",
   ghost: "text-ink hover:bg-surface-muted",
+  // 되돌릴 수 없는 동작(삭제 확인) 전용
+  danger: "bg-brand-red text-white hover:bg-brand-red/90",
 } as const;
 
 const SIZE_CLASSES = {

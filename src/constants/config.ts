@@ -21,3 +21,24 @@ export const PUBLIC_API_TIMEOUT_MS = 35_000;
  * 관리자 화면은 그동안 "서버를 깨우는 중입니다. 최대 30초 걸릴 수 있습니다." 를 보여 준다 (IA 8-5).
  */
 export const ADMIN_API_TIMEOUT_MS = 35_000;
+
+/**
+ * 관리자 요청이 이 시간을 넘기면 Render 콜드 스타트로 보고 "서버를 깨우는 중" 안내를 띄운다 (IA 8-5).
+ * 로그인 · 목록 진입 · 저장에 같은 기준을 쓴다.
+ */
+export const ADMIN_SLOW_NOTICE_MS = 3_000;
+
+/** 관리자 목록 한 페이지 크기 = 명세 1-6 의 서버 기본값 */
+export const ADMIN_LIST_PAGE_SIZE = 20;
+
+/** 관리자 연도 필터 · 연월 선택의 첫 해. 마지막 해는 올해 + 1 (진행 중 프로젝트의 종료 예정월) */
+export const ADMIN_YEAR_RANGE_START = 2020;
+
+/** 폼 임시 저장 — 마지막 입력 후 이 시간이 지나면 저장한다 (PRD 4-6 · IA 8-6) */
+export const DRAFT_SAVE_DELAY_MS = 1_000;
+
+/** 폼 임시 저장본 보관 기간 7일 (PRD 4-6 · IA 8-6). 지나면 읽을 때 지운다 */
+export const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** 슬러그 중복 확인 — 입력이 멈춘 뒤 이 시간이 지나면 서버에 묻는다 (A-12 · A-13) */
+export const SLUG_CHECK_DELAY_MS = 400;

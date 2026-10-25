@@ -13,11 +13,13 @@
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
     "clsx": "^2.1.1",
     "jose": "^6.2.13",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-hook-form": "^7.89.0",
     "server-only": "^0.0.1",
     "simple-icons": "^16.32.0",
     "tailwind-merge": "^3.7.0",

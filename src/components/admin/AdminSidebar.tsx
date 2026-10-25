@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { clearAllDrafts } from "@/components/admin/lib/draft-storage";
+import { leavePage } from "@/components/admin/lib/leave-page";
 import { ADMIN_NAV_ITEMS, ADMIN_ROUTES, PUBLIC_ROUTES } from "@/constants/routes";
 import { useToast } from "@/hooks/use-toast";
 import { logout } from "@/lib/api/admin-api";
@@ -36,7 +37,7 @@ export default function AdminSidebar() {
     // 공용 계정 · 공용 PC 를 고려해 임시 저장본을 모두 지운다 (PRD 4-6)
     clearAllDrafts();
     // 전체 이동 — 클라이언트 라우터에 캐시된 관리자 화면이 뒤로 가기로 다시 보이지 않게 한다
-    window.location.assign(ADMIN_ROUTES.login);
+    leavePage(ADMIN_ROUTES.login);
   }
 
   return (
