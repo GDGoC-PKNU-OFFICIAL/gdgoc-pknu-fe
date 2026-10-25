@@ -6,8 +6,11 @@
 //   document 캡처 단계에서 링크 클릭을 먼저 받아 confirm 한다. 캡처 리스너는 React 루트보다 먼저 돌기 때문에
 //   여기서 막으면 next/link 의 클라이언트 이동도 일어나지 않는다.
 // - router.push 로 하는 이동(저장 성공 후 목록)은 막지 않는다 — 저장이 끝났으니 경고할 이유가 없다.
+// - 로그인 리다이렉트 · 로그아웃(leavePage)도 막지 않는다 — "머무르기" 를 고르면 저장 중 상태로 멈춘 폼에 갇힌다.
 
 import { useEffect } from "react";
+
+import { isLeavingPage } from "../lib/leave-page";
 
 export const LEAVE_WARNING_MESSAGE =
   "저장하지 않은 변경사항이 있습니다. 이 페이지를 나갈까요? 임시 저장된 내용은 남아 있습니다.";
@@ -29,6 +32,7 @@ export function useLeaveWarning(active: boolean): void {
     if (!active) return;
 
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isLeavingPage()) return;
       event.preventDefault();
     };
     const onClickCapture = (event: MouseEvent) => {

@@ -87,20 +87,37 @@ export function useDraft<T extends FieldValues>({
     if (at !== null) setSavedAt(at);
   }, [form, storageKey, serverUpdatedAt]);
 
+  /** 대기 중인 자동 저장을 취소한다. 대기 중이었는지 돌려준다 */
+  const cancelPending = useCallback(() => {
+    if (timer.current === undefined) return false;
+    clearTimeout(timer.current);
+    timer.current = undefined;
+    return true;
+  }, []);
+
   useEffect(() => {
     if (!autosaveEnabled) return;
+    // 마지막 입력 후 1초 안에 떠나도(링크 이동 · 탭 닫기) 그 입력까지 남긴다 — 이탈 경고가 그렇게 약속한다
+    const flush = () => {
+      if (cancelPending()) persist();
+    };
     const unsubscribe = form.subscribe({
       formState: { values: true },
       callback: () => {
-        clearTimeout(timer.current);
-        timer.current = setTimeout(persist, DRAFT_SAVE_DELAY_MS);
+        cancelPending();
+        timer.current = setTimeout(() => {
+          timer.current = undefined;
+          persist();
+        }, DRAFT_SAVE_DELAY_MS);
       },
     });
+    window.addEventListener("pagehide", flush);
     return () => {
       unsubscribe();
-      clearTimeout(timer.current);
+      window.removeEventListener("pagehide", flush);
+      flush();
     };
-  }, [autosaveEnabled, form, persist]);
+  }, [autosaveEnabled, form, persist, cancelPending]);
 
   const restore = useCallback(() => {
     if (!storedDraft) return;
@@ -117,15 +134,16 @@ export function useDraft<T extends FieldValues>({
 
   const saveNow = useCallback(() => {
     if (stopped || pendingDraft !== null) return;
-    clearTimeout(timer.current);
+    cancelPending();
     persist();
-  }, [stopped, pendingDraft, persist]);
+  }, [stopped, pendingDraft, persist, cancelPending]);
 
   const clear = useCallback(() => {
-    clearTimeout(timer.current);
+    // 대기 중인 저장을 먼저 취소한다 — 자동 저장이 꺼지며 cleanup 이 flush 해 저장본을 되살리지 않게
+    cancelPending();
     setStopped(true);
     removeDraft(storageKey);
-  }, [storageKey]);
+  }, [storageKey, cancelPending]);
 
   const pendingDraftIsStale =
     pendingDraft !== null &&

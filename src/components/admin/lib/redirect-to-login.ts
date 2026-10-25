@@ -8,6 +8,8 @@ import {
   ADMIN_ROUTES,
 } from "@/constants/routes";
 
+import { leavePage } from "./leave-page";
+
 /**
  * 전체 페이지 이동으로 로그인에 보낸다. 클라이언트 라우터 이동은 캐시된 관리자 화면을 보여 줄 수 있고,
  * 전체 이동이어야 proxy.ts 가 다시 돌아 만료 쿠키를 지운다.
@@ -19,5 +21,5 @@ export function redirectToLogin(expired: boolean): void {
   const loginUrl = new URL(ADMIN_ROUTES.login, window.location.origin);
   loginUrl.searchParams.set(ADMIN_NEXT_PARAM, `${pathname}${search}`);
   if (expired) loginUrl.searchParams.set(ADMIN_REASON_PARAM, ADMIN_REASON_EXPIRED);
-  window.location.assign(loginUrl);
+  leavePage(loginUrl);
 }

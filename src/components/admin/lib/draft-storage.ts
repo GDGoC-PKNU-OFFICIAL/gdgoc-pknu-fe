@@ -70,13 +70,17 @@ export function readDraftRaw(key: string, now: number = Date.now()): string | nu
   return null;
 }
 
-/** 저장 성공 시 저장 시각, 실패 시 null (용량 초과 · 저장소 차단) */
+/** 로그아웃으로 모두 지운 뒤인지. 페이지를 떠나며 하는 마지막 자동 저장(pagehide)이 저장본을 되살리지 않게 한다 */
+let cleared = false;
+
+/** 저장 성공 시 저장 시각, 실패 시 null (용량 초과 · 저장소 차단 · 로그아웃 후) */
 export function writeDraft<T>(
   key: string,
   values: T,
   serverUpdatedAt: IsoDateTime | null,
   now: number = Date.now(),
 ): number | null {
+  if (cleared) return null;
   const draft: Draft<T> = { version: DRAFT_VERSION, values, savedAt: now, serverUpdatedAt };
   try {
     localStorage.setItem(key, JSON.stringify(draft));
@@ -98,6 +102,7 @@ export function removeDraft(key: string): void {
  * 모든 임시 저장본을 지운다. 공용 계정 · 공용 PC 를 고려해 로그아웃 때 호출한다.
  */
 export function clearAllDrafts(): void {
+  cleared = true;
   try {
     const keys: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
