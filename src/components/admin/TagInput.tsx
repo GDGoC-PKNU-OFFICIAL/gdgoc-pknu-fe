@@ -24,6 +24,7 @@ interface TagInputProps {
 /**
  * 태그 입력 (IA 8-4 "태그 입력") — 기술 스택 · 관심분야 · 참여자 이름.
  * Enter 또는 "추가" 버튼으로 넣는다. 중복 · 빈 값 · 개수 초과는 넣기 전에 막는다 (중복 불가 규칙: 명세 4-2 · 4-6).
+ * 입력칸을 벗어날 때도 넣는다 — 추가를 잊고 바로 저장을 눌러도 입력한 태그가 조용히 빠지지 않게.
  */
 export default function TagInput({
   id,
@@ -117,7 +118,10 @@ export default function TagInput({
             setNotice(null);
           }}
           onKeyDown={onKeyDown}
-          onBlur={onBlur}
+          onBlur={() => {
+            add();
+            onBlur?.();
+          }}
         />
         <Button variant="secondary" disabled={full || text.trim() === ""} onClick={add}>
           추가

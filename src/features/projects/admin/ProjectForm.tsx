@@ -149,7 +149,9 @@ export default function ProjectForm({ project }: ProjectFormProps) {
           successMessage: MESSAGES.saved,
           onError: (error) => {
             const unmatched = applyFieldErrors(form, error.fieldErrors);
-            if (unmatched.length < error.fieldErrors.length) return MESSAGES.invalid;
+            // 필드에 붙지 못한 에러(기간 전체 규칙 등)는 서버 문구를 그대로 보여 준다
+            if (unmatched.length > 0) return unmatched.map(({ message }) => message).join(" ");
+            if (error.fieldErrors.length > 0) return MESSAGES.invalid;
           },
         },
       );

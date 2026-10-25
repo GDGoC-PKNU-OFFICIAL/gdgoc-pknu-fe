@@ -13,9 +13,14 @@ export function toFormPath(field: string): string {
   return field.replace(/\[(\d+)\]/g, ".$1");
 }
 
+function isPlainObject(value: unknown): boolean {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 /**
  * 서버 필드 에러를 폼 필드에 붙이고, 첫 번째 에러 필드로 포커스를 옮긴다.
- * 폼에 없는 필드(쿼리 파라미터 이름 등)의 에러는 붙이지 않고 돌려준다 — 호출부가 토스트 등으로 보여 준다.
+ * 폼에 없는 필드(쿼리 파라미터 이름 등) · 보일 자리가 없는 객체 필드의 에러는 붙이지 않고 돌려준다
+ * — 호출부가 토스트 등으로 보여 준다.
  */
 export function applyFieldErrors<T extends FieldValues>(
   form: Pick<UseFormReturn<T>, "getValues" | "setError">,
@@ -25,8 +30,11 @@ export function applyFieldErrors<T extends FieldValues>(
   let focused = false;
   for (const error of fieldErrors) {
     const path = toFormPath(error.field) as FieldPath<T>;
-    // 값이 null 인 필드(thumbnailUrl 등)도 폼에 있는 필드다. undefined 만 "없는 필드"로 본다
-    if (form.getValues(path) === undefined) {
+    // 값이 null 인 필드(thumbnailUrl 등)도 폼에 있는 필드다. undefined 만 "없는 필드"로 본다.
+    // 객체 필드(period · links 등)는 하위 필드에만 에러 자리가 있어 붙여도 보이지 않는다 — 돌려준다.
+    // 배열 필드는 배열 전체 에러 자리가 있다 (list-errors)
+    const value = form.getValues(path);
+    if (value === undefined || isPlainObject(value)) {
       unmatched.push(error);
       continue;
     }
