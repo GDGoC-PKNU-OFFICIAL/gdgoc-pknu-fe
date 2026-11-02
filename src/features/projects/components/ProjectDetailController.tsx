@@ -24,18 +24,19 @@ import ProjectDetailOverlay from "./ProjectDetailOverlay";
 const OPEN_TRANSITION_TIMEOUT_MS = 500;
 
 interface ProjectDetailControllerProps {
-  /** /projects 의 전체 목록 — ?project= slug 를 여기서 찾는다 */
+  /** 이 페이지에서 열 수 있는 프로젝트 — ?project= slug 를 여기서 찾는다 (/projects: 전체, 홈: 진행 중 카드) */
   projects: Project[];
 }
 
 /**
  * ?project= 쿼리 ↔ 상세 카드(C-08) 연결 (IA 6-3, FRONT_ARCHITECTURE § 5-3).
+ * URL 은 지금 페이지 기준으로 바꾸므로 /projects · 홈 어디에 두어도 그 페이지 안에서 열린다.
  *
- * | 상황                   | 열 때            | 닫기 버튼 · ESC                  | 브라우저 뒤로 가기 |
- * | 목록에서 "자세히 보기"   | push + 표시 남김  | history.back()                   | 상세만 닫힘       |
- * | 공유 링크로 바로 진입    | (추가 없음)       | replace 로 project 쿼리만 제거      | 이전 사이트       |
+ * | 상황               | 열 때            | 닫기 버튼 · ESC                  | 브라우저 뒤로 가기 |
+ * | 목록에서 카드 클릭   | push + 표시 남김  | history.back()                   | 상세만 닫힘       |
+ * | 공유 링크로 바로 진입 | (추가 없음)       | replace 로 project 쿼리만 제거      | 이전 사이트       |
  *
- * "자세히 보기"는 ProjectCard 의 평범한 링크다. 이 컴포넌트가 문서의 클릭을 캡처 단계에서 가로채므로
+ * 카드 클릭은 ProjectCard 의 평범한 링크다. 이 컴포넌트가 문서의 클릭을 캡처 단계에서 가로채므로
  * 카드는 서버 컴포넌트로 남는다. 새 탭 열기(Ctrl · ⌘ · Shift · 가운데 클릭)는 가로채지 않는다.
  * useSearchParams 를 쓰므로 page.tsx 에서 Suspense 로 감싼다 (fallback 없음 — 닫힌 상태가 기본).
  */
@@ -122,12 +123,12 @@ export default function ProjectDetailController({ projects }: ProjectDetailContr
     if (!closingRef.current && stillInUrl) leaveDetailUrl();
     closingRef.current = false;
 
-    // 연 카드의 "자세히 보기"로 포커스를 돌려준다 (다른 연도라 화면에 없으면 생략)
+    // 연 카드의 링크로 포커스를 돌려준다 (다른 연도라 화면에 없으면 생략)
     const trigger = lastSlugRef.current ? findDetailLink(lastSlugRef.current) : null;
     trigger?.focus();
   }, []);
 
-  // "자세히 보기" 클릭 가로채기. 캡처 단계라 next/link 보다 먼저 받고, preventDefault 하면 Link 는 이동하지 않는다
+  // 카드 클릭 가로채기. 캡처 단계라 next/link 보다 먼저 받고, preventDefault 하면 Link 는 이동하지 않는다
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
