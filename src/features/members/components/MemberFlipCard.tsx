@@ -2,6 +2,8 @@
 
 import { type MouseEvent, useState } from "react";
 
+import Link from "next/link";
+
 import SafeImage from "@/components/common/SafeImage";
 import Badge from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
@@ -40,20 +42,20 @@ const CARD = cn(
 
 interface MemberFlipCardProps {
   member: Member;
+  /** 카드를 눌렀을 때 갈 경로. 홈은 Members 페이지이고, Members 페이지 안에서는 없다 */
+  href?: string;
 }
 
 /**
  * 멤버 플립 카드 (C-05). 홈 · Members 가 같은 카드를 쓴다.
  *
- * 마우스를 올리면 뒤집히고, 누르면 멤버 소개 페이지가 새 탭으로 열린다 (소개 페이지가 없으면 GitHub, 둘 다 없으면 링크 없음).
- * 카드 전체가 링크 하나라서 인터랙티브 요소가 중첩되지 않는다. 마우스가 없는 환경도 쓸 수 있어야 한다:
- * - 키보드: Tab 으로 포커스가 오면 뒤집히고 Enter 로 연다
- * - 터치: 첫 탭으로 뒤집고, 뒤집힌 카드를 다시 탭하면 연다
+ * 마우스를 올리면 뒤집힌다. 홈에서는 카드 전체가 Members 페이지로 가는 링크 하나다. 마우스가 없는 환경도 쓸 수 있어야 한다:
+ * - 키보드: Tab 으로 포커스가 오면 뒤집히고 Enter 로 이동한다
+ * - 터치: 첫 탭으로 뒤집고, 뒤집힌 카드를 다시 탭하면 이동한다 (링크가 없으면 탭할 때마다 뒤집는다)
  * 앞/뒤 상태는 URL 에 남기지 않는다 (IA 6-2). 슬라이드 트랙에서 스와이프하면 브라우저가 click 을 내지 않아 뒤집히지 않는다.
  */
-export default function MemberFlipCard({ member }: MemberFlipCardProps) {
-  const { name, department, history, interests, part, bio, links, photoUrl } = member;
-  const href = links.homepage ?? links.github;
+export default function MemberFlipCard({ member, href }: MemberFlipCardProps) {
+  const { name, department, history, interests, part, bio, photoUrl } = member;
   /** 터치에서만 쓴다. 마우스 · 키보드는 CSS 로 뒤집는다 */
   const [flipped, setFlipped] = useState(false);
 
@@ -148,16 +150,8 @@ export default function MemberFlipCard({ member }: MemberFlipCardProps) {
   }
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-flipped={flipped}
-      onClick={handleClick}
-      className={CARD}
-    >
+    <Link href={href} data-flipped={flipped} onClick={handleClick} className={CARD}>
       {faces}
-      <span className="sr-only">(새 탭)</span>
-    </a>
+    </Link>
   );
 }
