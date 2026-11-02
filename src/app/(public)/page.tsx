@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { Suspense } from "react";
 
 import { type Metadata } from "next";
 
-import PageSection, { SECTION_CONTAINER } from "@/components/common/PageSection";
+import HeroVisual from "@/components/common/HeroVisual";
+import PageSection from "@/components/common/PageSection";
 import PromiseSection from "@/components/common/PromiseSection";
-import { buttonStyles } from "@/components/ui/Button";
+import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
 import { HERO, HOME_LIST_LIMIT, HOME_SECTIONS } from "@/data/home";
@@ -17,6 +18,7 @@ import { upcomingEvents } from "@/features/events/lib/filter-upcoming";
 import MemberGrid from "@/features/members/components/MemberGrid";
 import { groupMembers } from "@/features/members/lib/sort-members";
 import CurrentProjectGrid from "@/features/projects/components/CurrentProjectGrid";
+import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
 import RecruitBanner from "@/features/settings/components/RecruitBanner";
 import StatsGrid from "@/features/settings/components/StatsGrid";
 import StudyGrid from "@/features/studies/components/StudyGrid";
@@ -49,33 +51,30 @@ export default async function HomePage() {
   return (
     <>
       {/* 1. 히어로 */}
-      <section className="border-b border-line bg-surface-muted">
-        <div className={SECTION_CONTAINER}>
-          <div className="flex flex-col gap-4">
-            <p className="text-sm font-medium text-ink-muted">{SITE.affiliation}</p>
-            <h1 className="text-4xl font-bold tracking-tight break-keep md:text-6xl">
-              {HERO.title}
-            </h1>
-            <p className="max-w-2xl text-base break-keep text-ink-muted md:text-lg">
-              {SITE.description}
-            </p>
+      <section className="relative overflow-hidden border-b border-line bg-[linear-gradient(105deg,#ffffff_38%,#eff4ff_72%,#f2eeff_100%)]">
+        {/* 하단의 은은한 곡선 빛 */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-[-10%] -bottom-56 h-96 rounded-[100%] bg-[#dfe8ff] opacity-70 blur-3xl"
+        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 py-16 md:px-8 lg:min-h-[min(calc(100dvh-4rem),48rem)] lg:grid-cols-[48fr_52fr]">
+          <div className="flex flex-col gap-8">
+            <RecruitBanner
+              recruiting={settings.recruiting}
+              bannerText={settings.bannerText}
+              recruitPeriod={settings.recruitPeriod}
+            />
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-ink-muted">{SITE.affiliation}</p>
+              <h1 className="text-4xl font-bold tracking-tight break-keep md:text-6xl">
+                {HERO.title}
+              </h1>
+              <p className="max-w-2xl text-base break-keep text-ink-muted md:text-lg">
+                {SITE.description}
+              </p>
+            </div>
           </div>
-          <RecruitBanner
-            recruiting={settings.recruiting}
-            bannerText={settings.bannerText}
-            recruitPeriod={settings.recruitPeriod}
-          />
-          <div className="flex flex-wrap gap-3">
-            <Link href={HERO.primaryCta.href} className={buttonStyles({ size: "lg" })}>
-              {HERO.primaryCta.label}
-            </Link>
-            <Link
-              href={HERO.secondaryCta.href}
-              className={buttonStyles({ variant: "secondary", size: "lg" })}
-            >
-              {HERO.secondaryCta.label}
-            </Link>
-          </div>
+          <HeroVisual className="mx-auto max-w-sm lg:max-w-none" />
         </div>
       </section>
 
@@ -116,7 +115,11 @@ export default async function HomePage() {
         title={HOME_SECTIONS.projects.title}
         link={HOME_SECTIONS.projects.link}
       >
-        <CurrentProjectGrid projects={currentProjects} emptyMessage={CURRENT_PROJECTS.empty} />
+        <CurrentProjectGrid
+          projects={currentProjects}
+          emptyMessage={CURRENT_PROJECTS.empty}
+          detailBasePath={PUBLIC_ROUTES.home}
+        />
       </PageSection>
 
       {/* 5. 진행 중 스터디 */}
@@ -151,6 +154,11 @@ export default async function HomePage() {
 
       {/* 8. 약속 */}
       <PromiseSection page="home" />
+
+      {/* ↳ 상세 카드 (?project=) — 카드를 눌러도 홈을 떠나지 않는다 */}
+      <Suspense fallback={null}>
+        <ProjectDetailController projects={currentProjects} />
+      </Suspense>
     </>
   );
 }

@@ -1,4 +1,3 @@
-import Badge from "@/components/ui/Badge";
 import { cn } from "@/lib/cn";
 import { formatIsoDate } from "@/lib/date";
 import type { SiteSetting } from "@/types/api";
@@ -6,8 +5,9 @@ import type { SiteSetting } from "@/types/api";
 type RecruitBannerProps = Pick<SiteSetting, "recruiting" | "bannerText" | "recruitPeriod">;
 
 /**
- * 모집 상태 배너 (C-01, P-00 #1). 표시만 하고 지원 버튼은 없다 — 지원 접수는 사이트 밖에서 한다 (PRD MVP 범위).
- * 모집중이면 강조하고, 마감이면 "모집 마감"으로 보여 준다.
+ * 모집 상태 (C-01, P-00 히어로). 타이틀 위에 놓는 작은 보조 정보라 카드 · 배너 모양으로 만들지 않는다.
+ * 표시만 하고 지원 버튼은 없다 — 지원 접수는 사이트 밖에서 한다 (PRD MVP 범위).
+ * 모집 상태 · 기간은 관리자 사이트 설정(A-50)에서 바꾼다. 기간이 없으면 그 자리에 배너 문구를 보여 준다.
  */
 export default function RecruitBanner({
   recruiting,
@@ -15,20 +15,38 @@ export default function RecruitBanner({
   recruitPeriod,
 }: RecruitBannerProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:gap-3",
-        recruiting ? "border-brand-green/40 bg-brand-green/10" : "border-line bg-surface-muted",
-      )}
-    >
-      <Badge tone={recruiting ? "green" : "neutral"} className="self-start sm:self-auto">
+    <div className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 text-[15px]">
+      <span
+        className={cn(
+          "inline-flex items-center gap-2 rounded-full px-3 py-1 font-medium",
+          recruiting ? "bg-[#E8F0FF] text-[#2459B5]" : "bg-surface-muted text-ink-muted",
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className={cn("size-2 rounded-full", recruiting ? "bg-brand-blue" : "bg-ink-muted")}
+        />
         {recruiting ? "모집중" : "모집 마감"}
-      </Badge>
-      <p className="text-sm break-keep">{bannerText}</p>
-      {recruitPeriod && (
-        <p className="text-sm text-ink-muted tabular-nums sm:ml-auto">
+      </span>
+      <span aria-hidden="true" className="h-4 w-px bg-line" />
+      {recruitPeriod ? (
+        <span className="inline-flex items-center gap-2 text-[#555B65] tabular-nums">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.75}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M7 3v4M17 3v4M4 10h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+          </svg>
           {formatIsoDate(recruitPeriod.start)} – {formatIsoDate(recruitPeriod.end)}
-        </p>
+        </span>
+      ) : (
+        <span className="break-keep text-[#555B65]">{bannerText}</span>
       )}
     </div>
   );

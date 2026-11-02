@@ -8,8 +8,6 @@ import { PUBLIC_ROUTES } from "@/constants/routes";
 
 export const HERO = {
   title: "함께 배우고, 끝까지 만듭니다",
-  primaryCta: { label: "프로젝트 보기", href: PUBLIC_ROUTES.projects },
-  secondaryCta: { label: "동아리 소개", href: PUBLIC_ROUTES.about },
 } as const;
 
 export const HOME_SECTIONS = {
@@ -22,7 +20,7 @@ export const HOME_SECTIONS = {
   projects: {
     badge: "프로젝트",
     title: "Current Projects",
-    link: { label: "과거 프로젝트까지 보기", href: PUBLIC_ROUTES.projects },
+    link: { label: "전체 프로젝트 보기", href: PUBLIC_ROUTES.projects },
   },
   studies: {
     badge: "스터디",
