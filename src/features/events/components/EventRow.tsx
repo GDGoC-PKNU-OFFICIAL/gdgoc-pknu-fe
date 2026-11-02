@@ -2,31 +2,27 @@ import { EVENT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
 import type { EventItem } from "@/types/api";
 
-import { EVENT_CATEGORY_STYLES, eventAnchorId, formatEventDate } from "../lib/event-labels";
+import { EVENT_CATEGORY_STYLES, formatEventDate } from "../lib/event-labels";
+
+const ROW = "flex w-full flex-col gap-1.5 rounded-2xl border border-line bg-surface p-4 text-left";
 
 interface EventRowProps {
   event: EventItem;
-  /** 캘린더 막대가 찾아올 앵커를 붙인다 (Events 페이지). 홈에는 캘린더가 없어 붙이지 않는다 */
-  anchored?: boolean;
+  /** 선택 중인 일정인지 (Events 페이지) */
+  selected?: boolean;
+  /** 있으면 눌러서 선택할 수 있다 — 캘린더가 그 일정으로 이동한다. 홈에서는 표시만 한다 */
+  onSelect?: (event: EventItem) => void;
 }
 
-/**
- * 일정 행 (C-06). 표시만 하고 인터랙션이 없다 — 이벤트 상세 페이지가 없다 (IA 1-3).
- * 앵커로 찾아오면 테두리로 강조한다.
- */
-export default function EventRow({ event, anchored = false }: EventRowProps) {
+/** 일정 행 (C-06). 이벤트 상세 페이지가 없어 내용을 행에 모두 보여 준다 (IA 1-3) */
+export default function EventRow({ event, selected = false, onSelect }: EventRowProps) {
   const { title, category, time, place, summary } = event;
   const meta = [time, place].filter(Boolean).join(" · ");
 
-  return (
-    <article
-      id={anchored ? eventAnchorId(event.id) : undefined}
-      className={cn(
-        "flex flex-col gap-1.5 rounded-2xl border border-line bg-surface p-4",
-        "target:border-brand-blue target:ring-2 target:ring-brand-blue/30",
-      )}
-    >
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
+  // 버튼 안에 넣을 수 있도록 블록 요소 없이 span 으로만 구성한다
+  const content = (
+    <>
+      <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
         <span className="font-medium tabular-nums">{formatEventDate(event)}</span>
         <span className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
           <span
@@ -35,10 +31,29 @@ export default function EventRow({ event, anchored = false }: EventRowProps) {
           />
           {EVENT_CATEGORY_LABELS[category]}
         </span>
-      </div>
-      <p className="font-semibold break-keep">{title}</p>
-      {meta && <p className="text-sm break-keep text-ink-muted">{meta}</p>}
-      {summary && <p className="text-sm break-keep text-ink-muted">{summary}</p>}
-    </article>
+      </span>
+      <span className="font-semibold break-keep">{title}</span>
+      {meta && <span className="text-sm break-keep text-ink-muted">{meta}</span>}
+      {summary && <span className="text-sm break-keep text-ink-muted">{summary}</span>}
+    </>
+  );
+
+  if (!onSelect) return <article className={ROW}>{content}</article>;
+
+  return (
+    <button
+      type="button"
+      data-event-id={event.id}
+      aria-pressed={selected}
+      onClick={() => onSelect(event)}
+      className={cn(
+        ROW,
+        "cursor-pointer transition-[border-color,box-shadow] hover:border-brand-blue/60",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
+        selected && "border-brand-blue ring-2 ring-brand-blue/30",
+      )}
+    >
+      {content}
+    </button>
   );
 }

@@ -35,8 +35,3 @@ export function formatEventDate({ date, endDate }: Pick<EventItem, "date" | "end
   if (!endDate || endDate === date) return withWeekday(date);
   return `${withWeekday(date)} – ${withWeekday(endDate)}`;
 }
-
-/** 캘린더 막대 → 일정 목록 항목으로 가는 앵커 (IA 4장 P-04) */
-export function eventAnchorId(id: number): string {
-  return `event-${id}`;
-}
