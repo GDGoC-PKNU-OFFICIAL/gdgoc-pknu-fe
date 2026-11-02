@@ -61,7 +61,6 @@ export default async function HomePage() {
           <div className="flex flex-col gap-8">
             <RecruitBanner
               recruiting={settings.recruiting}
-              bannerText={settings.bannerText}
               recruitPeriod={settings.recruitPeriod}
             />
             <div className="flex flex-col gap-4">
