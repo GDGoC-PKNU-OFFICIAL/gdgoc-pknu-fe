@@ -15,8 +15,6 @@ const VISIBLE_TECH_COUNT = 3;
 
 interface ProjectCardProps {
   project: Project;
-  /** 상세 카드를 열 페이지 경로. 생략하면 /projects */
-  detailBasePath?: string;
 }
 
 /**
@@ -27,7 +25,7 @@ interface ProjectCardProps {
  * ProjectDetailController 가 data-project-detail 링크 클릭을 가로채 히스토리 push + 카드가 커지는 전환으로 연다 (IA 6-3).
  * 썸네일의 data-project-thumb 는 그 전환에서 시작 위치를 찾는 데 쓴다.
  */
-export default function ProjectCard({ project, detailBasePath }: ProjectCardProps) {
+export default function ProjectCard({ project }: ProjectCardProps) {
   const { slug, title, summary, category, period, techStack, thumbnailUrl } = project;
   const visibleTech = techStack.slice(0, VISIBLE_TECH_COUNT);
   const hiddenTechCount = techStack.length - visibleTech.length;
@@ -52,7 +50,7 @@ export default function ProjectCard({ project, detailBasePath }: ProjectCardProp
         </Badge>
         <h3 className="line-clamp-2 text-lg font-semibold break-keep">
           <Link
-            href={projectDetailHref(slug, detailBasePath)}
+            href={projectDetailHref(slug)}
             scroll={false}
             data-project-detail={slug}
             className="outline-none after:absolute after:inset-0"

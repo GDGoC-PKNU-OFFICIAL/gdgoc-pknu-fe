@@ -24,13 +24,12 @@ import ProjectDetailOverlay from "./ProjectDetailOverlay";
 const OPEN_TRANSITION_TIMEOUT_MS = 500;
 
 interface ProjectDetailControllerProps {
-  /** 이 페이지에서 열 수 있는 프로젝트 — ?project= slug 를 여기서 찾는다 (/projects: 전체, 홈: 진행 중 카드) */
+  /** /projects 의 전체 목록 — ?project= slug 를 여기서 찾는다 */
   projects: Project[];
 }
 
 /**
  * ?project= 쿼리 ↔ 상세 카드(C-08) 연결 (IA 6-3, FRONT_ARCHITECTURE § 5-3).
- * URL 은 지금 페이지 기준으로 바꾸므로 /projects · 홈 어디에 두어도 그 페이지 안에서 열린다.
  *
  * | 상황               | 열 때            | 닫기 버튼 · ESC                  | 브라우저 뒤로 가기 |
  * | 목록에서 카드 클릭   | push + 표시 남김  | history.back()                   | 상세만 닫힘       |

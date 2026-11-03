@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import Link from "next/link";
 
 import { type Metadata } from "next";
 
@@ -9,7 +9,6 @@ import PageSection, {
   SECTION_CONTAINER,
 } from "@/components/common/PageSection";
 import SectionHeader from "@/components/common/SectionHeader";
-import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
 import { HERO, HOME_LIST_LIMIT, HOME_SECTIONS, HOME_STUDY_LIMIT } from "@/data/home";
@@ -21,8 +20,7 @@ import UpcomingEventList from "@/features/events/components/UpcomingEventList";
 import { upcomingEvents } from "@/features/events/lib/filter-upcoming";
 import MemberGrid from "@/features/members/components/MemberGrid";
 import { groupMembers } from "@/features/members/lib/sort-members";
-import CurrentProjectGrid from "@/features/projects/components/CurrentProjectGrid";
-import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
+import ProjectShowcaseGrid from "@/features/projects/components/ProjectShowcaseGrid";
 import RecruitBanner from "@/features/settings/components/RecruitBanner";
 import StatsGrid from "@/features/settings/components/StatsGrid";
 import StudyShowcase from "@/features/studies/components/StudyShowcase";
@@ -122,34 +120,33 @@ export default async function HomePage() {
         </ul>
       </PageSection>
 
-      {/* 4. 진행 중 프로젝트 */}
+      {/* 4. 진행 중 프로젝트 — 마우스를 올리면 카드 안에서 상세 정보가 보이고, 누르면 /projects 상세로 간다 */}
       <PageSection
         fullScreen
         id="home-projects"
         badge={HOME_SECTIONS.projects.badge}
         title={HOME_SECTIONS.projects.title}
-        link={HOME_SECTIONS.projects.link}
       >
-        <CurrentProjectGrid
-          projects={currentProjects}
-          emptyMessage={CURRENT_PROJECTS.empty}
-          detailBasePath={PUBLIC_ROUTES.home}
-        />
+        <ProjectShowcaseGrid projects={currentProjects} emptyMessage={CURRENT_PROJECTS.empty} />
+        <Link
+          href={HOME_SECTIONS.projects.link.href}
+          className="group mt-4 inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-medium text-brand-blue"
+        >
+          {HOME_SECTIONS.projects.link.label}
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+          >
+            →
+          </span>
+        </Link>
       </PageSection>
 
-      {/* 5. 진행 중 스터디 — 큰 카드라 은은한 블루 · 라벤더 배경을 깔고 헤더를 가운데에 둔다 */}
+      {/* 5. 진행 중 스터디 — 큰 카드라 헤더를 가운데에 둔다 */}
       <section
         aria-labelledby="home-studies-title"
-        className={cn("relative isolate overflow-hidden md:flex md:flex-col", FULL_SCREEN_SECTION)}
+        className={cn("md:flex md:flex-col", FULL_SCREEN_SECTION)}
       >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#f1f5ff_0%,#ffffff_42%)]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-48 -bottom-48 -z-10 size-160 rounded-full bg-[#ece6ff] opacity-60 blur-3xl"
-        />
         <div className={cn(SECTION_CONTAINER, "w-full gap-12")}>
           <SectionHeader
             align="center"
@@ -190,11 +187,6 @@ export default async function HomePage() {
 
       {/* 8. 약속 */}
       <ManifestoSection />
-
-      {/* ↳ 상세 카드 (?project=) — 카드를 눌러도 홈을 떠나지 않는다 */}
-      <Suspense fallback={null}>
-        <ProjectDetailController projects={currentProjects} />
-      </Suspense>
     </div>
   );
 }

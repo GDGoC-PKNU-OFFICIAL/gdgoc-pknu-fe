@@ -18,12 +18,9 @@ export const PAST_YEAR_QUERY = "pastYear";
  */
 export const OPENED_FROM_LIST_STATE_KEY = "gdgProjectOpenedFromList";
 
-/**
- * 상세 카드 링크. 카드가 있는 페이지 안에서 상세 카드가 열린다 (홈 카드는 홈에서, 목록 카드는 /projects 에서).
- * JS 가 없어도 이 주소로 이동해 열린다.
- */
-export function projectDetailHref(slug: string, basePath: string = PUBLIC_ROUTES.projects): string {
-  return `${basePath}?${PROJECT_QUERY}=${encodeURIComponent(slug)}`;
+/** 상세 카드 링크. JS 가 없거나 다른 페이지(홈)에서 눌러도 이 주소로 이동해 열린다 */
+export function projectDetailHref(slug: string): string {
+  return `${PUBLIC_ROUTES.projects}?${PROJECT_QUERY}=${encodeURIComponent(slug)}`;
 }
 
 /**

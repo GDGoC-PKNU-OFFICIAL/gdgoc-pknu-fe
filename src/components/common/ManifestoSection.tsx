@@ -26,40 +26,8 @@ export default function ManifestoSection() {
   return (
     <section
       aria-labelledby="promise-home-title"
-      className={cn("relative isolate overflow-hidden md:flex md:flex-col", FULL_SCREEN_SECTION)}
+      className={cn("md:flex md:flex-col", FULL_SCREEN_SECTION)}
     >
-      {/* 위아래 연한 블루 · 라벤더, 양쪽 가장자리에만 곡선 빛 — 가운데는 비워 둔다 */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#f1f5ff_0%,#ffffff_30%,#ffffff_70%,#f3efff_100%)]"
-      />
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 400 900"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute top-0 -left-40 -z-10 h-full w-96 opacity-70 blur-2xl"
-      >
-        <path
-          d="M120 -40C320 180 -40 380 180 560S260 840 80 960"
-          fill="none"
-          stroke="#c9d8ff"
-          strokeWidth="90"
-        />
-      </svg>
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 400 900"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute top-0 -right-40 -z-10 h-full w-96 opacity-70 blur-2xl"
-      >
-        <path
-          d="M300 -40C80 200 420 400 200 600S120 820 320 960"
-          fill="none"
-          stroke="#e2d9ff"
-          strokeWidth="90"
-        />
-      </svg>
-
       <RevealOnScroll className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-20 md:px-8 lg:grid-cols-[2fr_3fr] lg:gap-16">
         <div data-reveal-item style={revealOrder(0)} className="flex flex-col items-start gap-6">
           <Badge className="px-4 py-2 text-sm">{badge}</Badge>
@@ -71,9 +39,7 @@ export default function ManifestoSection() {
             <br />
             <span className="text-brand-blue">{countWord} 가지 약속.</span>
           </h2>
-          <p className="mt-2 max-w-[30rem] text-lg leading-[1.7] break-keep text-[#50566A]">
-            {intro}
-          </p>
+          <p className="mt-2 max-w-120 text-lg leading-[1.7] break-keep text-[#50566A]">{intro}</p>
           <Link
             href={link.href}
             className="inline-flex min-h-11 items-center text-sm font-medium text-brand-blue hover:underline"
@@ -88,7 +54,7 @@ export default function ManifestoSection() {
               <Link
                 href={link.href}
                 className={cn(
-                  "group flex min-h-[7.8rem] items-center gap-5 rounded-[28px] border border-[#e6ecf7] bg-white/75 px-5 py-6 backdrop-blur-md sm:gap-8 sm:px-10",
+                  "group flex min-h-[7.8rem] items-center gap-5 rounded-[28px] border border-[#e6ecf7] bg-surface px-5 py-6 sm:gap-8 sm:px-10",
                   "shadow-[0_8px_30px_rgba(80,110,180,0.06)] transition duration-300 ease-out",
                   "hover:-translate-y-1 hover:bg-[#f4f8ff]/90 hover:shadow-[0_18px_40px_rgba(80,110,180,0.14)]",
                   "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
