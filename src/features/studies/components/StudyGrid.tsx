@@ -1,8 +1,6 @@
 import EmptyState from "@/components/common/EmptyState";
 import type { Study } from "@/types/api";
 
-import { studyAnchorId } from "../lib/study-links";
-
 import StudyCard from "./StudyCard";
 
 interface StudyGridProps {
@@ -18,8 +16,7 @@ export default function StudyGrid({ studies, emptyMessage }: StudyGridProps) {
   return (
     <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {studies.map((study) => (
-        // 홈 큰 카드가 이 id 로 바로 찾아온다 (studyHref)
-        <li key={study.id} id={studyAnchorId(study.slug)}>
+        <li key={study.id}>
           <StudyCard study={study} />
         </li>
       ))}

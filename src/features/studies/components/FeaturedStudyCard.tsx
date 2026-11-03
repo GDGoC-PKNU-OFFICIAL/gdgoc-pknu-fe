@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 import Tag from "@/components/ui/Tag";
+import { PUBLIC_ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/cn";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Study } from "@/types/api";
 
-import { studyHref } from "../lib/study-links";
 import { studyVisualKind } from "../lib/study-visual";
 
 import StudyVisual from "./StudyVisual";
@@ -18,11 +18,11 @@ interface FeaturedStudyCardProps {
 
 /**
  * 홈 진행 중 스터디 큰 카드 (P-00 #5). 서버 컴포넌트다.
- * 카드 전체가 Studies 페이지의 해당 카드로 가는 링크다 — 제목 링크를 카드 크기로 넓힌다 (after:inset-0).
+ * 카드 전체가 Studies 페이지(맨 위부터)로 가는 링크다 — 제목 링크를 카드 크기로 넓힌다 (after:inset-0).
  * hover: 3~4px 떠오르고 파란 빛이 짙어지며 그림 · 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
  */
 export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardProps) {
-  const { slug, topic, title, summary, period, participants, format } = study;
+  const { topic, title, summary, period, participants, format } = study;
   const tags = [
     `#${topic}`,
     ...(format ? [format] : []),
@@ -79,7 +79,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
       <div className="mt-auto flex flex-col gap-3 pt-6 sm:max-w-[55%] lg:max-w-[52%]">
         <h3 className="text-2xl font-bold tracking-tight break-keep md:text-[28px]">
           <Link
-            href={studyHref(slug)}
+            href={PUBLIC_ROUTES.studies}
             className="after:absolute after:inset-0 after:rounded-[28px] focus-visible:outline-none"
           >
             {title}

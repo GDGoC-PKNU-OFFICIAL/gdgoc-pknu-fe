@@ -37,22 +37,6 @@ export default function StudyShowcase({ studies, emptyMessage, culture }: StudyS
         href={culture.href}
         className="group flex items-center gap-4 border-t border-line pt-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue md:gap-6"
       >
-        <span
-          aria-hidden="true"
-          className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-[#E8F0FF] text-brand-blue"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="size-7"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.75}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19M10 10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 19v-1.5a3.5 3.5 0 0 0-2.5-3.35M15 4.6a3 3 0 0 1 0 5.8" />
-          </svg>
-        </span>
         <span className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="text-lg font-bold break-keep">{culture.title}</span>
           <span className="text-[15px] break-keep text-ink-muted">{culture.description}</span>

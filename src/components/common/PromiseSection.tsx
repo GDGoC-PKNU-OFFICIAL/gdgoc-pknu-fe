@@ -1,19 +1,15 @@
 import Link from "next/link";
 
-import { FULL_SCREEN_SECTION } from "@/components/common/PageSection";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PROMISES, type PromisePage, type PromiseSet } from "@/data/promises";
-import { cn } from "@/lib/cn";
 
 interface PromiseSectionProps {
   /** 어느 페이지의 약속인지 (IA 5-6). 내용은 src/data/promises.ts 에서 가져온다 */
   page: PromisePage;
-  /** 한 화면을 섹션 하나가 차지한다 (홈, FULL_SCREEN_SECTION) */
-  fullScreen?: boolean;
 }
 
 /** 약속 섹션 C-07 — 각 공개 페이지 하단. About 에서는 동아리 강령 전문이 된다. */
-export default function PromiseSection({ page, fullScreen = false }: PromiseSectionProps) {
+export default function PromiseSection({ page }: PromiseSectionProps) {
   // 홈만 link, About 만 anchorId 를 가진다 → 공통 타입으로 넓혀 읽는다
   const promise: PromiseSet = PROMISES[page];
   const titleId = `promise-${page}-title`;
@@ -22,12 +18,9 @@ export default function PromiseSection({ page, fullScreen = false }: PromiseSect
     <section
       id={promise.anchorId}
       aria-labelledby={titleId}
-      className={cn(
-        "border-t border-line bg-surface-muted",
-        fullScreen && cn("md:flex md:flex-col", FULL_SCREEN_SECTION),
-      )}
+      className="border-t border-line bg-surface-muted"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-16 md:px-8">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8">
         <SectionHeader badge={promise.badge} title={promise.title} titleId={titleId} />
         {/* auto-rows-fr: 줄이 나뉘어도(예: 4개 → 3 + 1) 모든 칸 높이를 가장 높은 칸에 맞춘다 */}
         <ol className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
