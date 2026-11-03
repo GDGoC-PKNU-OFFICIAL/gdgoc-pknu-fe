@@ -29,7 +29,14 @@ export const HOME_SECTIONS = {
   studies: {
     badge: "스터디",
     title: "Current Studies",
-    link: { label: "전체 스터디 보기", href: PUBLIC_ROUTES.studies },
+    subtitle: "관심 있는 분야를 함께 탐구하고, 서로의 지식과 경험을 나누며 성장합니다.",
+    // 카드 아래 학습 문화 줄이 "전체 스터디 보기" 링크를 겸한다
+    culture: {
+      title: "함께하는 학습의 가치",
+      description: "지식 공유부터 실습, 프로젝트까지 함께하는 성장의 여정",
+      href: PUBLIC_ROUTES.studies,
+      linkLabel: "전체 스터디 보기",
+    },
   },
   events: {
     badge: "일정",
@@ -43,5 +50,8 @@ export const HOME_SECTIONS = {
   },
 } as const;
 
-/** 홈 진행 중 프로젝트 · 스터디 · 다가오는 일정 최대 개수 (IA 4장 P-00) */
+/** 홈 진행 중 프로젝트 · 다가오는 일정 최대 개수 (IA 4장 P-00) */
 export const HOME_LIST_LIMIT = 3;
+
+/** 홈 진행 중 스터디는 큰 카드라 2개까지만 보여 준다. 나머지는 Studies 페이지에서 본다 */
+export const HOME_STUDY_LIMIT = 2;

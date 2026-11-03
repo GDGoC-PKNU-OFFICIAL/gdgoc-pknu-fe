@@ -12,7 +12,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
-import { HERO, HOME_LIST_LIMIT, HOME_SECTIONS } from "@/data/home";
+import { HERO, HOME_LIST_LIMIT, HOME_SECTIONS, HOME_STUDY_LIMIT } from "@/data/home";
 import { CORE_MEMBERS } from "@/data/members";
 import { CURRENT_PROJECTS } from "@/data/projects";
 import { SITE } from "@/data/site";
@@ -25,7 +25,7 @@ import CurrentProjectGrid from "@/features/projects/components/CurrentProjectGri
 import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
 import RecruitBanner from "@/features/settings/components/RecruitBanner";
 import StatsGrid from "@/features/settings/components/StatsGrid";
-import StudyGrid from "@/features/studies/components/StudyGrid";
+import StudyShowcase from "@/features/studies/components/StudyShowcase";
 import { getEvents, getMembers, getProjects, getSettings, getStudies } from "@/lib/api/public-api";
 import { cn } from "@/lib/cn";
 import { splitByStatus } from "@/lib/split-by-status";
@@ -49,7 +49,7 @@ export default async function HomePage() {
   ]);
 
   const currentProjects = splitByStatus(projects).current.slice(0, HOME_LIST_LIMIT);
-  const currentStudies = splitByStatus(studies).current.slice(0, HOME_LIST_LIMIT);
+  const currentStudies = splitByStatus(studies).current.slice(0, HOME_STUDY_LIMIT);
   const nextEvents = upcomingEvents(events, { limit: HOME_LIST_LIMIT });
   const { core } = groupMembers(members);
 
@@ -137,16 +137,34 @@ export default async function HomePage() {
         />
       </PageSection>
 
-      {/* 5. 진행 중 스터디 */}
-      <PageSection
-        fullScreen
-        id="home-studies"
-        badge={HOME_SECTIONS.studies.badge}
-        title={HOME_SECTIONS.studies.title}
-        link={HOME_SECTIONS.studies.link}
+      {/* 5. 진행 중 스터디 — 큰 카드라 은은한 블루 · 라벤더 배경을 깔고 헤더를 가운데에 둔다 */}
+      <section
+        aria-labelledby="home-studies-title"
+        className={cn("relative isolate overflow-hidden md:flex md:flex-col", FULL_SCREEN_SECTION)}
       >
-        <StudyGrid studies={currentStudies} emptyMessage={CURRENT_STUDIES.empty} />
-      </PageSection>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(180deg,#f1f5ff_0%,#ffffff_42%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-48 -bottom-48 -z-10 size-160 rounded-full bg-[#ece6ff] opacity-60 blur-3xl"
+        />
+        <div className={cn(SECTION_CONTAINER, "w-full gap-12")}>
+          <SectionHeader
+            align="center"
+            badge={HOME_SECTIONS.studies.badge}
+            title={HOME_SECTIONS.studies.title}
+            subtitle={HOME_SECTIONS.studies.subtitle}
+            titleId="home-studies-title"
+          />
+          <StudyShowcase
+            studies={currentStudies}
+            emptyMessage={CURRENT_STUDIES.empty}
+            culture={HOME_SECTIONS.studies.culture}
+          />
+        </div>
+      </section>
 
       {/* 6. 다가오는 일정 */}
       <PageSection
