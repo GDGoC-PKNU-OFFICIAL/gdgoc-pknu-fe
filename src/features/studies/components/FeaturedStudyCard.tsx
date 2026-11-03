@@ -15,7 +15,7 @@ interface FeaturedStudyCardProps {
 /**
  * 홈 진행 중 스터디 큰 카드 (P-00 #5). 서버 컴포넌트다.
  * 카드 전체가 Studies 페이지(맨 위부터)로 가는 링크다 — 제목 링크를 카드 크기로 넓힌다 (after:inset-0).
- * hover: 3~4px 떠오르고 파란 빛이 짙어지며 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
+ * 흰 카드다. hover: 3~4px 떠오르고 그림자가 짙어지며 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
  */
 export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardProps) {
   const { topic, title, summary, period, participants, format } = study;
@@ -30,18 +30,12 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
     <article
       className={cn(
         "group relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-[28px] border border-[#e4e9f4] p-7 md:p-9",
-        "bg-[linear-gradient(140deg,#ffffff_0%,#f4f7ff_55%,#e8efff_100%)] shadow-[0_32px_64px_-40px_rgba(66,133,244,0.55)]",
-        "transition duration-300 ease-out hover:-translate-y-1 active:scale-[0.99]",
+        "bg-surface shadow-[0_8px_30px_rgba(80,110,180,0.06)]",
+        "transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(80,110,180,0.14)] active:scale-[0.99]",
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         "has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-brand-blue",
       )}
     >
-      {/* hover 때 짙어지는 파란 빛 */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_85%_45%,#d6e3ff_0%,transparent_60%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      />
-
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold tracking-[0.16em] text-brand-blue tabular-nums">
           STUDY {String(index + 1).padStart(2, "0")}
@@ -77,7 +71,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
         <ul aria-label="스터디 정보" className="flex flex-wrap gap-1.5 pt-1">
           {tags.map((tag) => (
             <li key={tag} className="min-w-0">
-              <Tag className="bg-surface/80 tabular-nums">{tag}</Tag>
+              <Tag className="tabular-nums">{tag}</Tag>
             </li>
           ))}
         </ul>
