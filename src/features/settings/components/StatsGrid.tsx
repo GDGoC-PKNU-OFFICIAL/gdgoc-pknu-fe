@@ -18,7 +18,7 @@ function easeOutQuart(t: number) {
 /**
  * 활동 통계 (P-00 #2). 항상 4칸, 모든 화면에서 2열 × 2행이고 칸 사이를 십자 구분선으로 나눈다.
  *
- * 화면에 들어오면 숫자가 0 부터 목표까지 한 번만 올라간다. 벗어났다 돌아와도 다시 세지 않는다.
+ * 화면에 들어올 때마다 숫자가 0 부터 목표까지 올라간다. 벗어나면 0 으로 돌아간다.
  * "모션 줄이기" 설정에서는 바로 최종 값을 보여 준다.
  * 화면 읽기 프로그램에는 올라가는 숫자 대신 최종 값만 읽힌다 (sr-only).
  */
@@ -34,9 +34,12 @@ export default function StatsGrid({ stats }: { stats: SiteStat[] }) {
     let frame = 0;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        // 한 번 시작하면 더 볼 필요가 없다
-        observer.disconnect();
+        cancelAnimationFrame(frame);
+        // 벗어나면 0 으로 돌려 두어, 다시 들어올 때마다 처음부터 센다
+        if (!entry?.isIntersecting) {
+          setProgress(0);
+          return;
+        }
 
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           setProgress(1);
