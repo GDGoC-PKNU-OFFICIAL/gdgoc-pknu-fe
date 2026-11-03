@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 
+import CodeOfConductSection from "@/components/common/CodeOfConductSection";
 import PageHeader from "@/components/common/PageHeader";
-import PromiseSection from "@/components/common/PromiseSection";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ABOUT_HEADER, ACTIVITIES, IDENTITY } from "@/data/about";
@@ -55,8 +55,8 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      {/* 4. 동아리 강령 (#code-of-conduct) — 약속 섹션 C-07 의 About 버전 */}
-      <PromiseSection page="about" />
+      {/* 4. 동아리 강령 (#code-of-conduct) — 약속 섹션 C-07 의 About 버전. 왼쪽 목차 + 오른쪽 강령 전체 */}
+      <CodeOfConductSection />
 
       {/* 5. 활동 규칙 */}
       <section aria-labelledby="rules-title" className={CONTAINER}>

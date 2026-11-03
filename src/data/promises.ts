@@ -18,7 +18,7 @@ export interface PromiseSet {
   items: readonly PromiseItem[];
   /** 섹션 하단 링크 (홈만 사용) */
   link?: { label: string; href: string };
-  /** 큰 제목 아래 소개 문구 (홈 ManifestoSection 만 사용) */
+  /** 큰 제목 아래 소개 문구 (홈 ManifestoSection · About CodeOfConductSection) */
   intro?: string;
   /** 섹션 앵커 id (About 강령만 사용) */
   anchorId?: string;
@@ -57,6 +57,7 @@ export const PROMISES = {
   about: {
     badge: "동아리 강령",
     title: "Code of Conduct",
+    intro: "GDG on Campus PKNU의 모든 멤버가 함께 지켜야 할 우리의 약속입니다.",
     items: codeOfConduct,
     anchorId: CODE_OF_CONDUCT_ID,
   },
