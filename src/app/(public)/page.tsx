@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { type Metadata } from "next";
 
 import HeroVisual from "@/components/common/HeroVisual";
+import ManifestoSection from "@/components/common/ManifestoSection";
 import PageSection, {
   FULL_SCREEN_SECTION,
   SECTION_CONTAINER,
 } from "@/components/common/PageSection";
-import PromiseSection from "@/components/common/PromiseSection";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ACTIVITIES } from "@/data/about";
@@ -189,7 +189,7 @@ export default async function HomePage() {
       </PageSection>
 
       {/* 8. 약속 */}
-      <PromiseSection fullScreen page="home" />
+      <ManifestoSection />
 
       {/* ↳ 상세 카드 (?project=) — 카드를 눌러도 홈을 떠나지 않는다 */}
       <Suspense fallback={null}>

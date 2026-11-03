@@ -53,6 +53,27 @@
       scroll-padding-top: 4rem;
     }
   }
+
+  /*
+   * 스크롤 진입 등장 (components/common/RevealOnScroll). 아래에서 20px 떠오르며 0.7초 동안 나타나고,
+   * --reveal-order 한 칸마다 0.1초 늦게 나온다. JS 가 꺼져 있거나 "모션 줄이기"면 숨기지 않는다.
+   * 항목 자체에는 hover 이동(translate)을 주지 말고 안쪽 요소에 준다 — 여기 translate 와 겹친다.
+   */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    [data-reveal] [data-reveal-item] {
+      opacity: 0;
+      translate: 0 20px;
+      transition:
+        opacity 700ms ease-out,
+        translate 700ms cubic-bezier(0.2, 0, 0, 1);
+      transition-delay: calc(var(--reveal-order, 0) * 100ms);
+    }
+
+    [data-reveal="shown"] [data-reveal-item] {
+      opacity: 1;
+      translate: none;
+    }
+  }
 }
 
 /*
