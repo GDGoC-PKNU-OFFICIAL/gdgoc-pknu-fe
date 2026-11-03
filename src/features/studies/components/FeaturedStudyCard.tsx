@@ -6,10 +6,6 @@ import { cn } from "@/lib/cn";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Study } from "@/types/api";
 
-import { studyVisualKind } from "../lib/study-visual";
-
-import StudyVisual from "./StudyVisual";
-
 interface FeaturedStudyCardProps {
   study: Study;
   /** 0 부터. "STUDY 01" 처럼 보여 준다 */
@@ -19,7 +15,7 @@ interface FeaturedStudyCardProps {
 /**
  * 홈 진행 중 스터디 큰 카드 (P-00 #5). 서버 컴포넌트다.
  * 카드 전체가 Studies 페이지(맨 위부터)로 가는 링크다 — 제목 링크를 카드 크기로 넓힌다 (after:inset-0).
- * hover: 3~4px 떠오르고 파란 빛이 짙어지며 그림 · 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
+ * hover: 3~4px 떠오르고 파란 빛이 짙어지며 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
  */
 export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardProps) {
   const { topic, title, summary, period, participants, format } = study;
@@ -33,7 +29,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
   return (
     <article
       className={cn(
-        "group relative isolate flex h-full min-h-80 flex-col overflow-hidden rounded-[28px] border border-[#e4e9f4] p-7 md:p-9",
+        "group relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-[28px] border border-[#e4e9f4] p-7 md:p-9",
         "bg-[linear-gradient(140deg,#ffffff_0%,#f4f7ff_55%,#e8efff_100%)] shadow-[0_32px_64px_-40px_rgba(66,133,244,0.55)]",
         "transition duration-300 ease-out hover:-translate-y-1 active:scale-[0.99]",
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
@@ -68,15 +64,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
         </span>
       </div>
 
-      {/* 모바일은 글 위에, 넓은 화면은 카드 오른쪽에 놓아 글과 겹치지 않게 한다 */}
-      <div className="pointer-events-none mx-auto mt-2 w-40 sm:absolute sm:top-1/2 sm:right-8 sm:mt-0 sm:w-56 sm:-translate-y-1/2 lg:right-6 lg:w-52">
-        <StudyVisual
-          kind={studyVisualKind(topic)}
-          className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none"
-        />
-      </div>
-
-      <div className="mt-auto flex flex-col gap-3 pt-6 sm:max-w-[55%] lg:max-w-[52%]">
+      <div className="mt-auto flex flex-col gap-3 pt-10">
         <h3 className="text-2xl font-bold tracking-tight break-keep md:text-[28px]">
           <Link
             href={PUBLIC_ROUTES.studies}
