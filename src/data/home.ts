@@ -11,7 +11,11 @@ export const HERO = {
 } as const;
 
 export const HOME_SECTIONS = {
-  stats: { badge: "활동 기록", title: "By the Numbers" },
+  stats: {
+    badge: "활동 기록",
+    title: "By the Numbers",
+    caption: "부경대학교에서 매 학기 세션 · 스터디 · 프로젝트를 이어 가며 쌓아 온 기록입니다.",
+  },
   about: {
     badge: "동아리 소개",
     title: "What We Do",

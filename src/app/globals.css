@@ -41,6 +41,18 @@
   :target {
     scroll-margin-top: 5rem;
   }
+
+  /*
+   * 한 화면에 섹션 하나 (홈). 태블릿 · 데스크톱에서만 가까운 섹션 시작점으로 부드럽게 맞춘다.
+   * proximity 라 강제로 끌어당기지 않고, 휠 · 키보드 스크롤은 그대로 자유롭다. 모바일은 스냅하지 않는다.
+   * scroll-padding-top 은 고정 Header(h-16) 높이 — 섹션 시작이 Header 밑에 가려지지 않게.
+   */
+  @media (width >= 48rem) {
+    html:has([data-scroll-snap]) {
+      scroll-snap-type: y proximity;
+      scroll-padding-top: 4rem;
+    }
+  }
 }
 
 /*
