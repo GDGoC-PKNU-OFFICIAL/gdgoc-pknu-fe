@@ -98,6 +98,18 @@ export function formatYearMonth(year: number, month: number): YearMonth {
   return `${year}.${String(month).padStart(2, "0")}`;
 }
 
+/** "YYYY.MM" 에서 delta 개월 이동 — 캘린더 이전 · 다음 달 */
+export function shiftYearMonth(value: YearMonth, delta: number): YearMonth {
+  const { year, month } = parseYearMonth(value);
+  const shifted = year * 12 + (month - 1) + delta;
+  return formatYearMonth(Math.floor(shifted / 12), (shifted % 12) + 1);
+}
+
+/** "YYYY-MM-DD" → "YYYY.MM.DD" — 모집 기간 · 일정 날짜 표시 */
+export function formatIsoDate(date: IsoDate): string {
+  return date.replaceAll("-", ".");
+}
+
 /**
  * 프로젝트 · 스터디 기간 표시. end 가 없으면 진행 중 (IA 10-1 "2026.03 – 진행 중").
  * @example formatMonthPeriod({ start: "2025.03", end: "2025.06" }) // "2025.03 – 2025.06"

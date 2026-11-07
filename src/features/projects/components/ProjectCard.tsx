@@ -20,10 +20,9 @@ interface ProjectCardProps {
 /**
  * 프로젝트 카드 (C-02, IA 5-2). 서버 컴포넌트다.
  *
- * "자세히 보기"는 평범한 링크(/projects?project=slug)다.
- * - 홈 등 다른 페이지: 그대로 /projects 로 이동해 상세 카드가 열린다 (공유 링크 진입과 같은 동작)
- * - /projects 안: ProjectDetailController 가 data-project-detail 링크 클릭을 가로채
- *   히스토리 push + 카드가 커지는 전환으로 연다 (IA 6-3)
+ * 카드 전체가 상세 카드를 여는 링크다. 제목 링크의 ::after 를 카드 전체로 늘린다 —
+ * 카드를 통째로 <a> 로 감싸지 않으므로 스크린리더는 제목만 링크 이름으로 읽는다.
+ * ProjectDetailController 가 data-project-detail 링크 클릭을 가로채 히스토리 push + 카드가 커지는 전환으로 연다 (IA 6-3).
  * 썸네일의 data-project-thumb 는 그 전환에서 시작 위치를 찾는 데 쓴다.
  */
 export default function ProjectCard({ project }: ProjectCardProps) {
@@ -32,7 +31,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   const hiddenTechCount = techStack.length - visibleTech.length;
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface">
+    <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-[border-color,box-shadow] hover:border-brand-blue hover:shadow-md has-[a:focus-visible]:border-brand-blue has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-blue/30">
       <div data-project-thumb={slug} className="relative aspect-video bg-surface-muted">
         {/* 제목이 바로 아래 있으므로 장식 이미지로 둔다 */}
         <SafeImage
@@ -49,7 +48,17 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <Badge tone={PROJECT_CATEGORY_TONES[category]} className="self-start">
           {PROJECT_CATEGORY_LABELS[category]}
         </Badge>
-        <h3 className="line-clamp-2 text-lg font-semibold break-keep">{title}</h3>
+        <h3 className="line-clamp-2 text-lg font-semibold break-keep">
+          <Link
+            href={projectDetailHref(slug)}
+            scroll={false}
+            data-project-detail={slug}
+            className="outline-none after:absolute after:inset-0"
+          >
+            {title}
+            <span className="sr-only"> 자세히 보기</span>
+          </Link>
+        </h3>
         <p className="line-clamp-2 text-sm break-keep text-ink-muted">{summary}</p>
         <p className="text-sm text-ink-muted tabular-nums">{formatMonthPeriod(period)}</p>
 
@@ -67,16 +76,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             )}
           </ul>
         )}
-
-        <Link
-          href={projectDetailHref(slug)}
-          scroll={false}
-          data-project-detail={slug}
-          className="mt-auto inline-flex min-h-11 items-center gap-1 self-end text-sm font-medium text-brand-blue hover:underline"
-        >
-          <span className="sr-only">{title} </span>자세히 보기
-          <span aria-hidden="true">→</span>
-        </Link>
       </div>
     </article>
   );
