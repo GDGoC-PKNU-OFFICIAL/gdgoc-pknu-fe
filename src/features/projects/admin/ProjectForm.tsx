@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { type FormEvent, useCallback, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -16,6 +16,7 @@ import { useDraft } from "@/components/admin/hooks/use-draft";
 import { useLeaveWarning } from "@/components/admin/hooks/use-leave-warning";
 import { useSlowNotice } from "@/components/admin/hooks/use-slow-notice";
 import { useSlugCheck } from "@/components/admin/hooks/use-slug-check";
+import ImageUploadField, { type UploadStatus } from "@/components/admin/ImageUploadField";
 import { applyFieldErrors } from "@/components/admin/lib/apply-field-errors";
 import { draftKey } from "@/components/admin/lib/draft-storage";
 import { listErrors } from "@/components/admin/lib/list-errors";
@@ -24,7 +25,6 @@ import { adminYears } from "@/components/admin/lib/year-options";
 import StringListField from "@/components/admin/StringListField";
 import TagInput from "@/components/admin/TagInput";
 import YearMonthSelect from "@/components/admin/YearMonthSelect";
-import SafeImage from "@/components/common/SafeImage";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -59,6 +59,8 @@ const MESSAGES = {
   saved: "저장했습니다. 사이트에 곧 반영됩니다.",
   invalid: "입력값을 확인해 주세요.",
   slugTaken: "이미 사용 중인 슬러그입니다.",
+  uploading: "이미지 업로드가 끝난 뒤 저장해 주세요.",
+  uploadFailed: "이미지 업로드에 실패했습니다. 다시 시도하거나 선택을 취소해 주세요.",
 } as const;
 
 /** 종료월로 계산한 진행 상태 (명세 1-4). 아직 고르는 중이면 null */
@@ -80,7 +82,7 @@ interface ProjectFormProps {
 /**
  * A-12 · A-13 프로젝트 등록 · 수정 폼 (IA 8-4 · FRONT_ARCHITECTURE § 5-4).
  * react-hook-form + zod(1차 검증) + useDraft(임시 저장) + useAdminMutation(저장 · 토스트 · 401).
- * 썸네일 업로드(#28)는 presign API(BE Phase 4)가 생긴 뒤 붙인다 — 지금은 기존 썸네일 유지 · 제거만 된다.
+ * 썸네일은 ImageUploadField(presign → R2 직접 PUT)로 올리고, 업로드 중 · 실패 상태에서는 저장을 막는다 (§ 5-5).
  */
 export default function ProjectForm({ project }: ProjectFormProps) {
   const router = useRouter();
@@ -109,6 +111,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
   const { run, pending } = useAdminMutation();
   const slow = useSlowNotice(pending);
   const [saved, setSaved] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
   useLeaveWarning(isDirty && !saved);
 
   // 슬러그: 등록 폼에서 슬러그를 직접 고치기 전까지는 제목에서 제안한다 (IA 8-4)
@@ -133,7 +136,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
   );
   const status = statusOfEnd(values.period?.end ?? "", currentYearMonth);
 
-  const onSubmit = form.handleSubmit(
+  const submit = form.handleSubmit(
     async (output) => {
       if (slugStatus === "taken") {
         setError("slug", { type: "server", message: MESSAGES.slugTaken }, { shouldFocus: true });
@@ -162,6 +165,16 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     },
     () => toast.error(MESSAGES.invalid),
   );
+
+  // 업로드가 끝나지 않았거나 실패했으면 저장하지 않는다 — 이전 썸네일이 조용히 저장되는 것을 막는다 (IA F-5)
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    if (uploadStatus !== "idle") {
+      event.preventDefault();
+      toast.error(uploadStatus === "uploading" ? MESSAGES.uploading : MESSAGES.uploadFailed);
+      return;
+    }
+    return submit(event);
+  };
 
   const slugHint =
     slugStatus === "checking"
@@ -329,30 +342,21 @@ export default function ProjectForm({ project }: ProjectFormProps) {
             control={control}
             name="thumbnailUrl"
             render={({ field, fieldState }) => (
-              <FormFieldset
+              <ImageUploadField
                 id="project-thumbnailUrl"
                 legend="썸네일 이미지 (16:9)"
-                hint="이미지 업로드는 다음 작업에서 추가됩니다. 지금은 기존 썸네일을 유지하거나 제거할 수 있습니다."
+                target="project"
+                hint="jpg · png · webp, 5MB 이하. 16:9 로 잘린 모습이 공개 카드에 표시됩니다."
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+                fallbackSrc={DEFAULT_PROJECT_IMAGE}
+                aspect="video"
                 error={fieldState.error?.message}
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                  <div className="relative aspect-video w-full max-w-64 overflow-hidden rounded-lg border border-line bg-surface-muted">
-                    <SafeImage
-                      src={field.value}
-                      fallbackSrc={DEFAULT_PROJECT_IMAGE}
-                      alt={field.value ? "현재 썸네일" : "기본 이미지"}
-                      fill
-                      sizes="256px"
-                      className="object-cover"
-                    />
-                  </div>
-                  {field.value !== null && (
-                    <Button variant="secondary" onClick={() => field.onChange(null)}>
-                      썸네일 제거
-                    </Button>
-                  )}
-                </div>
-              </FormFieldset>
+                onStatusChange={setUploadStatus}
+                onBeforeUpload={draft.saveNow}
+              />
             )}
           />
         </FormSection>
