@@ -24,6 +24,7 @@ export const ADMIN_ROUTES = {
   projects: "/admin/projects",
   projectsNew: "/admin/projects/new",
   studies: "/admin/studies",
+  studiesNew: "/admin/studies/new",
   events: "/admin/events",
   members: "/admin/members",
   settings: "/admin/settings",
