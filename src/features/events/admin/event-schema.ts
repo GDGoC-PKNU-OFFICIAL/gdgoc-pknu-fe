@@ -7,6 +7,7 @@
 import { z } from "zod";
 
 import { EVENT_LIMITS } from "@/constants/limits";
+import { isIsoDate } from "@/lib/date";
 import { EVENT_CATEGORIES, type EventCategory, type EventItem } from "@/types/api";
 import type { EventRequest } from "@/types/request";
 
@@ -20,15 +21,6 @@ const MESSAGES = {
   endDate: "날짜 형식이 올바르지 않습니다.",
   dateOrder: "종료일은 시작일과 같거나 그 이후여야 합니다.",
 } as const;
-
-const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-/** "YYYY-MM-DD" 이면서 실제로 있는 날짜인지 (2026-02-30 같은 값을 거른다) */
-export function isIsoDate(value: string): boolean {
-  if (!ISO_DATE_PATTERN.test(value)) return false;
-  const date = new Date(`${value}T00:00:00Z`);
-  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
-}
 
 const requiredText = (max: number) =>
   z.string().trim().min(1, MESSAGES.required).max(max, MESSAGES.maxLength(max));

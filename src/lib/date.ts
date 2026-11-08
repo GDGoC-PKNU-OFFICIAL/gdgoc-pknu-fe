@@ -68,6 +68,15 @@ export function todayKst(): IsoDate {
   return toKstDate(new Date());
 }
 
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/** "YYYY-MM-DD" 이면서 실제로 있는 날짜인지 (2026-02-30 같은 값을 거른다) */
+export function isIsoDate(value: string): value is IsoDate {
+  if (!ISO_DATE_PATTERN.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
+}
+
 /** 이번 달(KST) "YYYY.MM" — 캘린더 초기 월 등 */
 export function currentYearMonthKst(): YearMonth {
   return todayKst().slice(0, 7).replace("-", ".");

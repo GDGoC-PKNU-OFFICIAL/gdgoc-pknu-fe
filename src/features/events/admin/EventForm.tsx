@@ -24,7 +24,7 @@ import { ADMIN_ROUTES } from "@/constants/routes";
 import { useToast } from "@/hooks/use-toast";
 import { createEvent, updateEvent } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
-import { formatKstDateTime } from "@/lib/date";
+import { formatKstDateTime, isIsoDate } from "@/lib/date";
 import { EVENT_CATEGORIES, type EventCategory, type EventItem } from "@/types/api";
 
 import { EVENT_CATEGORY_STYLES, formatEventDate } from "../lib/event-labels";
@@ -35,7 +35,6 @@ import {
   type EventFormValues,
   eventFormSchema,
   eventToForm,
-  isIsoDate,
   toEventRequest,
 } from "./event-schema";
 
