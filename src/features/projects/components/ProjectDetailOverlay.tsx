@@ -7,6 +7,7 @@ import Badge from "@/components/ui/Badge";
 import { buttonStyles } from "@/components/ui/Button";
 import Tag from "@/components/ui/Tag";
 import { PROJECT_CATEGORY_LABELS } from "@/constants/labels";
+import { trackEvent } from "@/lib/analytics";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Project } from "@/types/api";
 
@@ -189,12 +190,24 @@ function ProjectDetailContent({ project, titleId, onRequestClose }: ProjectDetai
             {hasLinks && (
               <div className="flex flex-wrap gap-2">
                 {links.github && (
-                  <ExternalButton href={links.github} variant="primary">
+                  <ExternalButton
+                    href={links.github}
+                    variant="primary"
+                    onClick={() =>
+                      trackEvent("project_link_click", { slug: project.slug, link_type: "github" })
+                    }
+                  >
                     GitHub
                   </ExternalButton>
                 )}
                 {links.demo && (
-                  <ExternalButton href={links.demo} variant="secondary">
+                  <ExternalButton
+                    href={links.demo}
+                    variant="secondary"
+                    onClick={() =>
+                      trackEvent("project_link_click", { slug: project.slug, link_type: "demo" })
+                    }
+                  >
                     데모
                   </ExternalButton>
                 )}
@@ -229,16 +242,18 @@ function BulletList({ items }: { items: string[] }) {
 interface ExternalButtonProps {
   href: string;
   variant: "primary" | "secondary";
+  onClick?: () => void;
   children: ReactNode;
 }
 
 /** 외부 링크는 새 탭 (IA 3-4) */
-function ExternalButton({ href, variant, children }: ExternalButtonProps) {
+function ExternalButton({ href, variant, onClick, children }: ExternalButtonProps) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={onClick}
       className={buttonStyles({ variant, className: "flex-1" })}
     >
       {children}

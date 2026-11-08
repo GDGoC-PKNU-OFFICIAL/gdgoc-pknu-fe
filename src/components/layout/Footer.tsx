@@ -2,10 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import BackToTop from "@/components/layout/BackToTop";
-import SocialIcon from "@/components/layout/SocialIcon";
+import SocialLinks from "@/components/layout/SocialLinks";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { SITE } from "@/data/site";
-import { SOCIAL_LINKS } from "@/data/social-links";
 
 /**
  * 공개 사이트 Footer (IA 3-3). 검은 바탕 — 로고는 글자만 흰 버전(gdgoc-pknu-white.svg)을 쓴다.
@@ -43,22 +42,8 @@ export default function Footer() {
             </a>
           </div>
 
-          {/* SNS — 로고 아이콘만, 순서 GitHub → Discord → Instagram */}
-          <ul className="-ml-2 flex gap-2">
-            {SOCIAL_LINKS.map(({ channel, ariaLabel, href }) => (
-              <li key={channel}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={ariaLabel}
-                  className="flex size-14 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                >
-                  <SocialIcon channel={channel} className="size-9" />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {/* SNS — GA4 sns_click 을 세려고 클라이언트 컴포넌트로 뺐다 */}
+          <SocialLinks />
         </div>
 
         {/* 하단 바 */}

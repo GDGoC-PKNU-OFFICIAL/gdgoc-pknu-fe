@@ -27,7 +27,12 @@ export default async function MembersPage() {
       <PageHeader title={MEMBERS_HEADER.title} description={MEMBERS_HEADER.description} />
 
       <PageSection id="core-members" badge={CORE_MEMBERS.badge} title={CORE_MEMBERS.title}>
-        <MemberCarousel label="코어멤버" members={core} emptyMessage={CORE_MEMBERS.empty} />
+        <MemberCarousel
+          label="코어멤버"
+          members={core}
+          emptyMessage={CORE_MEMBERS.empty}
+          analyticsSection="core_members"
+        />
       </PageSection>
 
       <PageSection
@@ -36,7 +41,12 @@ export default async function MembersPage() {
         title={SENIORS.title}
         subtitle={SENIORS.subtitle}
       >
-        <MemberCarousel label="시니어" members={senior} emptyMessage={SENIORS.empty} />
+        <MemberCarousel
+          label="시니어"
+          members={senior}
+          emptyMessage={SENIORS.empty}
+          analyticsSection="seniors"
+        />
       </PageSection>
 
       <PromiseSection page="members" />
