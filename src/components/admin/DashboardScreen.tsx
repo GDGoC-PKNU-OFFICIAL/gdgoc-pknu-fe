@@ -193,10 +193,11 @@ export default function DashboardScreen() {
         />
       </div>
 
+      {/* grid 칸은 기본 최소 너비가 내용 크기라, 한 줄로 자르는(truncate) 긴 제목이 칸을 밀어낸다 — 각 칸에 min-w-0 */}
       <div className="grid gap-4 lg:grid-cols-2">
         <section
           aria-labelledby="dashboard-upcoming"
-          className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5"
+          className="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface p-5"
         >
           <h2 id="dashboard-upcoming" className="text-sm font-semibold">
             다가오는 일정
@@ -224,7 +225,7 @@ export default function DashboardScreen() {
 
         <section
           aria-labelledby="dashboard-recent"
-          className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5"
+          className="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface p-5"
         >
           <h2 id="dashboard-recent" className="text-sm font-semibold">
             최근 수정
