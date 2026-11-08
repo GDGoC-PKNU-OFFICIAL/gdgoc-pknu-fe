@@ -27,6 +27,7 @@ export const ADMIN_ROUTES = {
   studiesNew: "/admin/studies/new",
   events: "/admin/events",
   members: "/admin/members",
+  membersNew: "/admin/members/new",
   settings: "/admin/settings",
 } as const;
 
