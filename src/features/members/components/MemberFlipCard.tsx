@@ -30,6 +30,12 @@ const FADE_IN = cn(
   "motion-reduce:group-data-[flipped=true]:opacity-100",
 );
 
+/** 미리보기(관리자 폼): 마우스 · 포커스로는 뒤집지 않고 [전면] · [후면] 버튼으로만 뒤집는다 */
+const PREVIEW_ROTATE = "motion-safe:group-data-[flipped=true]:rotate-y-180";
+const PREVIEW_FADE_OUT = "motion-reduce:group-data-[flipped=true]:opacity-0";
+const PREVIEW_FADE_IN =
+  "motion-reduce:opacity-0 motion-reduce:group-data-[flipped=true]:opacity-100";
+
 const FACE = cn(
   "absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-line backface-hidden",
   "motion-reduce:transition-opacity motion-reduce:duration-200",
@@ -44,6 +50,11 @@ interface MemberFlipCardProps {
   member: Member;
   /** 카드를 눌렀을 때 갈 경로. 홈은 Members 페이지이고, Members 페이지 안에서는 없다 */
   href?: string;
+  /**
+   * 관리자 폼 미리보기(A-42 · A-43)에서 보여 줄 면. 주면 카드가 상호작용 없이 이 면만 보여 준다
+   * (링크 · 포커스 · hover 뒤집기 없음). 내용은 바로 옆 입력 폼과 같으므로 스크린 리더에서는 숨긴다.
+   */
+  previewFace?: "front" | "back";
 }
 
 /**
@@ -54,7 +65,7 @@ interface MemberFlipCardProps {
  * - 터치: 첫 탭으로 뒤집고, 뒤집힌 카드를 다시 탭하면 이동한다 (링크가 없으면 탭할 때마다 뒤집는다)
  * 앞/뒤 상태는 URL 에 남기지 않는다 (IA 6-2). 슬라이드 트랙에서 스와이프하면 브라우저가 click 을 내지 않아 뒤집히지 않는다.
  */
-export default function MemberFlipCard({ member, href }: MemberFlipCardProps) {
+export default function MemberFlipCard({ member, href, previewFace }: MemberFlipCardProps) {
   const { name, department, history, interests, part, bio, photoUrl } = member;
   /** 터치에서만 쓴다. 마우스 · 키보드는 CSS 로 뒤집는다 */
   const [flipped, setFlipped] = useState(false);
@@ -69,17 +80,25 @@ export default function MemberFlipCard({ member, href }: MemberFlipCardProps) {
     }
   }
 
+  const preview = previewFace !== undefined;
+
   // 링크 안에 들어가므로 블록 요소 없이 span 으로만 구성한다
   const faces = (
     <span
       className={cn(
         "relative block h-full transition-transform duration-500 transform-3d",
         "motion-reduce:transition-none",
-        ROTATE,
+        preview ? PREVIEW_ROTATE : ROTATE,
       )}
     >
       {/* 전면 */}
-      <span className={cn(FACE, "items-center gap-3 bg-surface p-5", FADE_OUT)}>
+      <span
+        className={cn(
+          FACE,
+          "items-center gap-3 bg-surface p-5",
+          preview ? PREVIEW_FADE_OUT : FADE_OUT,
+        )}
+      >
         <span className="relative size-32 shrink-0 overflow-hidden rounded-2xl bg-surface-muted">
           {/* 이름이 바로 아래 있으므로 장식 이미지로 둔다 */}
           <SafeImage
@@ -126,12 +145,13 @@ export default function MemberFlipCard({ member, href }: MemberFlipCardProps) {
         className={cn(
           FACE,
           "items-center justify-center gap-5 bg-surface-muted p-6 text-center motion-safe:rotate-y-180",
-          FADE_IN,
+          preview ? PREVIEW_FADE_IN : FADE_IN,
         )}
       >
         <span className="flex flex-col gap-1">
           <span className="text-xs text-ink-muted">분야</span>
-          <span className="text-lg font-semibold">{MEMBER_PART_LABELS[part]}</span>
+          {/* 관리자 미리보기에서는 분야를 아직 고르지 않았을 수 있다 */}
+          <span className="text-lg font-semibold">{MEMBER_PART_LABELS[part] ?? "—"}</span>
         </span>
         <span className="flex flex-col gap-1">
           <span className="text-xs text-ink-muted">한 줄 소개</span>
@@ -140,6 +160,14 @@ export default function MemberFlipCard({ member, href }: MemberFlipCardProps) {
       </span>
     </span>
   );
+
+  if (preview) {
+    return (
+      <div aria-hidden="true" data-flipped={previewFace === "back"} className={CARD}>
+        {faces}
+      </div>
+    );
+  }
 
   if (!href) {
     return (
