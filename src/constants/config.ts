@@ -42,3 +42,9 @@ export const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 /** 슬러그 중복 확인 — 입력이 멈춘 뒤 이 시간이 지나면 서버에 묻는다 (A-12 · A-13) */
 export const SLUG_CHECK_DELAY_MS = 400;
+
+/**
+ * R2 직접 업로드(PUT) 타임아웃. 5MB 를 느린 회선(약 1Mbps)에서도 올릴 수 있는 여유를 둔다.
+ * Presigned URL 은 5분 유효하지만 발급 직후 바로 올리므로 그보다 짧게 끊는다.
+ */
+export const UPLOAD_TIMEOUT_MS = 90_000;

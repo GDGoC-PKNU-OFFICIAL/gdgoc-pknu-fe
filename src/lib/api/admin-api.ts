@@ -3,16 +3,24 @@
 // 쿠키는 같은 origin 이라 자동으로 실린다. 실패는 http.ts 가 ApiError 로 던진다 — 401 이면 호출부가 로그인으로 보낸다.
 // 도메인 CRUD 는 각 관리자 화면을 만들 때 아래 "리소스별" 구역에 추가한다.
 
-import { ADMIN_API_TIMEOUT_MS } from "@/constants/config";
-import type { Project, SessionResponse, SlugCheckResponse } from "@/types/api";
+import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
+import type {
+  ImageContentType,
+  PresignResponse,
+  Project,
+  SessionResponse,
+  SlugCheckResponse,
+} from "@/types/api";
 import type { Page } from "@/types/common";
 import type {
   LoginRequest,
+  PresignRequest,
   ProjectListQuery,
   ProjectRequest,
   SlugCheckQuery,
 } from "@/types/request";
 
+import { ApiError } from "./api-error";
 import { requestJson } from "./http";
 
 /** BFF 가 Spring 콜드 스타트를 기다리는 시간보다 조금 길게 — BFF 의 504 를 받아 메시지를 보여 주기 위해 */
@@ -116,4 +124,50 @@ export function checkProjectSlug(
   signal?: AbortSignal,
 ): Promise<SlugCheckResponse> {
   return getJson<SlugCheckResponse>(withQuery("/projects/slug-check", { ...query }), signal);
+}
+
+// ============================================================
+// 2-9 이미지 업로드 (FRONT_ARCHITECTURE § 5-5)
+// ============================================================
+
+/**
+ * ① 업로드 주소 발급 (BFF 경유). 형식 · 신고 용량 위반은 400 INVALID_FILE_TYPE · FILE_TOO_LARGE
+ * (fieldErrors: contentType · size — 폼 필드가 아니므로 호출부가 업로드 칸의 에러로 보여 준다)
+ */
+export function presignUpload(body: PresignRequest): Promise<PresignResponse> {
+  return sendJson<PresignResponse>("POST", "/uploads/presign", body);
+}
+
+/**
+ * ② 발급받은 주소로 R2 에 직접 PUT (BFF · Spring 을 거치지 않는다 — 명세 2-9).
+ * Content-Type 이 서명에 포함되므로 발급 요청과 같은 값을 보낸다. 쿠키는 보내지 않는다(다른 origin).
+ * R2 는 JSON 이 아닌 XML 에러를 돌려주므로 본문은 읽지 않고 상태만 본다.
+ */
+export async function uploadToPresignedUrl(
+  uploadUrl: string,
+  file: Blob,
+  contentType: ImageContentType,
+  signal?: AbortSignal,
+): Promise<void> {
+  const timeout = AbortSignal.timeout(UPLOAD_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": contentType },
+      body: file,
+      credentials: "omit",
+      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    });
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === "AbortError") throw cause;
+    throw ApiError.fromFetchFailure(cause);
+  }
+  if (!res.ok) {
+    throw new ApiError(
+      res.status,
+      "INTERNAL_ERROR",
+      `이미지 업로드에 실패했습니다. (HTTP ${res.status})`,
+    );
+  }
 }
