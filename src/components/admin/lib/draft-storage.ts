@@ -29,6 +29,9 @@ export interface Draft<T> {
   serverUpdatedAt: IsoDateTime | null;
 }
 
+/** 사이트 설정(A-50)은 단일 레코드라 id 가 없다 — "gdg-admin-draft:settings" */
+export const SETTINGS_DRAFT_KEY = `${DRAFT_KEY_PREFIX}settings`;
+
 /** @example draftKey("projects", "new") // "gdg-admin-draft:projects:new" */
 export function draftKey(resource: DraftResource, id: number | "new"): string {
   return `${DRAFT_KEY_PREFIX}${resource}:${id}`;

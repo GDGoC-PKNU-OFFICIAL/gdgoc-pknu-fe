@@ -6,11 +6,13 @@
 import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
 import type {
   AdminMember,
+  Dashboard,
   EventItem,
   ImageContentType,
   PresignResponse,
   Project,
   SessionResponse,
+  SiteSetting,
   SlugCheckResponse,
   Study,
 } from "@/types/api";
@@ -23,6 +25,7 @@ import type {
   MemberListQuery,
   MemberRequest,
   PresignRequest,
+  SettingRequest,
   ProjectListQuery,
   ProjectRequest,
   SlugCheckQuery,
@@ -240,6 +243,25 @@ export function updateMember(id: number, body: MemberRequest): Promise<AdminMemb
 /** 삭제 → 204. 프로젝트 · 스터디 기록에는 영향 없다 (참여자는 이름 문자열) */
 export function deleteMember(id: number): Promise<void> {
   return deleteResource(`/members/${id}`);
+}
+
+// ============================================================
+// 2-8 사이트 설정 · 대시보드
+// ============================================================
+
+/** A-50 설정 폼 초기값. 아직 한 번도 저장하지 않았으면 404 NOT_FOUND — 빈 폼으로 시작한다 */
+export function getAdminSettings(signal?: AbortSignal): Promise<SiteSetting> {
+  return getJson<SiteSetting>("/settings", signal);
+}
+
+/** A-50 저장 — 단일 레코드를 통째로 교체 (없으면 만든다). 통계는 정확히 4개 */
+export function updateSettings(body: SettingRequest): Promise<SiteSetting> {
+  return sendJson<SiteSetting>("PUT", "/settings", body);
+}
+
+/** A-00 요약 — 모집 상태 · 콘텐츠별 건수 · 다가오는 일정 3건 · 최근 수정 5건 */
+export function getDashboard(signal?: AbortSignal): Promise<Dashboard> {
+  return getJson<Dashboard>("/dashboard", signal);
 }
 
 // ============================================================
