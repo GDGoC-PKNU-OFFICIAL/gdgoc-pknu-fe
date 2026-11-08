@@ -10,6 +10,7 @@ import type {
   Project,
   SessionResponse,
   SlugCheckResponse,
+  Study,
 } from "@/types/api";
 import type { Page } from "@/types/common";
 import type {
@@ -18,6 +19,8 @@ import type {
   ProjectListQuery,
   ProjectRequest,
   SlugCheckQuery,
+  StudyListQuery,
+  StudyRequest,
 } from "@/types/request";
 
 import { ApiError } from "./api-error";
@@ -124,6 +127,43 @@ export function checkProjectSlug(
   signal?: AbortSignal,
 ): Promise<SlugCheckResponse> {
   return getJson<SlugCheckResponse>(withQuery("/projects/slug-check", { ...query }), signal);
+}
+
+// ============================================================
+// 2-5 스터디 관리
+// ============================================================
+
+/** A-21 목록. q 검색 대상: 제목 · 리더. 기본 정렬 periodStart,desc · 크기 20 (서버 기본값) */
+export function getAdminStudies(query: StudyListQuery, signal?: AbortSignal): Promise<Page<Study>> {
+  return getJson<Page<Study>>(withQuery("/studies", { ...query }), signal);
+}
+
+/** A-23 수정 폼 초기값. 없으면 404 NOT_FOUND */
+export function getAdminStudy(id: number, signal?: AbortSignal): Promise<Study> {
+  return getJson<Study>(`/studies/${id}`, signal);
+}
+
+/** A-22 등록 → 201 + Study. 슬러그 중복은 409 SLUG_DUPLICATED (fieldErrors: slug) */
+export function createStudy(body: StudyRequest): Promise<Study> {
+  return sendJson<Study>("POST", "/studies", body);
+}
+
+/** A-23 수정 (전체 필드 교체) → 200 + Study */
+export function updateStudy(id: number, body: StudyRequest): Promise<Study> {
+  return sendJson<Study>("PUT", `/studies/${id}`, body);
+}
+
+/** 삭제 → 204. 참여자 · 결과물 행도 함께 지워진다 */
+export function deleteStudy(id: number): Promise<void> {
+  return deleteResource(`/studies/${id}`);
+}
+
+/** 슬러그 중복 확인. 수정 화면은 excludeId 로 자기 자신을 뺀다 */
+export function checkStudySlug(
+  query: SlugCheckQuery,
+  signal?: AbortSignal,
+): Promise<SlugCheckResponse> {
+  return getJson<SlugCheckResponse>(withQuery("/studies/slug-check", { ...query }), signal);
 }
 
 // ============================================================
