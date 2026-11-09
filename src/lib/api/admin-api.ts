@@ -6,6 +6,7 @@
 import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
 import type {
   AdminMember,
+  EventItem,
   ImageContentType,
   PresignResponse,
   Project,
@@ -15,6 +16,9 @@ import type {
 } from "@/types/api";
 import type { Page } from "@/types/common";
 import type {
+  EventListQuery,
+  EventOrderRequest,
+  EventRequest,
   LoginRequest,
   MemberListQuery,
   MemberRequest,
@@ -167,6 +171,43 @@ export function checkStudySlug(
   signal?: AbortSignal,
 ): Promise<SlugCheckResponse> {
   return getJson<SlugCheckResponse>(withQuery("/studies/slug-check", { ...query }), signal);
+}
+
+// ============================================================
+// 2-6 일정 관리 (슬러그 없음 — slug-check 없음)
+// ============================================================
+
+/** A-31 목록. q 검색 대상: 제목. 기본 정렬 date,desc → 같은 날짜는 sortOrder 오름차순 */
+export function getAdminEvents(
+  query: EventListQuery,
+  signal?: AbortSignal,
+): Promise<Page<EventItem>> {
+  return getJson<Page<EventItem>>(withQuery("/events", { ...query }), signal);
+}
+
+/** A-33 수정 폼 초기값. 없으면 404 NOT_FOUND */
+export function getAdminEvent(id: number, signal?: AbortSignal): Promise<EventItem> {
+  return getJson<EventItem>(`/events/${id}`, signal);
+}
+
+/** A-32 등록 → 201. sortOrder 는 서버가 그 날짜의 마지막 순서 + 1 로 정한다 */
+export function createEvent(body: EventRequest): Promise<EventItem> {
+  return sendJson<EventItem>("POST", "/events", body);
+}
+
+/** A-33 수정 (전체 필드 교체). date 가 바뀌면 새 날짜의 마지막 순서로 간다 */
+export function updateEvent(id: number, body: EventRequest): Promise<EventItem> {
+  return sendJson<EventItem>("PUT", `/events/${id}`, body);
+}
+
+/** 삭제 → 204. 같은 날짜의 남은 순서 번호는 다시 매기지 않는다 */
+export function deleteEvent(id: number): Promise<void> {
+  return deleteResource(`/events/${id}`);
+}
+
+/** 같은 날짜 순서 변경 → 204. orderedIds 는 그 날짜의 일정 id 전체여야 한다 (누락 · 중복 · 다른 날짜 id 는 400) */
+export function reorderEvents(body: EventOrderRequest): Promise<void> {
+  return sendJson<void>("PUT", "/events/order", body);
 }
 
 // ============================================================
