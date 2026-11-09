@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useSearchParams } from "next/navigation";
 
+import { trackEvent } from "@/lib/analytics";
 import type { Project } from "@/types/api";
 
 import { PROJECT_THUMB_TRANSITION_NAME } from "../lib/project-labels";
@@ -62,7 +63,11 @@ export default function ProjectDetailController({ projects }: ProjectDetailContr
     if (!dialog) return;
     if (project) {
       lastSlugRef.current = project.slug;
-      if (!dialog.open) dialog.showModal();
+      if (!dialog.open) {
+        dialog.showModal();
+        // 목록에서 열기 · 공유 링크로 바로 들어오기 모두 센다 (IA 10-5)
+        trackEvent("project_detail_open", { slug: project.slug, status: project.status });
+      }
     } else if (dialog.open) {
       dialog.close(); // 브라우저 뒤로 가기 등으로 쿼리가 사라졌을 때
     }

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import CardSlider from "@/components/common/CardSlider";
 import EmptyState from "@/components/common/EmptyState";
+import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
 import { resolveSelectedYear, type YearGroup } from "../lib/group-by-year";
@@ -40,6 +41,7 @@ export default function PastProjectCarousel({ groups, emptyMessage }: PastProjec
     if (year === selectedYear) return;
     // 연도 변경은 히스토리를 쌓지 않는다 (IA 6-3). 슬라이드는 CardSlider 의 key 가 바뀌며 맨 앞으로 간다
     replaceUrl(urlWithQuery({ [PAST_YEAR_QUERY]: String(year) }));
+    trackEvent("year_select", { section: "past_projects", year });
   };
 
   return (

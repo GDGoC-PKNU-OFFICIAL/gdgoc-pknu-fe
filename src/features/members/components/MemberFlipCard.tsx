@@ -1,6 +1,6 @@
 "use client";
 
-import { type MouseEvent, useState } from "react";
+import { type FocusEvent, type MouseEvent, useRef, useState } from "react";
 
 import Link from "next/link";
 
@@ -8,6 +8,7 @@ import SafeImage from "@/components/common/SafeImage";
 import Badge from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
 import { MEMBER_PART_LABELS, MEMBER_ROLE_LABELS } from "@/constants/labels";
+import { type AnalyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import type { Member } from "@/types/api";
 
@@ -55,6 +56,8 @@ interface MemberFlipCardProps {
    * (링크 · 포커스 · hover 뒤집기 없음). 내용은 바로 옆 입력 폼과 같으므로 스크린 리더에서는 숨긴다.
    */
   previewFace?: "front" | "back";
+  /** GA4 member_card_flip 의 section (IA 10-5). 없으면 보내지 않는다 (관리자 미리보기 등) */
+  analyticsSection?: AnalyticsEvents["member_card_flip"]["section"];
 }
 
 /**
@@ -65,20 +68,44 @@ interface MemberFlipCardProps {
  * - 터치: 첫 탭으로 뒤집고, 뒤집힌 카드를 다시 탭하면 이동한다 (링크가 없으면 탭할 때마다 뒤집는다)
  * 앞/뒤 상태는 URL 에 남기지 않는다 (IA 6-2). 슬라이드 트랙에서 스와이프하면 브라우저가 click 을 내지 않아 뒤집히지 않는다.
  */
-export default function MemberFlipCard({ member, href, previewFace }: MemberFlipCardProps) {
+export default function MemberFlipCard({
+  member,
+  href,
+  previewFace,
+  analyticsSection,
+}: MemberFlipCardProps) {
   const { name, department, history, interests, part, bio, photoUrl } = member;
   /** 터치에서만 쓴다. 마우스 · 키보드는 CSS 로 뒤집는다 */
   const [flipped, setFlipped] = useState(false);
+  /** 같은 카드는 화면에 있는 동안 한 번만 센다 — hover 로 뒤집힐 때마다 이벤트가 쏟아지지 않게 */
+  const trackedRef = useRef(false);
+
+  /** 후면이 보이게 된 순간 (hover · 키보드 포커스 · 터치) — GA4 member_card_flip */
+  function trackFlip() {
+    if (!analyticsSection || trackedRef.current) return;
+    trackedRef.current = true;
+    trackEvent("member_card_flip", { section: analyticsSection, member_id: member.id });
+  }
 
   function handleClick(event: MouseEvent) {
     if (!window.matchMedia("(hover: none)").matches) return;
     if (!href) {
+      if (!flipped) trackFlip();
       setFlipped((value) => !value);
     } else if (!flipped) {
       event.preventDefault();
+      trackFlip();
       setFlipped(true);
     }
   }
+
+  /** 마우스 · 키보드는 CSS 로 뒤집히므로 같은 조건(hover · focus-visible)에서 센다 */
+  const flipTriggers = {
+    onMouseEnter: trackFlip,
+    onFocus: (event: FocusEvent<HTMLElement>) => {
+      if (event.currentTarget.matches(":focus-visible")) trackFlip();
+    },
+  };
 
   const preview = previewFace !== undefined;
 
@@ -171,14 +198,26 @@ export default function MemberFlipCard({ member, href, previewFace }: MemberFlip
 
   if (!href) {
     return (
-      <div tabIndex={0} data-flipped={flipped} onClick={handleClick} className={CARD}>
+      <div
+        tabIndex={0}
+        data-flipped={flipped}
+        onClick={handleClick}
+        {...flipTriggers}
+        className={CARD}
+      >
         {faces}
       </div>
     );
   }
 
   return (
-    <Link href={href} data-flipped={flipped} onClick={handleClick} className={CARD}>
+    <Link
+      href={href}
+      data-flipped={flipped}
+      onClick={handleClick}
+      {...flipTriggers}
+      className={CARD}
+    >
       {faces}
     </Link>
   );

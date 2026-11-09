@@ -18,7 +18,7 @@ export default function MemberGrid({ members, emptyMessage }: MemberGridProps) {
     <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {members.map((member) => (
         <li key={member.id}>
-          <MemberFlipCard member={member} href={PUBLIC_ROUTES.members} />
+          <MemberFlipCard member={member} href={PUBLIC_ROUTES.members} analyticsSection="home" />
         </li>
       ))}
     </ul>
