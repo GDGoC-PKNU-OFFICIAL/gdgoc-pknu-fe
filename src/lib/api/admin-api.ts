@@ -5,6 +5,7 @@
 
 import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
 import type {
+  AdminMember,
   ImageContentType,
   PresignResponse,
   Project,
@@ -15,6 +16,8 @@ import type {
 import type { Page } from "@/types/common";
 import type {
   LoginRequest,
+  MemberListQuery,
+  MemberRequest,
   PresignRequest,
   ProjectListQuery,
   ProjectRequest,
@@ -164,6 +167,38 @@ export function checkStudySlug(
   signal?: AbortSignal,
 ): Promise<SlugCheckResponse> {
   return getJson<SlugCheckResponse>(withQuery("/studies/slug-check", { ...query }), signal);
+}
+
+// ============================================================
+// 2-7 멤버 관리
+// ============================================================
+
+/** A-41 목록. q 검색 대상: 이름. 기본 정렬은 서버가 정한다 (구분 → 역할 순 → 이름) */
+export function getAdminMembers(
+  query: MemberListQuery,
+  signal?: AbortSignal,
+): Promise<Page<AdminMember>> {
+  return getJson<Page<AdminMember>>(withQuery("/members", { ...query }), signal);
+}
+
+/** A-43 수정 폼 · 플립 카드 미리보기 초기값 (consentConfirmedAt 포함). 없으면 404 NOT_FOUND */
+export function getAdminMember(id: number, signal?: AbortSignal): Promise<AdminMember> {
+  return getJson<AdminMember>(`/members/${id}`, signal);
+}
+
+/** A-42 등록 → 201. 주요 이력 3개 이상 · 공개 동의 미확인은 400 + fieldErrors */
+export function createMember(body: MemberRequest): Promise<AdminMember> {
+  return sendJson<AdminMember>("POST", "/members", body);
+}
+
+/** A-43 수정 (전체 필드 교체). 시니어면 role 은 null 이어야 한다 */
+export function updateMember(id: number, body: MemberRequest): Promise<AdminMember> {
+  return sendJson<AdminMember>("PUT", `/members/${id}`, body);
+}
+
+/** 삭제 → 204. 프로젝트 · 스터디 기록에는 영향 없다 (참여자는 이름 문자열) */
+export function deleteMember(id: number): Promise<void> {
+  return deleteResource(`/members/${id}`);
 }
 
 // ============================================================
