@@ -25,8 +25,11 @@ export default function StudyCard({ study }: { study: Study }) {
       <Badge tone="green" className="self-start">
         {topic}
       </Badge>
-      <h3 className="line-clamp-2 text-lg font-semibold break-keep">{title}</h3>
-      <p className="line-clamp-2 text-sm break-keep text-ink-muted">{summary}</p>
+      {/* 카드 규격을 맞추려고 제목은 1줄, 설명은 2줄 자리(짧아도 비워 둠), 방식 줄도 항상 둔다 */}
+      <h3 className="line-clamp-1 text-lg font-semibold break-all" title={title}>
+        {title}
+      </h3>
+      <p className="line-clamp-2 min-h-[2lh] text-sm break-keep text-ink-muted">{summary}</p>
 
       <dl className="mt-auto flex flex-col gap-1.5 border-t border-line pt-3 text-sm">
         <Row label="기간">
@@ -34,7 +37,7 @@ export default function StudyCard({ study }: { study: Study }) {
         </Row>
         <Row label="리더">{leader}</Row>
         <Row label="인원">{1 + participants.length}명</Row>
-        {format && <Row label="방식">{format}</Row>}
+        <Row label="방식">{format ?? "–"}</Row>
       </dl>
 
       {outputs.length > 0 && (

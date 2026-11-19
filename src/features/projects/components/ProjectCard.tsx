@@ -44,11 +44,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         />
       </div>
 
+      {/*
+        카드 규격을 맞추려고 글 칸 높이를 고정한다 — 제목 1줄, 설명 2줄 자리(짧아도 비워 둠),
+        기술 스택은 한 줄만 보이고 맨 아래에 붙는다. 그래서 어느 연도 · 줄에서도 카드 높이가 같다.
+      */}
       <div className="flex flex-1 flex-col gap-3 p-5">
         <Badge tone={PROJECT_CATEGORY_TONES[category]} className="self-start">
           {PROJECT_CATEGORY_LABELS[category]}
         </Badge>
-        <h3 className="line-clamp-2 text-lg font-semibold break-keep">
+        <h3 className="line-clamp-1 text-lg font-semibold break-all" title={title}>
           <Link
             href={projectDetailHref(slug)}
             scroll={false}
@@ -59,23 +63,26 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <span className="sr-only"> 자세히 보기</span>
           </Link>
         </h3>
-        <p className="line-clamp-2 text-sm break-keep text-ink-muted">{summary}</p>
+        <p className="line-clamp-2 min-h-[2lh] text-sm break-keep text-ink-muted">{summary}</p>
         <p className="text-sm text-ink-muted tabular-nums">{formatMonthPeriod(period)}</p>
 
-        {visibleTech.length > 0 && (
-          <ul aria-label="기술 스택" className="flex flex-wrap gap-1.5">
-            {visibleTech.map((tech) => (
-              <li key={tech} className="max-w-full">
-                <Tag>#{tech}</Tag>
-              </li>
-            ))}
-            {hiddenTechCount > 0 && (
-              <li>
-                <Tag aria-label={`외 ${hiddenTechCount}개`}>+{hiddenTechCount}</Tag>
-              </li>
-            )}
-          </ul>
-        )}
+        {/* 기술 스택이 없어도 같은 높이 자리를 둔다 */}
+        <div className="mt-auto h-5">
+          {visibleTech.length > 0 && (
+            <ul aria-label="기술 스택" className="flex h-5 flex-wrap gap-1.5 overflow-hidden">
+              {visibleTech.map((tech) => (
+                <li key={tech} className="max-w-full">
+                  <Tag>#{tech}</Tag>
+                </li>
+              ))}
+              {hiddenTechCount > 0 && (
+                <li>
+                  <Tag aria-label={`외 ${hiddenTechCount}개`}>+{hiddenTechCount}</Tag>
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
       </div>
     </article>
   );
