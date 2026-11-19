@@ -63,10 +63,12 @@ export default function SectionHeader({
       <Link
         href={link.href}
         className={cn(
-          "group inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-5 text-sm font-medium text-ink",
-          "transition-colors hover:border-brand-blue hover:text-brand-blue",
+          "group inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-5 text-sm font-medium",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
-          variant === "home" && "md:mt-1",
+          // 홈: 글자색 · 바탕색을 뒤집은 버튼 — 라이트는 검은 바탕 · 흰 글자, 다크는 흰 바탕 · 검은 글자 (ink ↔ surface)
+          variant === "home"
+            ? "bg-ink text-surface transition-opacity hover:opacity-85 md:mt-1"
+            : "border border-line bg-surface text-ink transition-colors hover:border-brand-blue hover:text-brand-blue",
         )}
       >
         <span className="sr-only">{link.label}: </span>
