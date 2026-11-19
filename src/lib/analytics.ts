@@ -5,7 +5,7 @@
 
 /** IA 10-5 표 그대로. 키 = 이벤트명, 값 = 파라미터 */
 export interface AnalyticsEvents {
-  sns_click: { channel: "github" | "discord" | "instagram" };
+  sns_click: { channel: "github" | "gmail" | "instagram" };
   project_detail_open: { slug: string; status: "current" | "past" };
   project_link_click: { slug: string; link_type: "github" | "demo" };
   year_select: { section: "past_projects"; year: number };

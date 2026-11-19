@@ -60,9 +60,6 @@ export const ADMIN_NEXT_PARAM = "next";
 export const ADMIN_REASON_PARAM = "reason";
 export const ADMIN_REASON_EXPIRED = "expired";
 
-/** About 의 동아리 강령 앵커 — 홈 약속 섹션 "동아리 강령 전체 보기" 링크 대상 (IA 3-4) */
-export const CODE_OF_CONDUCT_ID = "code-of-conduct";
-
 /**
  * GNB (IA 3-2). 배열 순서 = 화면 순서. 라벨은 영문 고정 문구다.
  * 개인정보처리방침은 GNB 에 두지 않는다 (Footer 하단 바).

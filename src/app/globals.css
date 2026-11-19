@@ -4,8 +4,13 @@
  * 브랜드 토큰 (PRD 3-2). Tailwind v4 는 CSS-first 설정이라 tailwind.config.ts 가 없다.
  * 여기 @theme 에 둔 값이 bg-brand-blue · text-ink-muted 같은 유틸리티로 생성된다.
  *
- * 다크 모드는 MVP 제외(PRD 8-1) → prefers-color-scheme 분기를 두지 않는다.
+ * 다크 모드: <html data-theme="dark"> 일 때 아래 [data-theme="dark"] 블록이 면 · 글자 토큰을 바꾼다.
+ * 토큰을 쓰는 곳(bg-surface · text-ink 등)은 저절로 따라오고, 색을 직접 적은 곳만 dark: 변형을 붙인다.
+ * 기본은 라이트이고 헤더 버튼(ThemeToggle)으로 바꾼다. 관리자 화면은 항상 라이트다.
  */
+
+/* dark: 변형은 OS 설정이 아니라 data-theme 속성을 따른다 */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @theme {
   /* Google 4색 — 로고 · 카테고리 · 강조에만 쓴다 */
   --color-brand-blue: #4285f4;
@@ -20,11 +25,94 @@
   --color-surface: #ffffff;
   --color-surface-muted: #f6f7f9;
 
-  /* 한글은 Geist 에 없으므로 OS 기본 한글 폰트로 넘어간다 */
+  /* 영문 · 숫자는 Geist, 한글은 웹 글꼴 Noto Sans KR. 글꼴을 못 받으면 OS 기본 한글 글꼴로 넘어간다 */
   --font-sans:
-    var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui,
-    sans-serif;
+    var(--font-geist-sans), var(--font-noto-sans-kr), "Apple SD Gothic Neo", "Malgun Gothic",
+    system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* 신호가 퍼지는 파동 (animate-signal) — 점 크기에서 3배까지 번지며 사라진다. 두 겹을 1초 엇갈려 쓴다 */
+  --animate-signal: signal 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  @keyframes signal {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(3.2);
+      opacity: 0;
+    }
+  }
+
+  /*
+    애니메이션 영화 오프닝처럼 통통 튀는 글자 (BouncyTitle). transform-origin 은 글자 바닥이다.
+    letter-drop: 위에서 떨어져 바닥에 닿으면 납작해졌다가(squash) 한 번 튀어 오르며 길쭉해지고(stretch) 자리를 잡는다.
+    letter-hop: 다 떨어진 뒤 한 글자가 움츠렸다가 폴짝 뛰어 다시 착지한다.
+  */
+  --animate-letter-drop: letter-drop 0.9s both;
+  --animate-letter-hop: letter-hop 0.8s both;
+  @keyframes letter-drop {
+    0% {
+      opacity: 0;
+      transform: translateY(-120%) scale(0.9, 1.15);
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    12% {
+      opacity: 1;
+    }
+    42% {
+      transform: translateY(0) scale(1.18, 0.78);
+      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+    }
+    64% {
+      transform: translateY(-16%) scale(0.95, 1.06);
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    80% {
+      transform: translateY(0) scale(1.07, 0.93);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1, 1);
+    }
+  }
+  @keyframes letter-hop {
+    0% {
+      transform: translateY(0) scale(1, 1);
+    }
+    18% {
+      transform: translateY(0) scale(1.15, 0.8);
+      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+    }
+    48% {
+      transform: translateY(-55%) scale(0.92, 1.1);
+      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    70% {
+      transform: translateY(0) scale(1.16, 0.82);
+    }
+    85% {
+      transform: translateY(0) scale(0.97, 1.03);
+    }
+    100% {
+      transform: translateY(0) scale(1, 1);
+    }
+  }
+
+  /* 영문 포인트 글꼴 (font-nav) — GNB 메뉴 · 홈 섹션 타이틀. 한글이 섞이면 sans(Noto Sans KR)로 넘어간다 */
+  --font-nav: var(--font-roboto-condensed), var(--font-sans);
+  /* 홈 히어로 제목 (font-display) */
+  --font-display: var(--font-google-sans), var(--font-sans);
+}
+
+/* 다크 테마 토큰. :root 보다 우선하도록 :root[data-theme] 로 쓴다 */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #e8eaed;
+  --color-ink-muted: #9aa0a6;
+  --color-line: #2a2f37;
+  --color-surface: #101318;
+  --color-surface-muted: #181c23;
 }
 
 @layer base {

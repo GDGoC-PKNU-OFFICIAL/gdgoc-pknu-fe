@@ -6,9 +6,9 @@ export const SITE = {
   /** 소속 표기 (Footer 하단 바) */
   affiliation: "GDG on Campus · 국립부경대학교",
   /** 동아리 한 줄 소개 (Footer 브랜드 · 기본 description) */
-  tagline: "국립부경대학교 학생 개발자 커뮤니티",
+  tagline: "Google Developer Groups on Campus PKNU",
   description:
-    "GDG on Campus PKNU는 국립부경대학교 학생 개발자 커뮤니티입니다. 정기 세션 · 파트 스터디 · 학기 프로젝트로 함께 배우고 끝까지 만듭니다.",
+    "GDGoC PKNU는 국립부경대학교 학생 개발자 커뮤니티입니다.\n모두가 편리한 세상을 꿈꾸며 함께 배우고 끝까지 만듭니다.",
   contactEmail: "gdscpknu@gmail.com",
   /** 저작권 표기 시작 연도 */
   copyrightYear: 2026,

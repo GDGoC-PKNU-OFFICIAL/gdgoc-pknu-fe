@@ -16,7 +16,9 @@ export default function RecruitBanner({ recruiting, recruitPeriod }: RecruitBann
       <span
         className={cn(
           "inline-flex items-center gap-2 rounded-full px-3 py-1 font-medium",
-          recruiting ? "bg-[#E8F0FF] text-[#2459B5]" : "bg-surface-muted text-ink-muted",
+          recruiting
+            ? "bg-[#E8F0FF] text-[#2459B5] dark:bg-brand-blue/15 dark:text-[#8ab4f8]"
+            : "bg-surface-muted text-ink-muted",
         )}
       >
         <span
@@ -28,7 +30,7 @@ export default function RecruitBanner({ recruiting, recruitPeriod }: RecruitBann
       {recruitPeriod && (
         <>
           <span aria-hidden="true" className="h-4 w-px bg-line" />
-          <span className="inline-flex items-center gap-2 text-[#555B65] tabular-nums">
+          <span className="inline-flex items-center gap-2 text-[#555B65] tabular-nums dark:text-ink-muted">
             <svg
               aria-hidden="true"
               viewBox="0 0 24 24"

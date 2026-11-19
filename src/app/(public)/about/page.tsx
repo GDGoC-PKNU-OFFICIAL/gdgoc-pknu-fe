@@ -1,6 +1,5 @@
 import { type Metadata } from "next";
 
-import CodeOfConductSection from "@/components/common/CodeOfConductSection";
 import PageHeader from "@/components/common/PageHeader";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
@@ -10,7 +9,7 @@ import { RULES } from "@/data/rules";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "GDG on Campus PKNU의 활동 방식 · 동아리 강령 · 활동 규칙 · 자주 묻는 질문",
+  description: "GDG on Campus PKNU의 활동 방식 · 활동 규칙 · 자주 묻는 질문",
   alternates: { canonical: PUBLIC_ROUTES.about },
 };
 
@@ -55,10 +54,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      {/* 4. 동아리 강령 (#code-of-conduct) — 약속 섹션 C-07 의 About 버전. 왼쪽 목차 + 오른쪽 강령 전체 */}
-      <CodeOfConductSection />
-
-      {/* 5. 활동 규칙 */}
+      {/* 4. 활동 규칙 */}
       <section aria-labelledby="rules-title" className={CONTAINER}>
         <SectionHeader badge={RULES.badge} title={RULES.title} titleId="rules-title" />
         <ul className="flex max-w-3xl list-disc flex-col gap-3 pl-5 break-keep marker:text-brand-blue">
@@ -68,7 +64,7 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      {/* 6. FAQ — 네이티브 <details> 아코디언: JS 없이 키보드 · 스크린리더 지원 */}
+      {/* 5. FAQ — 네이티브 <details> 아코디언: JS 없이 키보드 · 스크린리더 지원 */}
       <section aria-labelledby="faq-title" className={CONTAINER}>
         <SectionHeader badge={FAQ.badge} title={FAQ.title} titleId="faq-title" />
         <div className="flex max-w-3xl flex-col divide-y divide-line border-y border-line">

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: PUBLIC_ROUTES.privacy },
 };
 
-// P-06 개인정보처리방침 (IA 4장). 정적 페이지이고 약속 섹션이 없다.
+// P-06 개인정보처리방침 (IA 4장). 정적 페이지다.
 export default function PrivacyPage() {
   return (
     <>

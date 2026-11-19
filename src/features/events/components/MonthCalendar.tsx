@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 
-import Button from "@/components/ui/Button";
 import { EVENT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
-import { parseYearMonth } from "@/lib/date";
+import { formatYearMonth, parseYearMonth } from "@/lib/date";
 import { EVENT_CATEGORIES, type EventItem, type IsoDate, type YearMonth } from "@/types/api";
 
 import { buildCalendarMatrix, type CalendarWeek } from "../lib/build-calendar-matrix";
@@ -25,8 +24,13 @@ interface MonthCalendarProps {
   selectedEvent: EventItem | null;
   onMoveMonth: (delta: number) => void;
   onToday: () => void;
+  /** 오른쪽 월 메뉴에서 고른 달로 바로 이동 */
+  onPickMonth: (yearMonth: YearMonth) => void;
   onSelect: (event: EventItem) => void;
 }
+
+/** 월 메뉴 항목 1월 ~ 12월 */
+const MONTHS = Array.from({ length: 12 }, (_, index) => index + 1);
 
 /**
  * 월간 캘린더 (P-04 #2). 월 이동은 화면 상태라 URL 에 남기지 않는다 (IA 6-2).
@@ -40,6 +44,7 @@ export default function MonthCalendar({
   selectedEvent,
   onMoveMonth,
   onToday,
+  onPickMonth,
   onSelect,
 }: MonthCalendarProps) {
   const { year, month } = parseYearMonth(yearMonth);
@@ -50,20 +55,62 @@ export default function MonthCalendar({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <p aria-live="polite" className="text-lg font-bold tabular-nums">
+      {/* 툴바: [오늘] ‹ › 2026년 11월 ··· [11월 ▾] — 구글 캘린더처럼 왼쪽부터 잇고, 월 메뉴는 오른쪽 끝 */}
+      <div className="flex flex-wrap items-center gap-2 py-1 sm:gap-4">
+        <button
+          type="button"
+          onClick={onToday}
+          className={cn(
+            "inline-flex h-10 shrink-0 items-center rounded-full border border-[#747775] px-5 text-sm font-medium text-ink dark:border-[#8e918f]",
+            "transition-colors hover:bg-black/5 active:bg-black/10 dark:hover:bg-white/10 dark:active:bg-white/15",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
+          )}
+        >
+          오늘
+        </button>
+        <div className="flex shrink-0 items-center">
+          <ToolbarIconButton label="이전 달" onClick={() => onMoveMonth(-1)}>
+            <Chevron path="M15 6l-6 6 6 6" />
+          </ToolbarIconButton>
+          <ToolbarIconButton label="다음 달" onClick={() => onMoveMonth(1)}>
+            <Chevron path="M9 6l6 6-6 6" />
+          </ToolbarIconButton>
+        </div>
+        <p
+          aria-live="polite"
+          className="text-lg whitespace-nowrap text-ink tabular-nums sm:text-[22px]"
+        >
           {year}년 {month}월
         </p>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="이전 달" onClick={() => onMoveMonth(-1)}>
-            <Chevron path="M15 6l-6 6 6 6" />
-          </Button>
-          <Button variant="secondary" onClick={onToday}>
-            오늘
-          </Button>
-          <Button variant="ghost" size="icon" aria-label="다음 달" onClick={() => onMoveMonth(1)}>
-            <Chevron path="M9 6l6 6-6 6" />
-          </Button>
+
+        {/* 월 메뉴: 보고 있는 해의 1~12월 중 하나를 고르면 그 달로 이동한다. 해는 ‹ › 로 넘긴다 */}
+        <div className="relative ml-auto shrink-0">
+          <select
+            aria-label={`${year}년 중 이동할 달`}
+            value={month}
+            onChange={(e) => onPickMonth(formatYearMonth(year, Number(e.target.value)))}
+            className={cn(
+              "h-10 cursor-pointer appearance-none rounded-full border border-[#747775] bg-surface pr-10 pl-5 text-sm font-medium text-ink dark:border-[#8e918f]",
+              "transition-colors hover:border-brand-blue",
+              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
+            )}
+          >
+            {MONTHS.map((m) => (
+              // 펼친 목록도 흰 바탕(다크는 어두운 바탕) — 브라우저 기본 회색을 쓰지 않는다
+              <option key={m} value={m} className="bg-surface text-ink">
+                {m}월
+              </option>
+            ))}
+          </select>
+          {/* 기본 화살표를 숨기고(appearance-none) 같은 자리에 ▾ 를 그린다 */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-ink"
+            fill="currentColor"
+          >
+            <path d="M7 10l5 5 5-5z" />
+          </svg>
         </div>
       </div>
 
@@ -105,6 +152,32 @@ export default function MonthCalendar({
         ))}
       </ul>
     </div>
+  );
+}
+
+/** 툴바의 둥근 아이콘 버튼 (이전 · 다음 달) */
+function ToolbarIconButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className={cn(
+        "inline-flex size-10 items-center justify-center rounded-full text-ink",
+        "transition-colors hover:bg-black/5 active:bg-black/10 dark:hover:bg-white/10 dark:active:bg-white/15",
+        "focus-visible:outline-2 focus-visible:outline-brand-blue",
+      )}
+    >
+      {children}
+    </button>
   );
 }
 

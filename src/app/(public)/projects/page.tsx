@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
-import PromiseSection from "@/components/common/PromiseSection";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CURRENT_PROJECTS, PAST_PROJECTS, PROJECTS_HEADER } from "@/data/projects";
@@ -79,9 +78,6 @@ export default async function ProjectsPage() {
       <Suspense fallback={null}>
         <ProjectDetailController projects={projects} />
       </Suspense>
-
-      {/* 4. 약속 */}
-      <PromiseSection page="projects" />
     </>
   );
 }

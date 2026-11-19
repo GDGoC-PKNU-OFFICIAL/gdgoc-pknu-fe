@@ -1,7 +1,6 @@
 import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
-import PromiseSection from "@/components/common/PromiseSection";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { EVENTS_HEADER } from "@/data/events";
 import EventsBoard from "@/features/events/components/EventsBoard";
@@ -25,7 +24,6 @@ export default async function EventsPage() {
     <>
       <PageHeader title={EVENTS_HEADER.title} description={EVENTS_HEADER.description} />
       <EventsBoard events={events} serverToday={todayKst()} />
-      <PromiseSection page="events" />
     </>
   );
 }

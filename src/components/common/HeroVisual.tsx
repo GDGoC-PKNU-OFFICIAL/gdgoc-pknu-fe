@@ -9,7 +9,7 @@ export default function HeroVisual({ className }: { className?: string }) {
     <svg
       aria-hidden="true"
       viewBox="0 0 600 560"
-      className={cn("h-auto w-full overflow-visible", className)}
+      className={cn("h-auto w-full overflow-visible dark:opacity-75", className)}
     >
       <defs>
         <radialGradient id="hero-glass" cx="36%" cy="28%" r="80%">

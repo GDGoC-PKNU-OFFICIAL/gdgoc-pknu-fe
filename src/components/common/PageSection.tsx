@@ -1,7 +1,5 @@
 import { type ReactNode } from "react";
 
-import Link from "next/link";
-
 import { cn } from "@/lib/cn";
 
 import SectionHeader from "./SectionHeader";
@@ -19,18 +17,20 @@ export const FULL_SCREEN_SECTION = "md:min-h-[calc(100svh-4rem)] md:justify-cent
 interface PageSectionProps {
   /** 제목 요소 id 의 접두어 — aria-labelledby 대상 */
   id: string;
-  /** IA 10-2 섹션 헤더 */
-  badge: string;
+  /** IA 10-2 섹션 헤더. 배지는 없어도 된다 (홈) */
+  badge?: string;
   title: string;
   subtitle?: string;
-  /** 섹션 아래 페이지 안 이동 링크 (IA 3-4) */
+  /** 페이지 안 이동 링크 (IA 3-4). 제목 줄 오른쪽에 "자세히 보기" 버튼으로 둔다 */
   link?: { label: string; href: string };
   /** 한 화면을 섹션 하나가 차지한다 (FULL_SCREEN_SECTION) */
   fullScreen?: boolean;
+  /** 타이틀 모양 (SectionHeader variant). 메인 페이지는 home */
+  titleVariant?: "default" | "home";
   children: ReactNode;
 }
 
-/** 공개 페이지 섹션: 헤더 + 본문 + 이동 링크 */
+/** 공개 페이지 섹션: 헤더(+ 오른쪽 자세히 보기 버튼) + 본문 */
 export default function PageSection({
   id,
   badge,
@@ -38,6 +38,7 @@ export default function PageSection({
   subtitle,
   link,
   fullScreen = false,
+  titleVariant = "default",
   children,
 }: PageSectionProps) {
   const titleId = `${id}-title`;
@@ -46,16 +47,15 @@ export default function PageSection({
       aria-labelledby={titleId}
       className={cn(SECTION_CONTAINER, fullScreen && FULL_SCREEN_SECTION)}
     >
-      <SectionHeader badge={badge} title={title} subtitle={subtitle} titleId={titleId} />
+      <SectionHeader
+        badge={badge}
+        title={title}
+        subtitle={subtitle}
+        titleId={titleId}
+        variant={titleVariant}
+        link={link}
+      />
       {children}
-      {link && (
-        <Link
-          href={link.href}
-          className="inline-flex min-h-11 items-center self-start text-sm font-medium text-brand-blue hover:underline"
-        >
-          {link.label} →
-        </Link>
-      )}
     </section>
   );
 }
