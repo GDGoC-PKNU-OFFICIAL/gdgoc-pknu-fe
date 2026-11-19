@@ -37,8 +37,8 @@ export default function NavLinks({ orientation, onNavigate, className }: NavLink
               aria-current={isActive ? "page" : undefined}
               onClick={onNavigate}
               className={cn(
-                "flex min-h-11 items-center rounded-full font-medium transition-colors",
-                orientation === "horizontal" ? "px-4 text-sm" : "px-2 text-2xl",
+                "flex min-h-11 items-center rounded-full font-nav font-semibold transition-colors",
+                orientation === "horizontal" ? "px-2.5 text-base lg:px-4" : "px-2 text-2xl",
                 isActive ? "text-brand-blue" : "text-ink hover:text-brand-blue",
               )}
             >

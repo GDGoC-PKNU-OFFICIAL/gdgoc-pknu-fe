@@ -5,8 +5,8 @@ import { cn } from "@/lib/cn";
 const TONE_CLASSES = {
   blue: "bg-brand-blue/10 text-brand-blue",
   red: "bg-brand-red/10 text-brand-red",
-  yellow: "bg-brand-yellow/15 text-[#8a6100]", // 노랑 글자는 흰 배경 대비 부족 → 어두운 톤
-  green: "bg-brand-green/10 text-[#1e7e34]",
+  yellow: "bg-brand-yellow/15 text-[#8a6100] dark:text-[#fdd663]", // 노랑 글자는 흰 배경 대비 부족 → 어두운 톤
+  green: "bg-brand-green/10 text-[#1e7e34] dark:text-[#81c995]",
   neutral: "bg-surface-muted text-ink-muted",
 } as const;
 

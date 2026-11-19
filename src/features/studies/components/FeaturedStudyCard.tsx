@@ -29,7 +29,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
   return (
     <article
       className={cn(
-        "group relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-[28px] border border-[#e4e9f4] p-7 md:p-9",
+        "group relative isolate flex h-full min-h-72 flex-col overflow-hidden rounded-[28px] border border-[#e4e9f4] p-7 md:p-9 dark:border-line dark:shadow-none",
         "bg-surface shadow-[0_8px_30px_rgba(80,110,180,0.06)]",
         "transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(80,110,180,0.14)] active:scale-[0.99]",
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
@@ -42,7 +42,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
         </span>
         <span
           aria-hidden="true"
-          className="flex size-10 items-center justify-center rounded-full border border-[#e4e9f4] bg-surface/80 text-ink transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
+          className="flex size-10 items-center justify-center rounded-full border border-[#e4e9f4] bg-surface/80 text-ink transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none dark:border-line"
         >
           <svg
             viewBox="0 0 24 24"

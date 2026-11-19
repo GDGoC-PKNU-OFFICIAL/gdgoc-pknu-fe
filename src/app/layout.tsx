@@ -1,7 +1,8 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Google_Sans, Noto_Sans_KR, Roboto_Condensed } from "next/font/google";
 
 import { SITE } from "@/data/site";
 import { publicEnv } from "@/lib/env/client";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
 import type { Metadata } from "next";
 import "./globals.css";
@@ -13,6 +14,30 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+/**
+ * 한글 글꼴 (Noto Sans KR, 가변 굵기 100–900). 영문 · 숫자는 Geist 가 먼저 그리고 한글만 이 글꼴로 넘어온다.
+ * 한글은 subset 목록에 없지만 Google 이 글자 묶음(unicode-range)으로 나눠 주어, 화면에 나온 글자 묶음만 내려받는다.
+ * 미리 내려받을(preload) 라틴 글자는 Geist 가 맡으므로 끈다.
+ */
+const notoSansKr = Noto_Sans_KR({
+  variable: "--font-noto-sans-kr",
+  preload: false,
+  display: "swap",
+});
+
+/** 영문 포인트 글꼴 (Roboto Condensed, 가변 굵기 100–900) — GNB 메뉴 · 홈 섹션 타이틀 (font-nav) */
+const robotoCondensed = Roboto_Condensed({
+  variable: "--font-roboto-condensed",
+  subsets: ["latin"],
+});
+
+/** 홈 히어로 제목 글꼴 (Google Sans — 구글 로고 글꼴 Product Sans 계열) — font-display */
+const googleSans = Google_Sans({
+  variable: "--font-google-sans",
+  weight: "variable",
   subsets: ["latin"],
 });
 
@@ -43,7 +68,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    // data-theme 은 아래 스크립트가 하이드레이션 전에 붙이므로 서버 HTML 과 달라도 경고하지 않는다
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansKr.variable} ${robotoCondensed.variable} ${googleSans.variable} h-full antialiased`}
+    >
+      <head>
+        {/* 다크 테마를 첫 화면이 그려지기 전에 적용한다 (lib/theme.ts) */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

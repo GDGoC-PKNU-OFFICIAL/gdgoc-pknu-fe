@@ -2,7 +2,6 @@ import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
 import PageSection from "@/components/common/PageSection";
-import PromiseSection from "@/components/common/PromiseSection";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CORE_MEMBERS, MEMBERS_HEADER, SENIORS } from "@/data/members";
 import MemberCarousel from "@/features/members/components/MemberCarousel";
@@ -48,8 +47,6 @@ export default async function MembersPage() {
           analyticsSection="seniors"
         />
       </PageSection>
-
-      <PromiseSection page="members" />
     </>
   );
 }

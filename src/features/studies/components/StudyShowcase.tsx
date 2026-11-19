@@ -10,8 +10,8 @@ interface StudyShowcaseProps {
   /** 이미 정렬 · 개수를 자른 진행 중 스터디 */
   studies: Study[];
   emptyMessage: string;
-  /** 카드 아래 학습 문화 줄. 누르면 Studies 페이지로 간다 */
-  culture: { title: string; description: string; href: string; linkLabel: string };
+  /** 카드 아래 학습 문화 줄. 누르면 Studies 페이지로 간다. 없으면 그리지 않는다 */
+  culture?: { title: string; description: string; href: string; linkLabel: string };
 }
 
 /**
@@ -33,22 +33,24 @@ export default function StudyShowcase({ studies, emptyMessage, culture }: StudyS
         </ul>
       )}
 
-      <Link
-        href={culture.href}
-        className="group flex items-center gap-4 border-t border-line pt-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue md:gap-6"
-      >
-        <span className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="text-lg font-bold break-keep">{culture.title}</span>
-          <span className="text-[15px] break-keep text-ink-muted">{culture.description}</span>
-          <span className="sr-only">{culture.linkLabel}</span>
-        </span>
-        <span
-          aria-hidden="true"
-          className="text-xl text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brand-blue motion-reduce:transition-none"
+      {culture && (
+        <Link
+          href={culture.href}
+          className="group flex items-center gap-4 border-t border-line pt-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue md:gap-6"
         >
-          →
-        </span>
-      </Link>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="text-lg font-bold break-keep">{culture.title}</span>
+            <span className="text-[15px] break-keep text-ink-muted">{culture.description}</span>
+            <span className="sr-only">{culture.linkLabel}</span>
+          </span>
+          <span
+            aria-hidden="true"
+            className="text-xl text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brand-blue motion-reduce:transition-none"
+          >
+            →
+          </span>
+        </Link>
+      )}
     </div>
   );
 }

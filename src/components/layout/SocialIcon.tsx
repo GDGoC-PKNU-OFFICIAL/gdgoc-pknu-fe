@@ -1,11 +1,11 @@
-import { siDiscord, siGithub, siInstagram } from "simple-icons";
+import { siGithub, siGmail, siInstagram } from "simple-icons";
 
 import { type SocialChannel } from "@/data/social-links";
 
 // 브랜드 로고 path 는 simple-icons(CC0) 에서 가져온다 — 손으로 옮겨 적으면 모양이 틀어진다.
 const ICONS = {
   github: siGithub,
-  discord: siDiscord,
+  gmail: siGmail,
   instagram: siInstagram,
 } satisfies Record<SocialChannel, { path: string }>;
 

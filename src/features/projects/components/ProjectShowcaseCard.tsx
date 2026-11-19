@@ -1,17 +1,12 @@
 import Link from "next/link";
 
 import SafeImage from "@/components/common/SafeImage";
-import Badge from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
 import { PROJECT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
 import type { Project } from "@/types/api";
 
-import {
-  DEFAULT_PROJECT_IMAGE,
-  PROJECT_CATEGORY_TONES,
-  PROJECT_STATUS_LABELS,
-} from "../lib/project-labels";
+import { DEFAULT_PROJECT_IMAGE, PROJECT_STATUS_LABELS } from "../lib/project-labels";
 import { projectDetailHref } from "../lib/project-query";
 
 /** 카드 앞면에 보여 줄 기술 스택 수. 나머지는 "+n" (IA 5-2) */
@@ -21,8 +16,30 @@ const VISIBLE_FEATURE_COUNT = 3;
 
 const STATUS_DOT = { current: "bg-brand-green", past: "bg-ink-muted" } as const;
 
+/** 분류 글자 색 — 다른 카드의 분류 배지(PROJECT_CATEGORY_TONES)와 같은 색 계열 */
+const CATEGORY_TEXT = {
+  "solution-challenge": "text-brand-blue",
+  "team-project": "text-[#1e7e34] dark:text-[#81c995]",
+  official: "text-brand-red",
+} satisfies Record<Project["category"], string>;
+
 /** 마우스 · 키보드 포커스 때 상세 정보를 보여 주는 조건 */
 const REVEAL = "group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100";
+
+/**
+ * 잡지형 배치에서의 카드 모양 (ProjectShowcaseGrid).
+ * - standard: 사진 위 · 내용 아래 (기본)
+ * - photo: 글 없이 사진만 카드를 꽉 채운다. 태블릿 이상에서는 칸 높이를 모두 채운다.
+ *   제목 · 설명은 마우스를 올리거나 포커스하면 덮이는 오버레이로 본다 (화면 읽기 프로그램에는 제목이 읽힌다)
+ */
+export type ShowcaseLayout = "standard" | "photo";
+
+/** 사진이 실제로 그려지는 폭 (next/image sizes) */
+const THUMB_SIZES = {
+  standard: "(min-width: 1280px) 368px, (min-width: 768px) 50vw, 90vw",
+  photo: "(min-width: 1024px) 66vw, (min-width: 768px) 50vw, 90vw",
+} satisfies Record<ShowcaseLayout, string>;
+
 const RISE = "group-hover:translate-y-0 group-has-[a:focus-visible]:translate-y-0";
 
 /**
@@ -32,7 +49,14 @@ const RISE = "group-hover:translate-y-0 group-has-[a:focus-visible]:translate-y-
  * 카드 크기는 그대로다. 마우스가 없는 화면(터치)은 오버레이 대신 같은 정보를 카드 아래쪽에 처음부터 보여 준다.
  * 카드를 누르면 /projects 의 상세 카드로 간다 (projectDetailHref).
  */
-export default function ProjectShowcaseCard({ project }: { project: Project }) {
+export default function ProjectShowcaseCard({
+  project,
+  layout = "standard",
+}: {
+  project: Project;
+  layout?: ShowcaseLayout;
+}) {
+  const photoOnly = layout === "photo";
   const { slug, title, summary, description, category, status, period, techStack, features } =
     project;
   const visibleTech = techStack.slice(0, VISIBLE_TECH_COUNT);
@@ -74,66 +98,102 @@ export default function ProjectShowcaseCard({ project }: { project: Project }) {
   return (
     <article
       className={cn(
-        "group relative isolate flex h-full flex-col overflow-hidden rounded-[20px] border border-[#E1E4E8] bg-surface",
+        "group relative isolate flex h-full flex-col overflow-hidden rounded-[20px] border border-[#E1E4E8] bg-surface dark:border-line",
         "shadow-[0_1px_3px_rgba(16,24,40,0.04)] transition duration-300 ease-out",
         "hover:-translate-y-1 hover:shadow-[0_24px_48px_-28px_rgba(31,31,31,0.45)]",
         "has-[a:focus-visible]:-translate-y-1 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-blue",
         "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
       )}
     >
-      <div className="relative aspect-video overflow-hidden bg-surface-muted">
+      <div
+        className={cn(
+          "relative overflow-hidden bg-surface-muted",
+          photoOnly ? "aspect-[4/3] md:aspect-auto md:min-h-[26rem] md:flex-1" : "aspect-video",
+        )}
+      >
         {/* 제목이 바로 아래 있으므로 장식 이미지로 둔다. 없으면 기본 이미지 (C-11) */}
         <SafeImage
           src={project.thumbnailUrl}
           fallbackSrc={DEFAULT_PROJECT_IMAGE}
           alt=""
           fill
-          sizes="(min-width: 1280px) 368px, (min-width: 768px) 50vw, 90vw"
+          sizes={THUMB_SIZES[layout]}
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03] group-has-[a:focus-visible]:scale-[1.03] motion-reduce:transition-none"
         />
       </div>
 
-      {/* 오버레이가 덮일 때 앞면 글자는 숨겨 겹쳐 비치지 않게 한다 */}
-      <div className="flex flex-1 flex-col gap-3 p-5 transition-opacity duration-300 group-hover:opacity-0 group-has-[a:focus-visible]:opacity-0 motion-reduce:transition-none">
-        <div className="flex items-center justify-between gap-3">
-          <Badge tone={PROJECT_CATEGORY_TONES[category]}>{PROJECT_CATEGORY_LABELS[category]}</Badge>
-          <span className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
-            <span aria-hidden="true" className={cn("size-1.5 rounded-full", STATUS_DOT[status])} />
-            {PROJECT_STATUS_LABELS[status]}
-          </span>
-        </div>
-        <h3 className="line-clamp-2 text-lg font-semibold break-keep">
-          <Link
-            href={projectDetailHref(slug)}
-            className="outline-none after:absolute after:inset-0"
-          >
-            {title}
-            <span className="sr-only"> 자세히 보기</span>
+      {photoOnly ? (
+        // 사진만 보이는 카드: 제목은 화면 읽기 프로그램용으로만 두고, 카드 전체를 링크로 덮는다
+        <>
+          <h3 className="sr-only">{title}</h3>
+          <Link href={projectDetailHref(slug)} className="absolute inset-0 outline-none">
+            <span className="sr-only">{title} 자세히 보기</span>
           </Link>
-        </h3>
-        <p className="line-clamp-2 text-sm break-keep text-ink-muted">{summary}</p>
-        <p className="text-sm text-ink-muted tabular-nums">{periodText}</p>
-
-        {visibleTech.length > 0 && (
-          <ul aria-label="기술 스택" className="flex flex-wrap gap-1.5">
-            {visibleTech.map((tech) => (
-              <li key={tech} className="max-w-full">
-                <Tag>#{tech}</Tag>
-              </li>
-            ))}
-            {hiddenTechCount > 0 && (
-              <li>
-                <Tag aria-label={`외 ${hiddenTechCount}개`}>+{hiddenTechCount}</Tag>
-              </li>
+        </>
+      ) : (
+        <>
+          {/* 오버레이가 덮일 때 앞면 글자는 숨겨 겹쳐 비치지 않게 한다 */}
+          <div
+            className={cn(
+              "flex min-w-0 flex-col gap-3 p-5 transition-opacity duration-300 group-hover:opacity-0 group-has-[a:focus-visible]:opacity-0 motion-reduce:transition-none",
+              "flex-1",
             )}
-          </ul>
-        )}
+          >
+            <div className="flex items-center justify-between gap-3">
+              {/* 분류는 배경 없는 글자로만. 색은 분류별 배지 색을 그대로 쓴다 */}
+              <span className={cn("text-xs font-semibold", CATEGORY_TEXT[category])}>
+                {PROJECT_CATEGORY_LABELS[category]}
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
+                <span
+                  aria-hidden="true"
+                  className={cn("size-1.5 rounded-full", STATUS_DOT[status])}
+                />
+                {PROJECT_STATUS_LABELS[status]}
+              </span>
+            </div>
+            {/* 긴 영문 · 띄어쓰기 없는 문자열도 카드 밖으로 넘치지 않게 어디서든 줄을 바꾼다 */}
+            <h3
+              className={cn(
+                "line-clamp-2 font-semibold [overflow-wrap:anywhere] break-keep",
+                "text-lg",
+              )}
+            >
+              <Link
+                href={projectDetailHref(slug)}
+                className="outline-none after:absolute after:inset-0"
+              >
+                {title}
+                <span className="sr-only"> 자세히 보기</span>
+              </Link>
+            </h3>
+            <p className="line-clamp-2 text-sm [overflow-wrap:anywhere] break-keep text-ink-muted">
+              {summary}
+            </p>
+            <p className="text-sm text-ink-muted tabular-nums">{periodText}</p>
 
-        {/* 터치 화면: hover 가 없으니 상세 정보를 처음부터 보여 준다 */}
-        <div className="flex flex-col gap-3 border-t border-line pt-3 [@media(hover:hover)]:hidden">
-          {details("light")}
-        </div>
-      </div>
+            {visibleTech.length > 0 && (
+              <ul aria-label="기술 스택" className="flex flex-wrap gap-1.5">
+                {visibleTech.map((tech) => (
+                  <li key={tech} className="max-w-full">
+                    <Tag>#{tech}</Tag>
+                  </li>
+                ))}
+                {hiddenTechCount > 0 && (
+                  <li>
+                    <Tag aria-label={`외 ${hiddenTechCount}개`}>+{hiddenTechCount}</Tag>
+                  </li>
+                )}
+              </ul>
+            )}
+
+            {/* 터치 화면: hover 가 없으니 상세 정보를 처음부터 보여 준다 */}
+            <div className="flex flex-col gap-3 border-t border-line pt-3 [@media(hover:hover)]:hidden">
+              {details("light")}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 마우스 · 키보드: 카드 안을 덮는 상세 정보. 같은 내용이 앞면 · 링크 대상에 있어 스크린리더에서는 숨긴다 */}
       <div
@@ -175,7 +235,6 @@ export default function ProjectShowcaseCard({ project }: { project: Project }) {
               ))}
             </p>
           )}
-          <p className="text-sm font-medium text-[#8ab4f8]">프로젝트 자세히 보기 →</p>
         </div>
       </div>
     </article>

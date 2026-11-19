@@ -2,7 +2,6 @@ import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
 import PageSection from "@/components/common/PageSection";
-import PromiseSection from "@/components/common/PromiseSection";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CURRENT_STUDIES, PAST_STUDIES, STUDIES_HEADER } from "@/data/studies";
 import StudyGrid from "@/features/studies/components/StudyGrid";
@@ -33,8 +32,6 @@ export default async function StudiesPage() {
       <PageSection id="past-studies" badge={PAST_STUDIES.badge} title={PAST_STUDIES.title}>
         <StudyGrid studies={past} emptyMessage={PAST_STUDIES.empty} />
       </PageSection>
-
-      <PromiseSection page="studies" />
     </>
   );
 }

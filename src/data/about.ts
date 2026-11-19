@@ -23,6 +23,8 @@ export interface Activity {
   /** 주기 · 시기 */
   cadence: string;
   description: string;
+  /** 홈 What We Do 카드 그림 (public/ 기준 경로, 800×520). 없으면 그림 없이 그린다 */
+  image?: string;
 }
 
 export const ACTIVITIES = {
@@ -33,16 +35,19 @@ export const ACTIVITIES = {
       title: "정기 세션",
       cadence: "격주",
       description: "멤버와 초청 연사가 기술 · 경험을 나누는 발표 세션입니다.",
+      image: "/images/activities/session-color.webp",
     },
     {
       title: "파트 스터디",
       cadence: "학기 중 주 1회",
       description: "프론트엔드 · 백엔드 · 모바일 · AI·ML 등 파트별로 모여 함께 공부합니다.",
+      image: "/images/activities/study-color.webp",
     },
     {
       title: "학기 프로젝트",
       cadence: "학기 단위",
       description: "팀을 꾸려 한 학기 동안 서비스를 기획하고 배포까지 완성합니다.",
+      image: "/images/activities/project-color.webp",
     },
     {
       title: "Solution Challenge",

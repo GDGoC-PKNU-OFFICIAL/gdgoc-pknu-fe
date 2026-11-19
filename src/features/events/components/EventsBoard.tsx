@@ -77,6 +77,7 @@ export default function EventsBoard({ events, serverToday }: EventsBoardProps) {
             setPickedMonth((month) => shiftYearMonth(month ?? thisMonth, delta))
           }
           onToday={() => setPickedMonth(null)}
+          onPickMonth={setPickedMonth}
           onSelect={selectFromCalendar}
         />
       </section>
