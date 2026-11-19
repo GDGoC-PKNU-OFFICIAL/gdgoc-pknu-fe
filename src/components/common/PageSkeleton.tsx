@@ -9,7 +9,7 @@ export default function PageSkeleton({ label }: { label: string }) {
   return (
     <div aria-busy="true" aria-label={label}>
       <div className="border-b border-line bg-surface-muted">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
+        <div className="mx-auto flex max-w-site flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
           <Skeleton className="h-10 w-48 md:h-14" />
           <Skeleton className="h-5 w-full max-w-md" />
         </div>

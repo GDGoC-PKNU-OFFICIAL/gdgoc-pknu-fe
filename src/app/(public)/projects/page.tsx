@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   alternates: { canonical: PUBLIC_ROUTES.projects },
 };
 
-const CONTAINER = "mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8";
+const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 
 // P-02 Projects (IA 4장). 서버 컴포넌트이고 searchParams 를 읽지 않는다 — 읽으면 동적 렌더링이 되어
 // Render 콜드 스타트가 방문자에게 닿는다 (FRONT_ARCHITECTURE § 1 제약 3). 쿼리는 클라이언트 컴포넌트만 읽는다.

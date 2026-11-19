@@ -15,7 +15,7 @@ import { SITE } from "@/data/site";
 export default function Footer() {
   return (
     <footer className="bg-[#111111] text-white dark:border-t dark:border-line dark:bg-[#0a0c10]">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-12 pb-8 md:px-8">
+      <div className="mx-auto flex max-w-site flex-col gap-10 px-4 pt-12 pb-8 md:px-8">
         {/*
           두 기둥의 줄 높이를 맞춰 가로로 나란히 둔다.
           1줄: 로고 ↔ Back to top (44px) / 2줄: 소개 ↔ SNS 아이콘 (48px)

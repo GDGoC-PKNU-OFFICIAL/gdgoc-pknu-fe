@@ -61,7 +61,7 @@ export default function EventsBoard({ events, serverToday }: EventsBoardProps) {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 md:px-8 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
+    <div className="mx-auto grid max-w-site gap-12 px-4 py-16 md:px-8 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
       <section aria-labelledby="calendar-title" className="flex flex-col gap-8">
         <SectionHeader
           badge={CALENDAR_SECTION.badge}
