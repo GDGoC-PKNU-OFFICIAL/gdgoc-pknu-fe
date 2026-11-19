@@ -56,5 +56,5 @@ export const HOME_LIST_LIMIT = 3;
 /** 홈 다가오는 일정 최대 개수. 타임라인은 데스크톱에서 한 줄에 3개씩 놓는다 (EventTimeline) */
 export const HOME_EVENT_LIMIT = 6;
 
-/** 홈 진행 중 스터디는 큰 카드라 2개까지만 보여 준다. 나머지는 Studies 페이지에서 본다 */
-export const HOME_STUDY_LIMIT = 2;
+/** 홈 진행 중 스터디는 4개까지 보여 준다 (태블릿 이상 2 × 2). 나머지는 Studies 페이지에서 본다 */
+export const HOME_STUDY_LIMIT = 4;
