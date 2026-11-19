@@ -108,9 +108,9 @@ export default async function HomePage() {
         link={HOME_SECTIONS.about.link}
       >
         <ul className="grid gap-4 md:grid-cols-3">
-          {/* 카드 위쪽에 활동 그림, 아래에 제목 · 설명. 주기(격주 등)는 홈에서 보여 주지 않는다.
+          {/* 활동 6개를 3개씩 두 줄로. 카드 위쪽에 활동 그림, 아래에 제목 · 설명. 주기(격주 등)는 홈에서 보여 주지 않는다.
               마우스를 올리면 4px 떠오르고 그림자가 짙어진다 ("모션 줄이기"면 그림자만) */}
-          {ACTIVITIES.items.slice(0, HOME_LIST_LIMIT).map(({ title, description, image }) => (
+          {ACTIVITIES.items.map(({ title, description, image }) => (
             <li
               key={title}
               className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_14px_28px_-10px_rgba(40,70,140,0.22)] transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_22px_36px_-12px_rgba(40,70,140,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:shadow-[0_14px_28px_-10px_rgba(0,0,0,0.7)] dark:hover:shadow-[0_22px_36px_-12px_rgba(0,0,0,0.8)]"
