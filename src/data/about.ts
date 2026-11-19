@@ -54,7 +54,7 @@ export const ACTIVITIES = {
       cadence: "학기 초",
       description:
         "개발 경험이 없어도 괜찮아요! 프론트엔드 · 백엔드 · AI · 게임 등 여러 분야를 직접 체험해 본 뒤 진로를 고를 수 있는 입문 교육입니다.",
-      image: "/images/activities/intro.webp",
+      image: "/images/activities/intro-illust.webp",
     },
     // Solution Challenge 는 아래 대외활동에 포함되어 하나로 합쳤다
     {
@@ -62,14 +62,14 @@ export const ACTIVITIES = {
       cadence: "연중",
       description:
         "Google Solution Challenge · GDG DevFest · Career Session 등 구글과 GDG 가 주관하는 전국 · 글로벌 커뮤니티 공식 행사에 참여할 기회를 드립니다.",
-      image: "/images/activities/gdg-events.webp",
+      image: "/images/activities/gdg-events-illust.webp",
     },
     {
       title: "Build with AI",
       cadence: "행사",
       description:
         "GDG 의 지원을 받아 부경대에서 여는 AI 개발 행사입니다. 구글 Antigravity 로 AI 에이전트 기반 개발을 경험하고 최신 구글 기술을 실습합니다.",
-      image: "/images/activities/build-ai.webp",
+      image: "/images/activities/build-ai-illust.webp",
     },
   ] satisfies Activity[],
 } as const;
