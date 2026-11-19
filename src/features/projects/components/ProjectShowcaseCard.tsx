@@ -27,17 +27,20 @@ const CATEGORY_TEXT = {
 const REVEAL = "group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100";
 
 /**
- * 잡지형 배치에서의 카드 모양 (ProjectShowcaseGrid).
- * - standard: 사진 위 · 내용 아래 (기본)
- * - photo: 글 없이 사진만 카드를 꽉 채운다. 태블릿 이상에서는 칸 높이를 모두 채운다.
- *   제목 · 설명은 마우스를 올리거나 포커스하면 덮이는 오버레이로 본다 (화면 읽기 프로그램에는 제목이 읽힌다)
+ * 카드 모양 (ProjectShowcaseGrid).
+ * - standard: 사진(16:9) 위 · 내용 아래 (기본, 3장이 아닐 때)
+ * - feature · tile: 잡지형 배치. 카드 전체가 사진이고, 분류 · 제목은 사진 아래쪽 어두운 띠 위에 얹는다.
+ *   카드 = 사진 비율이라 칸이 반듯하게 맞는다.
+ *   - feature: 큰 카드. 모바일 4:3, 태블릿 이상은 오른쪽 두 장 높이를 채운다(폭 3 : 2 라 거의 정확히 4:3)
+ *   - tile: 작은 카드. 항상 16:9
  */
-export type ShowcaseLayout = "standard" | "photo";
+export type ShowcaseLayout = "standard" | "feature" | "tile";
 
 /** 사진이 실제로 그려지는 폭 (next/image sizes) */
 const THUMB_SIZES = {
-  standard: "(min-width: 1280px) 368px, (min-width: 768px) 50vw, 90vw",
-  photo: "(min-width: 1024px) 66vw, (min-width: 768px) 50vw, 90vw",
+  standard: "(min-width: 1440px) 448px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 90vw",
+  feature: "(min-width: 1440px) 830px, (min-width: 768px) 60vw, 90vw",
+  tile: "(min-width: 1440px) 552px, (min-width: 768px) 40vw, 90vw",
 } satisfies Record<ShowcaseLayout, string>;
 
 const RISE = "group-hover:translate-y-0 group-has-[a:focus-visible]:translate-y-0";
@@ -56,7 +59,7 @@ export default function ProjectShowcaseCard({
   project: Project;
   layout?: ShowcaseLayout;
 }) {
-  const photoOnly = layout === "photo";
+  const overlay = layout !== "standard";
   const { slug, title, summary, description, category, status, period, techStack, features } =
     project;
   const visibleTech = techStack.slice(0, VISIBLE_TECH_COUNT);
@@ -108,7 +111,7 @@ export default function ProjectShowcaseCard({
       <div
         className={cn(
           "relative overflow-hidden bg-surface-muted",
-          photoOnly ? "aspect-[4/3] md:aspect-auto md:min-h-[26rem] md:flex-1" : "aspect-video",
+          layout === "feature" ? "aspect-[4/3] md:aspect-auto md:flex-1" : "aspect-video",
         )}
       >
         {/* 제목이 바로 아래 있으므로 장식 이미지로 둔다. 없으면 기본 이미지 (C-11) */}
@@ -122,14 +125,35 @@ export default function ProjectShowcaseCard({
         />
       </div>
 
-      {photoOnly ? (
-        // 사진만 보이는 카드: 제목은 화면 읽기 프로그램용으로만 두고, 카드 전체를 링크로 덮는다
-        <>
-          <h3 className="sr-only">{title}</h3>
-          <Link href={projectDetailHref(slug)} className="absolute inset-0 outline-none">
-            <span className="sr-only">{title} 자세히 보기</span>
-          </Link>
-        </>
+      {overlay ? (
+        // 사진 카드: 아래쪽 어두운 띠 위에 분류 · 제목. 마우스 · 포커스 때는 상세 오버레이에 자리를 내준다
+        <div
+          className={cn(
+            "absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 pt-16 text-white md:p-6 md:pt-20",
+            "bg-[linear-gradient(180deg,rgba(17,17,17,0)_0%,rgba(17,17,17,0.55)_45%,rgba(17,17,17,0.8)_100%)]",
+            "transition-opacity duration-300 motion-reduce:transition-none",
+            "group-has-[a:focus-visible]:opacity-0 [@media(hover:hover)]:group-hover:opacity-0",
+          )}
+        >
+          <span className="text-xs font-semibold text-white/85">
+            {PROJECT_CATEGORY_LABELS[category]}
+          </span>
+          <h3
+            className={cn(
+              "line-clamp-2 font-semibold [overflow-wrap:anywhere] break-keep",
+              layout === "feature" ? "text-xl md:text-2xl" : "text-lg",
+            )}
+          >
+            {/* 카드 전체를 덮는 링크 */}
+            <Link
+              href={projectDetailHref(slug)}
+              className="outline-none after:absolute after:inset-0"
+            >
+              {title}
+              <span className="sr-only"> 자세히 보기</span>
+            </Link>
+          </h3>
+        </div>
       ) : (
         <>
           {/* 오버레이가 덮일 때 앞면 글자는 숨겨 겹쳐 비치지 않게 한다 */}

@@ -100,6 +100,9 @@
   }
 
   /* 영문 포인트 글꼴 (font-nav) — GNB 메뉴 · 홈 섹션 타이틀. 한글이 섞이면 sans(Noto Sans KR)로 넘어간다 */
+  /* 공개 사이트 본문 · 헤더 · 푸터 공통 최대 폭 (max-w-site) */
+  --container-site: 90rem;
+
   --font-nav: var(--font-roboto-condensed), var(--font-sans);
   /* 홈 히어로 제목 (font-display) */
   --font-display: var(--font-google-sans), var(--font-sans);

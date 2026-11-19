@@ -13,7 +13,7 @@ interface PageHeaderProps {
 export default function PageHeader({ title, description, children }: PageHeaderProps) {
   return (
     <header className="border-b border-line bg-surface-muted">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
+      <div className="mx-auto flex max-w-site flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
         <h1 className="text-3xl font-bold tracking-tight md:text-5xl">{title}</h1>
         <p className="text-base break-keep text-ink-muted md:text-lg">{description}</p>
         {children}

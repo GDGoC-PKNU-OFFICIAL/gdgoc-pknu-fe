@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import SectionHeader from "./SectionHeader";
 
 /** 공개 페이지 본문 폭 · 여백 */
-export const SECTION_CONTAINER = "mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8";
+export const SECTION_CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 
 /**
  * 한 화면에 섹션 하나 (홈). 태블릿 · 데스크톱에서 Header(h-16) 아래 화면 높이를 채우고 스크롤 스냅 지점이 된다.

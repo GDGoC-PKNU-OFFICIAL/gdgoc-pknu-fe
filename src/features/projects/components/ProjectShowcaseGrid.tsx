@@ -14,19 +14,22 @@ interface ProjectShowcaseGridProps {
 }
 
 /**
- * 잡지형 배치 — 카드가 정확히 3장일 때. 첫 카드는 사진만 크게(2칸 × 2줄), 나머지 두 장은 오른쪽에 위아래로.
+ * 잡지형 배치 — 카드가 정확히 3장일 때. 모든 카드가 사진 카드라 전체가 반듯한 직사각형이 된다.
  *
- *   데스크톱 (3열)            태블릿 (2열)        모바일 (1열)
- *   ┌─────────────┬──────┐    ┌──────┬──────┐     ┌────┐
- *   │             │  2   │    │      │  2   │     │ 1  │
- *   │   1 (사진)  ├──────┤    │  1   ├──────┤     │ 2  │
- *   │             │  3   │    │      │  3   │     │ 3  │
- *   └─────────────┴──────┘    └──────┴──────┘     └────┘
+ *   태블릿 · 데스크톱 (폭 3 : 2)        모바일 (1열)
+ *   ┌──────────────┬──────────┐        ┌────┐
+ *   │              │ 2 (16:9) │        │1 4:3│
+ *   │   1 (4:3)    ├──────────┤        │2 16:9│
+ *   │              │ 3 (16:9) │        │3 16:9│
+ *   └──────────────┴──────────┘        └────┘
+ *
+ * 왼쪽 4:3 높이(3/4 × 3) = 오른쪽 16:9 두 장 높이(9/16 × 2 × 2) — 폭을 3 : 2 로 나누면 높이가 맞는다.
+ * 오른쪽 두 장이 줄 높이를 정하고, 왼쪽 카드는 그 높이를 채운다 (칸 사이 간격만큼만 4:3 에서 어긋난다).
  */
 const MAGAZINE: { layout: ShowcaseLayout; cell: string }[] = [
-  { layout: "photo", cell: "md:row-span-2 lg:col-span-2" },
-  { layout: "standard", cell: "" },
-  { layout: "standard", cell: "" },
+  { layout: "feature", cell: "md:row-span-2" },
+  { layout: "tile", cell: "" },
+  { layout: "tile", cell: "" },
 ];
 
 /**
@@ -44,7 +47,7 @@ export default function ProjectShowcaseGrid({ projects, emptyMessage }: ProjectS
       <ul
         className={cn(
           "grid gap-6",
-          magazine ? "md:grid-cols-2 lg:grid-cols-3" : "auto-rows-fr md:grid-cols-2 xl:grid-cols-3",
+          magazine ? "md:grid-cols-[3fr_2fr]" : "auto-rows-fr md:grid-cols-2 xl:grid-cols-3",
         )}
       >
         {projects.map((project, index) => {

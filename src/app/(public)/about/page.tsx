@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: PUBLIC_ROUTES.about },
 };
 
-const CONTAINER = "mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8";
+const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 
 // P-01 About (IA 4장). 전부 src/data 의 정적 콘텐츠라 API 호출이 없다.
 // "지원 모집 중" 항목은 두지 않는다 — 모집 여부는 홈 히어로 배너로만 안내한다.

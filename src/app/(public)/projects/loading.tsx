@@ -10,12 +10,12 @@ export default function ProjectsLoading() {
   return (
     <div aria-busy="true" aria-label="프로젝트를 불러오는 중">
       <div className="border-b border-line bg-surface-muted">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
+        <div className="mx-auto flex max-w-site flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
           <Skeleton className="h-10 w-48 md:h-14" />
           <Skeleton className="h-5 w-full max-w-md" />
         </div>
       </div>
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-16 md:px-8">
+      <div className="mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8">
         <Skeleton className="h-8 w-56" />
         <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: CARD_COUNT }, (_, index) => (
