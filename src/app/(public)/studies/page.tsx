@@ -1,10 +1,12 @@
+import { Suspense } from "react";
+
 import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
-import PageSection from "@/components/common/PageSection";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CURRENT_STUDIES, PAST_STUDIES, STUDIES_HEADER } from "@/data/studies";
-import StudyGrid from "@/features/studies/components/StudyGrid";
+import StudyBoard from "@/features/studies/components/StudyBoard";
+import StudyDetailController from "@/features/studies/components/StudyDetailController";
 import { getStudies } from "@/lib/api/public-api";
 import { splitByStatus } from "@/lib/split-by-status";
 
@@ -13,25 +15,32 @@ export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Studies",
-  description: "GDG on Campus PKNU의 진행 중인 스터디와 과거 스터디",
+  description: "GDG on Campus PKNU의 진행 중인 스터디와 연도별 과거 스터디",
+  // ?study= 가 붙은 주소도 목록 페이지를 대표 주소로 둔다
   alternates: { canonical: PUBLIC_ROUTES.studies },
 };
 
-// P-03 Studies (IA 4장). 연도 버튼 · 상세 카드 없이 그리드만 있다.
+// P-03 Studies. 서버 컴포넌트이고 searchParams 를 읽지 않는다 (정적 렌더링 유지) — 쿼리는 클라이언트 컴포넌트만 읽는다.
 export default async function StudiesPage() {
-  const { current, past } = splitByStatus(await getStudies());
+  const studies = await getStudies();
+  const { current, past } = splitByStatus(studies);
 
   return (
     <>
       <PageHeader title={STUDIES_HEADER.title} description={STUDIES_HEADER.description} />
 
-      <PageSection id="current-studies" badge={CURRENT_STUDIES.badge} title={CURRENT_STUDIES.title}>
-        <StudyGrid studies={current} emptyMessage={CURRENT_STUDIES.empty} />
-      </PageSection>
+      {/* 진행 중 스터디 그리드 + 연도별 과거 스터디. 정렬 · 연도 선택은 브라우저에서 바뀐다 */}
+      <StudyBoard
+        current={current}
+        past={past}
+        currentText={CURRENT_STUDIES}
+        pastText={PAST_STUDIES}
+      />
 
-      <PageSection id="past-studies" badge={PAST_STUDIES.badge} title={PAST_STUDIES.title}>
-        <StudyGrid studies={past} emptyMessage={PAST_STUDIES.empty} />
-      </PageSection>
+      {/* ↳ 상세 카드 (?study=) */}
+      <Suspense fallback={null}>
+        <StudyDetailController studies={studies} />
+      </Suspense>
     </>
   );
 }

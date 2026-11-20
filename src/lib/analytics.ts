@@ -8,7 +8,8 @@ export interface AnalyticsEvents {
   sns_click: { channel: "github" | "gmail" | "instagram" };
   project_detail_open: { slug: string; status: "current" | "past" };
   project_link_click: { slug: string; link_type: "github" | "demo" };
-  year_select: { section: "past_projects"; year: number };
+  year_select: { section: "past_projects" | "past_studies"; year: number };
+  study_detail_open: { slug: string; status: "current" | "past" };
   member_card_flip: { section: "home" | "core_members" | "seniors"; member_id: number };
   // discord_cta_click · member_link_click 은 지금 화면에 해당 버튼 · 링크가 없어 두지 않았다
   // (About Discord CTA 는 팀 결정으로 제외 · 멤버 카드에는 외부 링크가 없다)

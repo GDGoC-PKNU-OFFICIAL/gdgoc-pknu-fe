@@ -1,5 +1,5 @@
 // src/data/studies.ts
-// P-03 Studies 의 고정 문구 — 페이지 헤더 · 섹션 헤더(IA 10-2) · 빈 상태(IA 10-3).
+// P-03 Studies 의 고정 문구 — 페이지 헤더 · 섹션 제목 · 빈 상태(IA 10-3). 섹션 배지는 두지 않는다.
 //
 // TODO(운영진): 페이지 헤더 설명은 초안이다. 확정 후 교체.
 
@@ -9,13 +9,11 @@ export const STUDIES_HEADER = {
 } as const;
 
 export const CURRENT_STUDIES = {
-  badge: "스터디",
   title: "Current Studies",
   empty: "진행 중인 스터디가 없습니다. 새 학기 스터디가 열리면 이곳에 올라옵니다.",
 } as const;
 
 export const PAST_STUDIES = {
-  badge: "스터디",
   title: "Past Studies",
   empty: "아직 완료된 스터디가 없습니다.",
 } as const;

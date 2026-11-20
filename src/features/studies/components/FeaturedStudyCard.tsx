@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import Tag from "@/components/ui/Tag";
-import { PUBLIC_ROUTES } from "@/constants/routes";
+import { studyDetailHref } from "@/features/studies/lib/study-query";
 import { cn } from "@/lib/cn";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Study } from "@/types/api";
@@ -18,7 +18,7 @@ interface FeaturedStudyCardProps {
  * 흰 카드다. hover: 3~4px 떠오르고 그림자가 짙어지며 화살표가 살짝 움직인다. 터치에서는 누르는 동안 살짝 눌린다.
  */
 export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardProps) {
-  const { topic, title, summary, period, participants, format } = study;
+  const { slug, topic, title, summary, period, participants, format } = study;
   const tags = [
     `#${topic}`,
     ...(format ? [format] : []),
@@ -61,7 +61,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
       <div className="mt-auto flex flex-col gap-3 pt-10">
         <h3 className="text-2xl font-bold tracking-tight break-keep md:text-[28px]">
           <Link
-            href={PUBLIC_ROUTES.studies}
+            href={studyDetailHref(slug)}
             className="after:absolute after:inset-0 after:rounded-[28px] focus-visible:outline-none"
           >
             {title}
