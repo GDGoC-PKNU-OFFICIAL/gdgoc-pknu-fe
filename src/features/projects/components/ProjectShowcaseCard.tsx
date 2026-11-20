@@ -129,8 +129,10 @@ export default function ProjectShowcaseCard({
         // 사진 카드: 아래쪽 어두운 띠 위에 분류 · 제목. 마우스 · 포커스 때는 상세 오버레이에 자리를 내준다
         <div
           className={cn(
-            "absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 pt-16 text-white md:p-6 md:pt-20",
-            "bg-[linear-gradient(180deg,rgba(17,17,17,0)_0%,rgba(17,17,17,0.55)_45%,rgba(17,17,17,0.8)_100%)]",
+            // 평소에는 사진이 어두워 보이지 않게 맨 아래 글자 뒤만 옅게 깔고, 글자 그림자로 읽히게 한다
+            "absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 pt-12 text-white md:p-6 md:pt-14",
+            "bg-[linear-gradient(180deg,rgba(17,17,17,0)_0%,rgba(17,17,17,0.18)_50%,rgba(17,17,17,0.45)_100%)]",
+            "[text-shadow:0_1px_8px_rgba(0,0,0,0.45)]",
             "transition-opacity duration-300 motion-reduce:transition-none",
             "group-has-[a:focus-visible]:opacity-0 [@media(hover:hover)]:group-hover:opacity-0",
           )}

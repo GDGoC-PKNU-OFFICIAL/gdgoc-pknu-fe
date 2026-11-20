@@ -10,6 +10,8 @@ import { PUBLIC_ROUTES } from "@/constants/routes";
 export const HERO = {
   affiliation: "Google Developer Groups on Campus · 국립부경대학교",
   title: "GDGoC PKNU",
+  /** 히어로 전체 배경 단체 사진 (2026 Git 세션, 2400×1800). 장식이라 대체 텍스트는 비운다 */
+  photo: { src: "/images/hero/hero-git-session.webp" },
 } as const;
 
 export const HOME_SECTIONS = {

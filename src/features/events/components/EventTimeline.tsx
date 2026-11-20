@@ -5,9 +5,6 @@ import type { EventItem, IsoDate } from "@/types/api";
 
 import { EVENT_CATEGORY_STYLES, formatEventDate, WEEKDAY_LABELS } from "../lib/event-labels";
 
-/** 데스크톱 · 태블릿 가로 타임라인 한 줄의 일정 수. 넘치면 다음 줄로 이어진다 */
-const ROW_SIZE = 3;
-
 interface EventTimelineProps {
   /** 이미 걸러 가까운 순으로 정렬한 일정 */
   events: EventItem[];
@@ -70,11 +67,20 @@ function Dot({ nearest }: { nearest: boolean }) {
   );
 }
 
-/** 일정 내용 카드 */
-function EventBody({ event }: { event: EventItem }) {
+/**
+ * 일정 내용. align 을 주면(데스크톱 좌우 타임라인) 테두리 없는 글로 그 쪽에 붙이고,
+ * 없으면(모바일) 테두리 카드로 그린다.
+ */
+function EventBody({ event, align }: { event: EventItem; align?: "left" | "right" }) {
   const meta = [event.time, event.place].filter(Boolean).join(" · ");
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-2xl border border-line bg-surface p-5">
+    <div
+      className={cn(
+        "flex min-w-0 flex-col gap-1.5",
+        !align && "gap-2 rounded-2xl border border-line bg-surface p-5",
+        align === "right" && "items-end text-right",
+      )}
+    >
       <span className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
         <span
           aria-hidden="true"
@@ -97,40 +103,66 @@ function EventBody({ event }: { event: EventItem }) {
 
 /**
  * 홈 다가오는 일정 타임라인 (P-00 #6). 가까운 일정부터 왼쪽 → 오른쪽(모바일은 위 → 아래)으로 이어진다.
- * 데스크톱 · 태블릿: 가로선 위에 날짜 · 점, 아래에 내용 카드. 모바일: 왼쪽 세로선 옆에 날짜 · 카드.
+ * 데스크톱 · 태블릿: 가운데 세로선 좌우로 번갈아 놓인 날짜 · 내용. 모바일: 왼쪽 세로선 옆에 날짜 · 카드.
  * 두 모양 중 하나만 보이고(display: none), 숨은 쪽은 화면 읽기 프로그램에도 읽히지 않는다.
  */
 export default function EventTimeline({ events, emptyMessage }: EventTimelineProps) {
   if (events.length === 0) return <EmptyState message={emptyMessage} />;
 
   const last = events.length - 1;
-  // 한 줄에 ROW_SIZE 개씩. 일정이 그보다 적으면 그 수만큼 칸을 나눈다
-  const columns = Math.min(events.length, ROW_SIZE);
 
   return (
     <>
-      {/* 태블릿 · 데스크톱: 가로 타임라인. ROW_SIZE 개마다 다음 줄로 넘어간다 */}
-      <ol
-        className="hidden gap-x-6 gap-y-12 md:grid"
-        style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-      >
+      {/*
+        태블릿 · 데스크톱: 가운데 세로선을 따라 일정이 왼쪽 · 오른쪽으로 번갈아 놓인다.
+        날짜에서 가는 가로선이 세로선 위의 점까지 이어지고, 내용은 날짜 아래에 같은 쪽으로 붙는다.
+        옆 일정은 반대쪽이라 겹치지 않으므로 위로 당겨(-mt) 엇갈리게 촘촘히 쌓는다.
+      */}
+      <ol className="relative hidden md:flex md:flex-col">
+        <span
+          aria-hidden="true"
+          className="absolute top-4 bottom-0 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-brand-blue/30"
+        />
         {events.map((event, index) => {
-          // 줄의 마지막 칸이 아니고 다음 일정이 있으면 오른쪽으로 선을 잇는다
-          const lineToNext = index < last && (index + 1) % ROW_SIZE !== 0;
+          const left = index % 2 === 0;
+          const nearest = index === 0;
           return (
-            <li key={event.id} className="flex flex-col gap-4">
-              <DateHead event={event} nearest={index === 0} />
-              {/* 점과 가로선. 칸 사이 간격(gap-x-6)까지 선을 이어 그린다 */}
-              <div className="relative flex h-4 items-center">
-                {lineToNext && (
+            <li
+              key={event.id}
+              className={cn(
+                "grid grid-cols-[minmax(0,1fr)_0.875rem_minmax(0,1fr)]",
+                index > 0 && "-mt-8",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex flex-col gap-2",
+                  left ? "col-start-1 items-end text-right" : "col-start-3 items-start",
+                )}
+              >
+                {/* 날짜 ── 점 (오른쪽 일정은 점 ── 날짜) */}
+                <div
+                  className={cn(
+                    "flex h-8 w-full items-center justify-end gap-3",
+                    !left && "flex-row-reverse",
+                  )}
+                >
+                  <DateHead event={event} nearest={nearest} />
                   <span
                     aria-hidden="true"
-                    className="absolute top-1/2 left-0 h-px w-[calc(100%+1.5rem)] bg-line"
+                    className={cn(
+                      "h-px w-16 shrink-0 lg:w-28",
+                      nearest ? "bg-brand-blue" : "bg-brand-blue/40",
+                    )}
                   />
-                )}
-                <Dot nearest={index === 0} />
+                </div>
+                <div className={cn("max-w-sm", left ? "pr-16 lg:pr-28" : "pl-16 lg:pl-28")}>
+                  <EventBody event={event} align={left ? "right" : "left"} />
+                </div>
               </div>
-              <EventBody event={event} />
+              <div className="col-start-2 row-start-1 flex h-8 items-center">
+                <Dot nearest={nearest} />
+              </div>
             </li>
           );
         })}
