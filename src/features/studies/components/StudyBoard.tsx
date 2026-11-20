@@ -73,8 +73,9 @@ export default function StudyBoard({ current, past, currentText, pastText }: Stu
 
       {/* 과거 스터디 — 연도별 넘기기 */}
       <section aria-labelledby="past-studies-title" className={CONTAINER}>
-        {/* 제목 줄: 왼쪽 제목, 같은 높이 오른쪽에 연도 고르기(선택 연도 + "···" 로 펼치기) */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* 제목 줄: 왼쪽 제목, 같은 높이 오른쪽에 연도 고르기.
+            태블릿 이상은 선택 연도 + "···" 로 펼치기, 모바일은 네이티브 선택 상자 (YearPicker) */}
+        <div className="flex items-center justify-between gap-4">
           {/* 스터디 페이지는 섹션 배지 없이 제목만, 메인 페이지와 같은 제목 글꼴(home)로 둔다 */}
           <SectionHeader title={pastText.title} titleId="past-studies-title" variant="home" />
           {selectedGroup !== null && (

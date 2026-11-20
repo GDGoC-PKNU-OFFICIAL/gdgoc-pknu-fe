@@ -24,7 +24,13 @@ export default function StudyShowcase({ studies, emptyMessage, culture }: StudyS
       {studies.length === 0 ? (
         <EmptyState message={emptyMessage} />
       ) : (
-        <ul className={cn("grid gap-7", studies.length > 1 && "lg:grid-cols-2")}>
+        <ul
+          className={cn(
+            "grid gap-7",
+            // 모바일은 2장씩 비율 그대로 작게, 태블릿은 1열, 데스크톱 2열
+            studies.length > 1 && "grid-cols-2 gap-3 md:grid-cols-1 md:gap-7 lg:grid-cols-2",
+          )}
+        >
           {studies.map((study, index) => (
             <li key={study.id}>
               <FeaturedStudyCard study={study} index={index} />
