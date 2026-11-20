@@ -26,6 +26,7 @@ export default async function EventsPage() {
         title={EVENTS_HEADER.title}
         description={EVENTS_HEADER.description}
         titleVariant="home"
+        tone="plain"
       />
       <EventsBoard events={events} serverToday={todayKst()} />
     </>

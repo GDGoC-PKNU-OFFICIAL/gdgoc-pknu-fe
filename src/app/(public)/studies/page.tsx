@@ -31,6 +31,7 @@ export default async function StudiesPage() {
         title={STUDIES_HEADER.title}
         description={STUDIES_HEADER.description}
         titleVariant="home"
+        tone="plain"
       />
 
       {/* 진행 중 스터디 그리드 + 연도별 과거 스터디. 정렬 · 연도 선택은 브라우저에서 바뀐다 */}
