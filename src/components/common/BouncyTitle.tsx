@@ -1,19 +1,22 @@
 import { type CSSProperties, type ReactNode } from "react";
 
 /** 씨앗 글자(점 → 글자)가 나타나기 시작하는 시각 (초) */
-const SEED_START = 0.15;
+const SEED_START = 0.2;
 /** letter-seed 길이 (globals.css 와 같게) */
-const SEED = 0.7;
+const SEED = 1.1;
 /** 첫 글자가 씨앗 글자에서 튀어나가는 시각 (초) */
-const EJECT_START = 0.75;
+const EJECT_START = 0.55;
 /** 글자가 하나씩 튀어나가는 간격 (초) */
-const EJECT_STAGGER = 0.14;
+const EJECT_STAGGER = 0.07;
 /** letter-eject 길이 (globals.css 와 같게) */
-const EJECT = 0.7;
+const EJECT = 1.2;
 /** 이웃 글자 사이 거리 — 글자 평균 폭 (em) */
 const LETTER_WIDTH_EM = 0.68;
 
-/** 모든 글자가 자리를 잡는 시각 (초) — 뒤따르는 장식(배지 · 도형)의 시작 시각을 맞출 때 쓴다 */
+/**
+ * 모든 글자가 자리를 잡는 시각 (초) — 뒤따르는 장식(배지 · 도형)의 시작 시각을 맞출 때 쓴다.
+ * 감속 곡선이라 끝 무렵에는 거의 멈춰 있으므로, 장식은 이보다 조금 일찍 시작해도 자연스럽다.
+ */
 export function introEnd(text: string) {
   const ejected = [...text].length - 1;
   return Math.max(SEED_START + SEED, EJECT_START + (ejected - 1) * EJECT_STAGGER + EJECT);
@@ -22,9 +25,9 @@ export function introEnd(text: string) {
 /**
  * 로고 애니메이션처럼 등장하는 제목 (레퍼런스 영상을 0.2초 단위로 쪼개 따라 했다).
  *
- * 1. 하얀 점 하나가 통통 튀며 커지다가 씨앗 글자(originIndex 번째, 보통 소문자 o)가 된다.
- * 2. 나머지 글자가 그 씨앗 글자 자리에서 하나씩, 포물선을 그리며 튀어나가 제자리에 착지한다.
- *    씨앗에 가까운 글자부터 나간다.
+ * 1. 씨앗 글자(originIndex 번째)가 흐릿하게 떠오르며 먼저 자리 잡는다.
+ * 2. 나머지 글자가 그 씨앗 글자 자리에서 하나씩 미끄러지듯 퍼져 나가 제자리에 선다.
+ *    씨앗에 가까운 글자부터 나간다. 모두 한 번의 긴 감속 곡선(expo-out)이라 튀지 않고 부드럽다.
  *
  * 서버 컴포넌트이고 CSS 애니메이션만 쓴다.
  * - 화면 읽기 프로그램에는 글자 조각 대신 label(없으면 text) 전체를 한 번 읽힌다 (aria-label).

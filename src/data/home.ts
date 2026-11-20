@@ -59,4 +59,7 @@ export const HOME_LIST_LIMIT = 3;
 export const HOME_EVENT_LIMIT = 6;
 
 /** 홈 진행 중 스터디는 4개까지 보여 준다 (태블릿 이상 2 × 2). 나머지는 Studies 페이지에서 본다 */
+/** 홈 What We Do 에 보여 줄 활동 수 (ACTIVITIES 앞에서부터) */
+export const HOME_ACTIVITY_LIMIT = 4;
+
 export const HOME_STUDY_LIMIT = 4;
