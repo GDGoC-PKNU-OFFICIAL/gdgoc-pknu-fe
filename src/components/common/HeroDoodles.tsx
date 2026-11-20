@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 
 const FLOAT = "motion-safe:animate-doodle";
 /** 도형이 하나씩 나타나는 간격 (초) */
-const POP_STAGGER = 0.09;
+const POP_STAGGER = 0.07;
 
 export default function HeroDoodles({
   start = 0,
@@ -23,7 +23,7 @@ export default function HeroDoodles({
   /** order 번째로 톡 나타나고, 그 뒤 float 박자를 offset 초만큼 엇갈려 떠다닌다 */
   const appear = (order: number, offset: number): CSSProperties => {
     const pop = start + order * POP_STAGGER;
-    return { animationDelay: `${pop.toFixed(2)}s, ${(pop + 0.5 + offset).toFixed(2)}s` };
+    return { animationDelay: `${pop.toFixed(2)}s, ${(pop + 0.9 + offset).toFixed(2)}s` };
   };
 
   return (

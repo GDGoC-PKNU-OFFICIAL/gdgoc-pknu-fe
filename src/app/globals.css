@@ -45,90 +45,96 @@
   }
 
   /*
-    로고 애니메이션처럼 등장하는 제목 (BouncyTitle) — 레퍼런스 영상을 0.2초 단위로 쪼개 따라 했다.
-    letter-seed: 작은 점이 위로 통통 튀며 커지다가 착지해 글자가 된다 (squash & stretch).
-    letter-eject: 씨앗 글자 자리(--eject-x)에서 작게 출발해 포물선으로 튀어 올라 제자리에 착지한다.
-    transform-origin 은 글자 바닥이다.
+    홈 히어로 등장 (BouncyTitle · 배지 · 장식). 통통 튀는 만화 느낌 대신, 한 번의 긴 감속 곡선(expo-out)과
+    흐릿함 → 선명함으로 부드럽게 자리 잡는다. 움직임(transform)과 나타남(opacity · blur)은 따로 돌려
+    서로 다른 박자로 겹친다.
+    - letter-seed: 가운데 글자가 살짝 아래 · 작게 · 흐리게 있다가 떠오르며 자리 잡는다.
+    - letter-eject: 나머지 글자가 가운데 글자 자리(--eject-x)에서 미끄러지듯 퍼져 나가 제자리에 선다.
   */
-  --animate-letter-seed: letter-seed 0.7s both;
-  --animate-letter-eject: letter-eject 0.7s both;
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-letter-seed:
+    letter-seed 1.1s cubic-bezier(0.16, 1, 0.3, 1) both, soft-in 0.8s ease-out both;
+  --animate-letter-eject:
+    letter-eject 1.2s cubic-bezier(0.16, 1, 0.3, 1) both, soft-in 0.7s ease-out both;
   @keyframes letter-seed {
     0% {
-      opacity: 0;
-      transform: translate(-0.9em, -0.2em) scale(0.12);
-      animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
-    }
-    10% {
-      opacity: 1;
-    }
-    35% {
-      transform: translate(-0.3em, -0.95em) scale(0.22);
-      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    62% {
-      transform: translate(0, 0) scale(1.18, 0.82);
-      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
-    }
-    80% {
-      transform: translate(0, -0.08em) scale(0.95, 1.06);
+      transform: translateY(0.18em) scale(0.82);
     }
     100% {
-      opacity: 1;
       transform: none;
     }
   }
   @keyframes letter-eject {
     0% {
+      transform: translateX(var(--eject-x)) scale(0.88);
+    }
+    100% {
+      transform: none;
+    }
+  }
+  @keyframes soft-in {
+    0% {
       opacity: 0;
-      transform: translate(var(--eject-x), 0) scale(0.35);
-      animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
-    }
-    10% {
-      opacity: 1;
-    }
-    45% {
-      transform: translate(calc(var(--eject-x) * 0.45), -0.55em) scale(1.02);
-      animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5);
-    }
-    75% {
-      transform: translate(0, 0) scale(1.12, 0.88);
-      animation-timing-function: ease-out;
+      filter: blur(12px);
     }
     100% {
       opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  /* 알약 배지가 옆에서 흐릿하게 미끄러져 들어와 선다 (홈 히어로 "PKNU") */
+  --animate-pill-in: pill-in 1s cubic-bezier(0.16, 1, 0.3, 1) both, soft-in 0.6s ease-out both;
+  @keyframes pill-in {
+    0% {
+      transform: translateX(0.8em) scale(0.92);
+    }
+    100% {
       transform: none;
     }
   }
 
-  /* 알약 배지가 옆에서 번지듯 늘어지며 미끄러져 들어온다 (홈 히어로 "PKNU") */
-  --animate-pill-in: pill-in 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
-  @keyframes pill-in {
+  /* 소속 · 소개 글이 아래에서 살짝 떠오르며 나타난다 */
+  --animate-fade-up: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) both, soft-in 0.8s ease-out both;
+  @keyframes fade-up {
     0% {
-      opacity: 0;
-      transform: translateX(1.2em) scaleX(1.7) scaleY(0.6);
-    }
-    30% {
-      opacity: 1;
+      transform: translateY(14px);
     }
     100% {
-      opacity: 1;
       transform: none;
+    }
+  }
+
+  /* 히어로 배경 사진이 아주 천천히 다가오던 것을 멈추며 자리 잡는다 */
+  --animate-hero-zoom: hero-zoom 2.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  @keyframes hero-zoom {
+    0% {
+      scale: 1.08;
+    }
+    100% {
+      scale: 1;
     }
   }
 
   /*
-    장식이 0 에서 톡 커지며 나타나고(pop-in), 도형은 그 뒤 계속 떠다닌다(doodle = pop-in + float).
-    pop-in 은 scale, float 는 translate 속성을 써서 도형의 rotate(transform)와 겹치지 않는다.
+    장식이 작게 · 투명하게 있다가 부드럽게 커지며 나타나고(pop-in), 도형은 그 뒤 계속 떠다닌다(doodle = pop-in + float).
+    pop-in 은 scale · opacity, float 는 translate 속성을 써서 도형의 rotate(transform)와 겹치지 않는다.
     doodle 의 animation-delay 는 "나타날 시각, 떠다니기 시작할 시각" 두 개를 준다.
   */
-  --animate-pop-in: pop-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
-  --animate-doodle: pop-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both, float 6s ease-in-out infinite;
+  --animate-pop-in: pop-in 0.9s cubic-bezier(0.22, 1.25, 0.36, 1) both;
+  --animate-doodle:
+    pop-in 0.9s cubic-bezier(0.22, 1.25, 0.36, 1) both, float 7s ease-in-out infinite;
   @keyframes pop-in {
     0% {
-      scale: 0;
+      scale: 0.4;
+      opacity: 0;
+    }
+    60% {
+      opacity: 1;
     }
     100% {
       scale: 1;
+      opacity: 1;
     }
   }
 
@@ -140,7 +146,7 @@
       translate: 0 0;
     }
     50% {
-      translate: 0 -12px;
+      translate: 0 -8px;
     }
   }
 
