@@ -10,6 +10,8 @@ import { EVENT_CATEGORY_CHOICES, type EventItem, type IsoDate, type YearMonth } 
 import { buildCalendarMatrix, type CalendarWeek } from "../lib/build-calendar-matrix";
 import { EVENT_CATEGORY_STYLES, formatEventDate, WEEKDAY_LABELS } from "../lib/event-labels";
 
+// 달력 바탕은 "블루 틴트": 요일 줄 · 다른 달 칸 · 칸 선을 회색 대신 옅은 파랑으로 (다크는 어두운 남색 계열)
+
 /** 한 주에 보여 줄 일정 줄 수. 넘치면 "+n" */
 const MAX_LANES = 3;
 
@@ -121,11 +123,11 @@ export default function MonthCalendar({
       <div
         role="group"
         aria-label={`${year}년 ${month}월 달력`}
-        className="overflow-hidden rounded-2xl border border-line bg-surface"
+        className="overflow-hidden rounded-2xl border border-[#e1e9f7] bg-surface dark:border-[#26314a]"
       >
         <div
           aria-hidden="true"
-          className="grid grid-cols-7 bg-surface-muted text-xs text-ink-muted"
+          className="grid grid-cols-7 bg-[#eaf1fe] text-xs font-semibold text-[#3c64b4] dark:bg-[#1a2438] dark:text-[#9fbcf5]"
         >
           {WEEKDAY_LABELS.map((label) => (
             <span key={label} className="py-2 text-center">
@@ -217,7 +219,7 @@ function isSelectedDay(date: IsoDate, event: EventItem | null): boolean {
 function Week({ week, today, selectedEvent, onSelect }: WeekProps) {
   return (
     <div
-      className="grid grid-cols-7 border-t border-line [--lane:0.5rem] sm:[--lane:1.5rem]"
+      className="grid grid-cols-7 border-t border-[#e1e9f7] [--lane:0.5rem] sm:[--lane:1.5rem] dark:border-[#26314a]"
       style={{ gridTemplateRows: WEEK_ROWS }}
     >
       {week.days.map(({ date, day, inMonth }, column) => (
@@ -225,8 +227,8 @@ function Week({ week, today, selectedEvent, onSelect }: WeekProps) {
           key={date}
           style={{ gridColumn: column + 1, gridRow: "1 / -1" }}
           className={cn(
-            "border-l border-line first:border-l-0",
-            !inMonth && "bg-surface-muted",
+            "border-l border-[#e1e9f7] first:border-l-0 dark:border-[#26314a]",
+            !inMonth && "bg-[#f4f8ff] dark:bg-[#161d2b]",
             isSelectedDay(date, selectedEvent) && "bg-brand-blue/10",
           )}
         >
@@ -235,7 +237,7 @@ function Week({ week, today, selectedEvent, onSelect }: WeekProps) {
             aria-current={date === today ? "date" : undefined}
             className={cn(
               "mt-0.5 ml-0.5 flex size-6 items-center justify-center rounded-full text-xs tabular-nums",
-              !inMonth && "text-ink-muted",
+              !inMonth && "text-[#9db3da] dark:text-[#5c6f93]",
               date === today && "bg-brand-blue font-semibold text-white",
             )}
           >
