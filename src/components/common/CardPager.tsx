@@ -15,10 +15,12 @@ interface CardPagerProps {
 }
 
 /**
- * 쪽 단위로 넘기는 카드 그리드. 한 쪽은 모바일 1열 · 태블릿 2열 · 데스크톱 3열 그리드이고,
- * 카드가 pageSize 개를 넘으면 다음 쪽이 오른쪽에 이어진다.
- * - 스와이프 · 트랙패드 가로 스크롤(scroll-snap 으로 쪽 경계에 멈춤) + 좌우 화살표 + 아래 쪽 표시 점
- * - 카드가 한 쪽에 다 들어가면 화살표 · 점 없이 그리드만 그린다
+ * 쪽 단위로 넘기는 카드 그리드.
+ * - 태블릿 · 데스크톱: 한 쪽은 2열 · 3열 그리드이고, 카드가 pageSize 개를 넘으면 다음 쪽이 오른쪽에 이어진다.
+ *   스와이프 · 트랙패드 가로 스크롤(scroll-snap 으로 쪽 경계에 멈춤) + 좌우 화살표 + 아래 쪽 표시 점.
+ *   카드가 한 쪽에 다 들어가면 화살표 · 점 없이 그리드만 그린다.
+ * - 모바일: 쪽 구분 없이 모든 카드가 한 줄로 이어지고 옆으로 스와이프해 넘긴다 (카드 1장 + 다음 카드 일부).
+ *   쪽 묶음(ul)을 display: contents 로 풀어 카드(li)가 트랙의 직접 칸이 되게 한다.
  * 가로 넘침은 트랙 안에서만 생긴다 (페이지 전체 가로 스크롤 금지).
  */
 export default function CardPager({ label, pageSize, children }: CardPagerProps) {
@@ -61,37 +63,26 @@ export default function CardPager({ label, pageSize, children }: CardPagerProps)
     track.scrollTo({ left: target.offsetLeft, behavior: reduceMotion ? "auto" : "smooth" });
   };
 
-  const grid = "grid gap-4 md:grid-cols-2 xl:grid-cols-3";
-  if (pages.length <= 1) {
-    return (
-      <ul aria-label={label} className={grid}>
-        {items.map((item, index) => (
-          <li key={index} className="min-w-0">
-            {item}
-          </li>
-        ))}
-      </ul>
-    );
-  }
+  const multiPage = pages.length > 1;
 
   return (
     <div role="region" aria-label={label} className="flex flex-col gap-6">
       <div className="relative">
         {/* relative: 카드 안 absolute 요소가 트랙 기준으로 잡혀 트랙 밖으로 빠져나가지 않게.
-            gap-16: 쪽 사이를 띄워, 넘긴 뒤 이전 쪽 카드의 테두리 · 그림자가 왼쪽 가장자리에 비치지 않게 */}
+            md:gap-16: 쪽 사이를 띄워, 넘긴 뒤 이전 쪽 카드의 테두리 · 그림자가 왼쪽 가장자리에 비치지 않게 */}
         <div
           ref={trackRef}
           id={trackId}
-          className="relative flex snap-x snap-mandatory scrollbar-none gap-16 overflow-x-auto overscroll-x-contain pb-1 [&::-webkit-scrollbar]:hidden"
+          className="relative flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain pb-1 md:gap-16 [&::-webkit-scrollbar]:hidden"
         >
           {pages.map((page, pageIndex) => (
             <ul
               key={pageIndex}
-              aria-label={`${pageIndex + 1} / ${pages.length} 쪽`}
-              className={cn(grid, "w-full shrink-0 snap-start content-start")}
+              aria-label={multiPage ? `${pageIndex + 1} / ${pages.length} 쪽` : undefined}
+              className="contents md:grid md:w-full md:shrink-0 md:snap-start md:grid-cols-2 md:content-start md:gap-4 xl:grid-cols-3"
             >
               {page.map((item, index) => (
-                <li key={index} className="min-w-0">
+                <li key={index} className="w-[85%] min-w-0 shrink-0 snap-start md:w-auto">
                   {item}
                 </li>
               ))}
@@ -113,30 +104,32 @@ export default function CardPager({ label, pageSize, children }: CardPagerProps)
         />
       </div>
 
-      {/* 쪽 표시 점 — 눌러서 그 쪽으로 간다 */}
-      <div className="flex justify-center gap-2">
-        {pages.map((_, pageIndex) => {
-          const active = pageIndex === currentPage;
-          return (
-            <button
-              key={pageIndex}
-              type="button"
-              aria-label={`${pageIndex + 1}쪽`}
-              aria-current={active ? "true" : undefined}
-              aria-controls={trackId}
-              onClick={() => goToPage(pageIndex)}
-              className="flex size-6 items-center justify-center focus-visible:outline-2 focus-visible:outline-brand-blue"
-            >
-              <span
-                className={cn(
-                  "block h-2 rounded-full transition-all duration-300",
-                  active ? "w-6 bg-ink" : "w-2 bg-line",
-                )}
-              />
-            </button>
-          );
-        })}
-      </div>
+      {/* 쪽 표시 점 — 눌러서 그 쪽으로 간다 (태블릿 · 데스크톱, 쪽이 둘 이상일 때) */}
+      {multiPage && (
+        <div className="hidden justify-center gap-2 md:flex">
+          {pages.map((_, pageIndex) => {
+            const active = pageIndex === currentPage;
+            return (
+              <button
+                key={pageIndex}
+                type="button"
+                aria-label={`${pageIndex + 1}쪽`}
+                aria-current={active ? "true" : undefined}
+                aria-controls={trackId}
+                onClick={() => goToPage(pageIndex)}
+                className="flex size-6 items-center justify-center focus-visible:outline-2 focus-visible:outline-brand-blue"
+              >
+                <span
+                  className={cn(
+                    "block h-2 rounded-full transition-all duration-300",
+                    active ? "w-6 bg-ink" : "w-2 bg-line",
+                  )}
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

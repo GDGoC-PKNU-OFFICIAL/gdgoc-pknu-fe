@@ -165,8 +165,8 @@ export default async function HomePage() {
         title={HOME_SECTIONS.about.title}
         link={HOME_SECTIONS.about.link}
       >
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {/* 홈에서는 HOME_ACTIVITY_TITLES 의 활동 4개만 한 줄로 (태블릿은 2개씩 두 줄). 전체 6개는 About 에서 본다.
+        <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+          {/* 홈에서는 HOME_ACTIVITY_TITLES 의 활동 4개만 한 줄로 (모바일 · 태블릿은 2개씩 두 줄 — 모바일은 비율 그대로 작게). 전체 6개는 About 에서 본다.
               카드 위쪽에 활동 그림(4:3, 양옆을 살짝 잘라 세로로 넉넉하게), 아래에 제목 · 설명. 주기(격주 등)는 홈에서 보여 주지 않는다.
               마우스를 올리면 4px 떠오르고 그림자가 짙어진다 ("모션 줄이기"면 그림자만) */}
           {HOME_ACTIVITY_TITLES.flatMap((name) =>
@@ -183,13 +183,15 @@ export default async function HomePage() {
                   alt=""
                   width={800}
                   height={520}
-                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 25vw, 50vw"
                   className="aspect-[4/3] w-full border-b border-line bg-white object-cover dark:brightness-90"
                 />
               )}
-              <div className="flex flex-col gap-1.5 px-5 py-4">
-                <h3 className="font-semibold break-keep">{title}</h3>
-                <p className="text-sm break-keep text-ink-muted">{description}</p>
+              <div className="flex flex-col gap-1 px-3 py-3 md:gap-1.5 md:px-5 md:py-4">
+                <h3 className="text-sm font-semibold break-keep md:text-base">{title}</h3>
+                <p className="line-clamp-3 text-xs break-keep text-ink-muted md:line-clamp-none md:text-sm">
+                  {description}
+                </p>
               </div>
             </li>
           ))}

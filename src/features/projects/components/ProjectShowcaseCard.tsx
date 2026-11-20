@@ -40,7 +40,7 @@ export type ShowcaseLayout = "standard" | "feature" | "tile";
 const THUMB_SIZES = {
   standard: "(min-width: 1440px) 448px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 90vw",
   feature: "(min-width: 1440px) 830px, (min-width: 768px) 60vw, 90vw",
-  tile: "(min-width: 1440px) 552px, (min-width: 768px) 40vw, 90vw",
+  tile: "(min-width: 1440px) 552px, (min-width: 768px) 40vw, 50vw",
 } satisfies Record<ShowcaseLayout, string>;
 
 const RISE = "group-hover:translate-y-0 group-has-[a:focus-visible]:translate-y-0";
@@ -130,20 +130,27 @@ export default function ProjectShowcaseCard({
         <div
           className={cn(
             // 평소에는 사진이 어두워 보이지 않게 맨 아래 글자 뒤만 옅게 깔고, 글자 그림자로 읽히게 한다
-            "absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-5 pt-12 text-white md:p-6 md:pt-14",
+            "absolute inset-x-0 bottom-0 flex flex-col text-white md:gap-1.5 md:p-6 md:pt-14",
+            // 모바일 작은 칸(tile)은 여백 · 글자를 줄인다
+            layout === "tile" ? "gap-0.5 p-3 pt-8" : "gap-1.5 p-5 pt-12",
             "bg-[linear-gradient(180deg,rgba(17,17,17,0)_0%,rgba(17,17,17,0.18)_50%,rgba(17,17,17,0.45)_100%)]",
             "[text-shadow:0_1px_8px_rgba(0,0,0,0.45)]",
             "transition-opacity duration-300 motion-reduce:transition-none",
             "group-has-[a:focus-visible]:opacity-0 [@media(hover:hover)]:group-hover:opacity-0",
           )}
         >
-          <span className="text-xs font-semibold text-white/85">
+          <span
+            className={cn(
+              "font-semibold text-white/85",
+              layout === "tile" ? "text-[10px] md:text-xs" : "text-xs",
+            )}
+          >
             {PROJECT_CATEGORY_LABELS[category]}
           </span>
           <h3
             className={cn(
               "line-clamp-2 font-semibold [overflow-wrap:anywhere] break-keep",
-              layout === "feature" ? "text-xl md:text-2xl" : "text-lg",
+              layout === "feature" ? "text-xl md:text-2xl" : "text-sm md:text-lg",
             )}
           >
             {/* 카드 전체를 덮는 링크 */}

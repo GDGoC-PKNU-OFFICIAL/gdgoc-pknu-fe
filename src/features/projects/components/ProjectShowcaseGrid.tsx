@@ -16,18 +16,18 @@ interface ProjectShowcaseGridProps {
 /**
  * 잡지형 배치 — 카드가 정확히 3장일 때. 모든 카드가 사진 카드라 전체가 반듯한 직사각형이 된다.
  *
- *   태블릿 · 데스크톱 (폭 3 : 2)        모바일 (1열)
- *   ┌──────────────┬──────────┐        ┌────┐
- *   │              │ 2 (16:9) │        │1 4:3│
- *   │   1 (4:3)    ├──────────┤        │2 16:9│
- *   │              │ 3 (16:9) │        │3 16:9│
- *   └──────────────┴──────────┘        └────┘
+ *   태블릿 · 데스크톱 (폭 3 : 2)        모바일 (1번은 한 줄, 2 · 3번은 비율 그대로 작게 한 줄에 둘)
+ *   ┌──────────────┬──────────┐        ┌──────────┐
+ *   │              │ 2 (16:9) │        │  1 (4:3) │
+ *   │   1 (4:3)    ├──────────┤        ├────┬─────┤
+ *   │              │ 3 (16:9) │        │2   │3    │
+ *   └──────────────┴──────────┘        └────┴─────┘
  *
  * 왼쪽 4:3 높이(3/4 × 3) = 오른쪽 16:9 두 장 높이(9/16 × 2 × 2) — 폭을 3 : 2 로 나누면 높이가 맞는다.
  * 오른쪽 두 장이 줄 높이를 정하고, 왼쪽 카드는 그 높이를 채운다 (칸 사이 간격만큼만 4:3 에서 어긋난다).
  */
 const MAGAZINE: { layout: ShowcaseLayout; cell: string }[] = [
-  { layout: "feature", cell: "md:row-span-2" },
+  { layout: "feature", cell: "col-span-2 md:col-span-1 md:row-span-2" },
   { layout: "tile", cell: "" },
   { layout: "tile", cell: "" },
 ];
@@ -47,7 +47,9 @@ export default function ProjectShowcaseGrid({ projects, emptyMessage }: ProjectS
       <ul
         className={cn(
           "grid gap-6",
-          magazine ? "md:grid-cols-[3fr_2fr]" : "auto-rows-fr md:grid-cols-2 xl:grid-cols-3",
+          magazine
+            ? "grid-cols-2 gap-3 md:grid-cols-[3fr_2fr] md:gap-6"
+            : "auto-rows-fr md:grid-cols-2 xl:grid-cols-3",
         )}
       >
         {projects.map((project, index) => {
