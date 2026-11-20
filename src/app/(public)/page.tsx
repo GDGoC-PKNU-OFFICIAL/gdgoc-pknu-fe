@@ -2,8 +2,9 @@ import Image from "next/image";
 
 import { type Metadata } from "next";
 
-import BouncyTitle from "@/components/common/BouncyTitle";
-import HeroVisual from "@/components/common/HeroVisual";
+import BouncyTitle, { introEnd } from "@/components/common/BouncyTitle";
+import GooglyEyes from "@/components/common/GooglyEyes";
+import HeroDoodles from "@/components/common/HeroDoodles";
 import PageSection, {
   FULL_SCREEN_SECTION,
   SECTION_CONTAINER,
@@ -53,30 +54,70 @@ export default async function HomePage() {
   const currentStudies = splitByStatus(studies).current.slice(0, HOME_STUDY_LIMIT);
   const nextEvents = upcomingEvents(events, { limit: HOME_EVENT_LIMIT });
 
+  // 히어로 제목: 큰 글자 "GDGoC" + 배지 "PKNU". 제목 등장이 끝나는 시각에 배지 · 눈 · 도형을 잇따라 띄운다
+  const HERO_WORD = "GDGoC";
+  const TITLE_DONE = introEnd(HERO_WORD);
+
   // 한 화면에 섹션 하나씩 (FULL_SCREEN_SECTION). data-scroll-snap 이 이 페이지에서만 스크롤 스냅을 켠다
   return (
     <div data-scroll-snap>
-      {/* 1. 히어로 */}
-      <section className="relative overflow-hidden border-b border-line bg-[linear-gradient(105deg,#ffffff_38%,#eff4ff_72%,#f2eeff_100%)] md:snap-start dark:bg-[linear-gradient(105deg,#101318_38%,#121c33_72%,#191b36_100%)]">
-        {/* 하단의 은은한 곡선 빛 */}
+      {/* 1. 히어로 — 단체 사진을 화면 가득 깔고, 선글라스 낀 듯 어둡게 톤을 눌러 그 위에 흰 글자를 올린다 */}
+      <section className="relative isolate overflow-hidden bg-[#0b0f17] md:snap-start">
+        <Image
+          src={HERO.photo.src}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-[50%_45%] saturate-[0.85]"
+        />
+        {/* 선글라스 렌즈: 푸른빛 도는 어두운 막 + 가장자리를 더 어둡게(비네팅) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-[-10%] -bottom-56 h-96 rounded-[100%] bg-[#dfe8ff] opacity-70 blur-3xl dark:bg-[#1e3a78] dark:opacity-40"
+          className="absolute inset-0 -z-10 bg-[#0b1220]/60 bg-[radial-gradient(ellipse_at_center,rgba(11,18,32,0)_30%,rgba(11,18,32,0.55)_100%)]"
         />
-        {/* 행성 그림은 글 뒤 가운데에 은은한 배경으로 깐다 */}
-        <HeroVisual className="pointer-events-none absolute top-1/2 left-1/2 w-[min(56rem,140vw)] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-45 dark:opacity-30" />
-        {/* 글은 가운데 정렬. 아래 여백을 더 줘서 화면 가운데보다 조금 위에 둔다 */}
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 px-4 py-24 text-center md:min-h-[calc(100svh-4rem)] md:px-8 md:pt-16 md:pb-56">
+        {/* 제목 둘레에 떠 있는 알록달록한 도형 (태블릿 · 데스크톱) */}
+        <HeroDoodles
+          start={TITLE_DONE + 0.55}
+          className="absolute inset-0 -z-10 hidden opacity-90 md:block"
+        />
+        {/*
+          사진 위라 라이트 · 다크 상관없이 어두운 테마 토큰으로 그린다 (data-theme="dark").
+          글은 가운데 정렬. 아래 여백을 더 줘서 화면 가운데보다 조금 위에 둔다
+        */}
+        <div
+          data-theme="dark"
+          className="relative mx-auto flex max-w-4xl flex-col items-center justify-center gap-8 px-4 py-28 text-center text-ink md:min-h-[calc(100svh-4rem)] md:px-8 md:pt-16 md:pb-40"
+        >
           <RecruitBanner recruiting={settings.recruiting} recruitPeriod={settings.recruitPeriod} />
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-base font-medium text-ink-muted md:text-lg">{HERO.affiliation}</p>
-            {/* 글자가 하나씩 떨어져 통통 튀고, 마지막에 소문자 o 가 폴짝 뛴다 */}
-            <BouncyTitle
-              text={HERO.title}
-              hopIndex={HERO.title.indexOf("o")}
-              className="font-display text-6xl font-bold tracking-tight md:text-8xl lg:text-9xl"
-            />
-            <p className="max-w-2xl text-base break-keep whitespace-pre-line text-ink-muted md:text-lg">
+          <div className="flex flex-col items-center gap-4 [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
+            <p className="text-base font-medium text-white/85 md:text-lg">{HERO.affiliation}</p>
+            {/*
+              가운데 글자에서 나머지 글자가 뿜어져 나오고, 마지막에 소문자 o 가 폴짝 뛴다.
+              "PKNU" 는 제목 오른쪽 아래에 기울어진 남색 알약 배지로(뿜기가 끝나면 떨어진다), 왼쪽 위에는 두리번거리는 눈을 얹는다
+            */}
+            <div className="relative mb-6 md:mb-10">
+              <GooglyEyes
+                delay={TITLE_DONE + 0.3}
+                className="absolute -top-3 -left-6 size-12 -rotate-12 md:-top-5 md:-left-12 md:size-20"
+              />
+              <BouncyTitle
+                text={HERO_WORD}
+                label={HERO.title}
+                originIndex={2} // 가운데 G 에서 나머지 글자가 튀어나온다
+                className="font-display text-7xl font-bold tracking-tight text-white md:text-9xl lg:text-[10rem] lg:leading-none"
+              >
+                <span className="absolute -right-4 -bottom-7 rotate-[-7deg] md:-right-8 md:-bottom-10">
+                  <span
+                    className="inline-block rounded-full bg-[#1b2a5e] px-4 py-1 text-2xl font-bold tracking-wide text-white shadow-lg motion-safe:animate-pill-in md:px-6 md:text-4xl lg:text-5xl"
+                    style={{ animationDelay: `${TITLE_DONE.toFixed(2)}s` }}
+                  >
+                    PKNU
+                  </span>
+                </span>
+              </BouncyTitle>
+            </div>
+            <p className="max-w-2xl text-base break-keep whitespace-pre-line text-white/85 md:text-lg">
               {SITE.description}
             </p>
           </div>

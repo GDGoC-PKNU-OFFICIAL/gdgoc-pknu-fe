@@ -45,57 +45,115 @@
   }
 
   /*
-    애니메이션 영화 오프닝처럼 통통 튀는 글자 (BouncyTitle). transform-origin 은 글자 바닥이다.
-    letter-drop: 위에서 떨어져 바닥에 닿으면 납작해졌다가(squash) 한 번 튀어 오르며 길쭉해지고(stretch) 자리를 잡는다.
-    letter-hop: 다 떨어진 뒤 한 글자가 움츠렸다가 폴짝 뛰어 다시 착지한다.
+    로고 애니메이션처럼 등장하는 제목 (BouncyTitle) — 레퍼런스 영상을 0.2초 단위로 쪼개 따라 했다.
+    letter-seed: 작은 점이 위로 통통 튀며 커지다가 착지해 글자가 된다 (squash & stretch).
+    letter-eject: 씨앗 글자 자리(--eject-x)에서 작게 출발해 포물선으로 튀어 올라 제자리에 착지한다.
+    transform-origin 은 글자 바닥이다.
   */
-  --animate-letter-drop: letter-drop 0.9s both;
-  --animate-letter-hop: letter-hop 0.8s both;
-  @keyframes letter-drop {
+  --animate-letter-seed: letter-seed 0.7s both;
+  --animate-letter-eject: letter-eject 0.7s both;
+  @keyframes letter-seed {
     0% {
       opacity: 0;
-      transform: translateY(-120%) scale(0.9, 1.15);
-      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+      transform: translate(-0.9em, -0.2em) scale(0.12);
+      animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
     }
-    12% {
+    10% {
       opacity: 1;
     }
-    42% {
-      transform: translateY(0) scale(1.18, 0.78);
-      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
-    }
-    64% {
-      transform: translateY(-16%) scale(0.95, 1.06);
+    35% {
+      transform: translate(-0.3em, -0.95em) scale(0.22);
       animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    62% {
+      transform: translate(0, 0) scale(1.18, 0.82);
+      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
     }
     80% {
-      transform: translateY(0) scale(1.07, 0.93);
+      transform: translate(0, -0.08em) scale(0.95, 1.06);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1, 1);
+      transform: none;
     }
   }
-  @keyframes letter-hop {
+  @keyframes letter-eject {
     0% {
-      transform: translateY(0) scale(1, 1);
+      opacity: 0;
+      transform: translate(var(--eject-x), 0) scale(0.35);
+      animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
     }
-    18% {
-      transform: translateY(0) scale(1.15, 0.8);
-      animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+    10% {
+      opacity: 1;
     }
-    48% {
-      transform: translateY(-55%) scale(0.92, 1.1);
-      animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    45% {
+      transform: translate(calc(var(--eject-x) * 0.45), -0.55em) scale(1.02);
+      animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5);
     }
-    70% {
-      transform: translateY(0) scale(1.16, 0.82);
-    }
-    85% {
-      transform: translateY(0) scale(0.97, 1.03);
+    75% {
+      transform: translate(0, 0) scale(1.12, 0.88);
+      animation-timing-function: ease-out;
     }
     100% {
-      transform: translateY(0) scale(1, 1);
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* 알약 배지가 옆에서 번지듯 늘어지며 미끄러져 들어온다 (홈 히어로 "PKNU") */
+  --animate-pill-in: pill-in 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.2) both;
+  @keyframes pill-in {
+    0% {
+      opacity: 0;
+      transform: translateX(1.2em) scaleX(1.7) scaleY(0.6);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /*
+    장식이 0 에서 톡 커지며 나타나고(pop-in), 도형은 그 뒤 계속 떠다닌다(doodle = pop-in + float).
+    pop-in 은 scale, float 는 translate 속성을 써서 도형의 rotate(transform)와 겹치지 않는다.
+    doodle 의 animation-delay 는 "나타날 시각, 떠다니기 시작할 시각" 두 개를 준다.
+  */
+  --animate-pop-in: pop-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  --animate-doodle: pop-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both, float 6s ease-in-out infinite;
+  @keyframes pop-in {
+    0% {
+      scale: 0;
+    }
+    100% {
+      scale: 1;
+    }
+  }
+
+  /* 히어로 장식 도형이 천천히 떠다닌다 (HeroDoodles). transform 대신 translate 를 써서 도형의 rotate 와 겹치지 않게 */
+  --animate-float: float 6s ease-in-out infinite;
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -12px;
+    }
+  }
+
+  /* 눈 깜빡임 (GooglyEyes) — 4초에 한 번 */
+  --animate-blink: blink 4s ease-in-out infinite;
+  @keyframes blink {
+    0%,
+    92%,
+    100% {
+      scale: 1 1;
+    }
+    96% {
+      scale: 1 0.1;
     }
   }
 
@@ -108,8 +166,12 @@
   --font-display: var(--font-google-sans), var(--font-sans);
 }
 
-/* 다크 테마 토큰. :root 보다 우선하도록 :root[data-theme] 로 쓴다 */
-:root[data-theme="dark"] {
+/*
+ * 다크 테마 토큰. :root 보다 우선하도록 :root[data-theme] 로 쓴다.
+ * 일부 영역에만 data-theme="dark" 를 줘도(예: 사진 위 홈 히어로) 그 안은 어두운 토큰으로 그린다.
+ */
+:root[data-theme="dark"],
+[data-theme="dark"] {
   color-scheme: dark;
   --color-ink: #e8eaed;
   --color-ink-muted: #9aa0a6;

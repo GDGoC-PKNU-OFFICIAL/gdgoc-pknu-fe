@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import HeaderBar from "@/components/layout/HeaderBar";
 import MobileNav from "@/components/layout/MobileNav";
 import NavLinks from "@/components/layout/NavLinks";
 import ThemeToggle from "@/components/layout/ThemeToggle";
@@ -8,11 +9,11 @@ import { PUBLIC_ROUTES } from "@/constants/routes";
 
 /**
  * 공개 사이트 GNB (IA 3-2). 서버 컴포넌트이고, 경로를 읽는 NavLinks 와 메뉴를 여닫는 MobileNav 만 클라이언트다.
- * 관리자 페이지로 가는 링크는 두지 않는다.
+ * 관리자 페이지로 가는 링크는 두지 않는다. 맨 위에서는 아래 경계선을 숨긴다 (HeaderBar).
  */
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
+    <HeaderBar>
       <div className="relative mx-auto flex h-16 max-w-site items-center justify-between px-4 md:px-8">
         {/* 로고 비율 · 색을 임의로 바꾸지 않는다 (PRD 3-2) */}
         {/*
@@ -51,6 +52,6 @@ export default function Header() {
           <MobileNav />
         </div>
       </div>
-    </header>
+    </HeaderBar>
   );
 }
