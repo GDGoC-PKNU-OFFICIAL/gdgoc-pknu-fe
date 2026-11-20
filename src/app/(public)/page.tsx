@@ -123,8 +123,14 @@ export default async function HomePage() {
               >
                 <span className="absolute -right-4 -bottom-7 rotate-[-7deg] md:-right-8 md:-bottom-10">
                   <span
-                    className="inline-block rounded-full bg-[#1b2a5e] px-4 py-1 text-2xl font-bold tracking-wide text-white shadow-lg motion-safe:animate-pill-in md:px-6 md:text-4xl lg:text-5xl"
-                    style={{ animationDelay: `${(TITLE_DONE - 0.7).toFixed(2)}s` }}
+                    className="inline-block rounded-full bg-[#1b2a5e] text-2xl leading-none font-bold tracking-wide text-white shadow-lg motion-safe:animate-pill-in md:text-4xl lg:text-5xl"
+                    style={{
+                      animationDelay: `${(TITLE_DONE - 0.7).toFixed(2)}s`,
+                      // 글자 상자를 대문자 윗선 ~ 기준선으로 잘라(text-box) 위아래 여백을 같게 → 글자가 알약 정중앙에 온다.
+                      // 지원 안 하는 브라우저는 leading-none 으로 거의 가운데. 여백은 em 이라 글자 크기와 함께 커진다
+                      textBox: "trim-both cap alphabetic",
+                      padding: "0.32em 0.6em",
+                    }}
                   >
                     PKNU
                   </span>
