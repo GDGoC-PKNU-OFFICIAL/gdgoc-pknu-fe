@@ -1,11 +1,17 @@
+import { Suspense } from "react";
+
 import { type Metadata } from "next";
 
+import ActivityPoster from "@/components/common/ActivityPoster";
+import EmblaSlider from "@/components/common/EmblaSlider";
 import PageHeader from "@/components/common/PageHeader";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
-import { ABOUT_HEADER, ACTIVITIES, IDENTITY } from "@/data/about";
+import { ABOUT_ACTIVITY_GROUPS, ABOUT_HEADER, ACTIVITIES, IDENTITY } from "@/data/about";
 import { FAQ } from "@/data/faq";
 import { RULES } from "@/data/rules";
+import RuleDetailController from "@/features/about/components/RuleDetailController";
+import RuleDocBlock from "@/features/about/components/RuleDocBlock";
 
 export const metadata: Metadata = {
   title: "About",
@@ -17,15 +23,33 @@ const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 
 // P-01 About (IA 4장). 전부 src/data 의 정적 콘텐츠라 API 호출이 없다.
 // "지원 모집 중" 항목은 두지 않는다 — 모집 여부는 홈 히어로 배너로만 안내한다.
+/** What We Do 포스터 카드 목록 (묶음 순서대로, 묶음 이름이 카드 위 작은 글씨) */
+function activityPosters() {
+  return ABOUT_ACTIVITY_GROUPS.flatMap(({ eyebrow, titles }) =>
+    titles.flatMap((name) =>
+      ACTIVITIES.items
+        .filter((item) => item.title === name)
+        .map((activity) => ({ activity, eyebrow })),
+    ),
+  ).map(({ activity, eyebrow }, index) => (
+    <ActivityPoster key={activity.title} activity={activity} eyebrow={eyebrow} index={index} />
+  ));
+}
+
 // IA 4장 P-01 #7 Discord CTA 는 팀 결정으로 제외했다 — Discord 는 Footer 아이콘으로만 안내한다.
 export default function AboutPage() {
   return (
     <>
-      <PageHeader title={ABOUT_HEADER.title} description={ABOUT_HEADER.description} />
+      <PageHeader
+        title={ABOUT_HEADER.title}
+        description={ABOUT_HEADER.description}
+        titleVariant="home"
+        tone="plain"
+      />
 
       {/* 2. 정체성 */}
       <section aria-labelledby="identity-title" className={CONTAINER}>
-        <SectionHeader badge={IDENTITY.badge} title={IDENTITY.title} titleId="identity-title" />
+        <SectionHeader title={IDENTITY.title} titleId="identity-title" variant="home" />
         <div className="flex max-w-3xl flex-col gap-4 text-base leading-relaxed break-keep md:text-lg">
           {IDENTITY.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
@@ -35,38 +59,25 @@ export default function AboutPage() {
 
       {/* 3. 활동 방식 */}
       <section aria-labelledby="activities-title" className={CONTAINER}>
-        <SectionHeader
-          badge={ACTIVITIES.badge}
-          title={ACTIVITIES.title}
-          titleId="activities-title"
-        />
-        <ul className="grid gap-4 md:grid-cols-2">
-          {ACTIVITIES.items.map((activity) => (
-            <li
-              key={activity.title}
-              className="flex flex-col gap-2 rounded-2xl border border-line p-6"
-            >
-              <p className="text-sm font-semibold text-brand-blue">{activity.cadence}</p>
-              <h3 className="text-lg font-semibold">{activity.title}</h3>
-              <p className="text-sm break-keep text-ink-muted">{activity.description}</p>
-            </li>
-          ))}
-        </ul>
+        <SectionHeader title={ACTIVITIES.title} titleId="activities-title" variant="home" />
+        {/* 앨범 카드처럼 세로로 긴 색 카드를 옆으로 넘긴다 (홈 활동 4개 + 무료 학습 콘텐츠 3개).
+            끌기 · 관성 · 끝 저항 · 트랙패드 스와이프는 Embla 가 맡는다 */}
+        <EmblaSlider label="What We Do 활동 목록">{activityPosters()}</EmblaSlider>
       </section>
 
-      {/* 4. 활동 규칙 */}
+      {/* 4. 활동 규칙 — 규칙 문서 3개를 아이콘 블록으로 (모바일 한 줄에 하나, md 이상 세 개). 누르면 ?rule= 상세 카드 */}
       <section aria-labelledby="rules-title" className={CONTAINER}>
-        <SectionHeader badge={RULES.badge} title={RULES.title} titleId="rules-title" />
-        <ul className="flex max-w-3xl list-disc flex-col gap-3 pl-5 break-keep marker:text-brand-blue">
-          {RULES.items.map((rule) => (
-            <li key={rule}>{rule}</li>
+        <SectionHeader title={RULES.title} titleId="rules-title" variant="home" />
+        <ul className="grid gap-3 md:grid-cols-3 md:gap-4">
+          {RULES.items.map((doc) => (
+            <RuleDocBlock key={doc.title} doc={doc} />
           ))}
         </ul>
       </section>
 
       {/* 5. FAQ — 네이티브 <details> 아코디언: JS 없이 키보드 · 스크린리더 지원 */}
       <section aria-labelledby="faq-title" className={CONTAINER}>
-        <SectionHeader badge={FAQ.badge} title={FAQ.title} titleId="faq-title" />
+        <SectionHeader title={FAQ.title} titleId="faq-title" variant="home" />
         <div className="flex max-w-3xl flex-col divide-y divide-line border-y border-line">
           {FAQ.items.map((item) => (
             <details key={item.question} className="group">
@@ -86,6 +97,11 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
+
+      {/* ↳ 활동 규칙 상세 카드 (?rule=) */}
+      <Suspense fallback={null}>
+        <RuleDetailController />
+      </Suspense>
     </>
   );
 }

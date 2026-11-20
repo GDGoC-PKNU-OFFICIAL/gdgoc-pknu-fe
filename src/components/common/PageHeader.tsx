@@ -14,6 +14,10 @@ interface PageHeaderProps {
    * 기본은 본문 글꼴(Geist).
    */
   titleVariant?: "default" | "home";
+  /**
+   * 배경. muted = 회색 띠 + 아래 경계선(기본), plain = 본문과 같은 흰 바탕 · 경계선 없음
+   */
+  tone?: "muted" | "plain";
 }
 
 const TITLE_CLASSES = {
@@ -27,9 +31,10 @@ export default function PageHeader({
   description,
   children,
   titleVariant = "default",
+  tone = "muted",
 }: PageHeaderProps) {
   return (
-    <header className="border-b border-line bg-surface-muted">
+    <header className={tone === "muted" ? "border-b border-line bg-surface-muted" : "bg-surface"}>
       <div className="mx-auto flex max-w-site flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
         <h1 className={cn(TITLE_CLASSES[titleVariant])}>{title}</h1>
         <p className="text-base break-keep text-ink-muted md:text-lg">{description}</p>
