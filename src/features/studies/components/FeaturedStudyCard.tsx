@@ -42,7 +42,7 @@ export default function FeaturedStudyCard({ study, index }: FeaturedStudyCardPro
         </span>
         <span
           aria-hidden="true"
-          className="flex size-10 items-center justify-center rounded-full border border-[#e4e9f4] bg-surface/80 text-ink transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none dark:border-line"
+          className="flex size-10 items-center justify-center text-ink transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
         >
           <svg
             viewBox="0 0 24 24"
