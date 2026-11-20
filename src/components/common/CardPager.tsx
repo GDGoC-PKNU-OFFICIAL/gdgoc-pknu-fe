@@ -68,12 +68,14 @@ export default function CardPager({ label, pageSize, children }: CardPagerProps)
   return (
     <div role="region" aria-label={label} className="flex flex-col gap-6">
       <div className="relative">
+        {/* py-3 · -my-3: 마우스를 올리면 카드가 위로 떠오르고 그림자가 커지는데, 가로 스크롤 트랙이 위아래를 잘라 내지 않도록
+            여유를 두고 바깥 간격은 그대로 둔다 */}
         {/* relative: 카드 안 absolute 요소가 트랙 기준으로 잡혀 트랙 밖으로 빠져나가지 않게.
             md:gap-16: 쪽 사이를 띄워, 넘긴 뒤 이전 쪽 카드의 테두리 · 그림자가 왼쪽 가장자리에 비치지 않게 */}
         <div
           ref={trackRef}
           id={trackId}
-          className="relative flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain pb-1 md:gap-16 [&::-webkit-scrollbar]:hidden"
+          className="relative -my-3 flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain py-3 md:gap-16 [&::-webkit-scrollbar]:hidden"
         >
           {pages.map((page, pageIndex) => (
             <ul

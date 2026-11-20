@@ -29,12 +29,14 @@ export default function CardSlider({ label, children, className }: CardSliderPro
 
   return (
     <div role="region" aria-label={label} className={cn("relative", className)}>
+      {/* py-3 · -my-3: 마우스를 올리면 카드가 위로 떠오르고 그림자가 커지는데, 가로 스크롤 트랙이 위아래를 잘라 내지 않도록
+            여유를 두고 바깥 간격은 그대로 둔다 */}
       {/* relative: 카드 안의 absolute 요소(sr-only 등)가 트랙 기준으로 잡혀 트랙 안에서 잘리게 한다.
           없으면 화면 밖 카드의 absolute 요소가 트랙 밖으로 빠져나와 페이지 전체에 가로 스크롤을 만든다 */}
       <ul
         ref={trackRef}
         id={trackId}
-        className="relative flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain pb-1 [&::-webkit-scrollbar]:hidden"
+        className="relative -my-3 flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain py-3 [&::-webkit-scrollbar]:hidden"
       >
         {Children.map(children, (child) => (
           <li className="w-[85%] shrink-0 snap-start md:w-[calc((100%-1rem)/2)] xl:w-[calc((100%-2rem)/3)]">
