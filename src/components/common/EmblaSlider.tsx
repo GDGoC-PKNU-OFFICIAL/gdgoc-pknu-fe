@@ -26,15 +26,20 @@ export default function EmblaSlider({ label, children }: { label: string; childr
 
   return (
     <div role="region" aria-label={label} aria-roledescription="carousel">
-      {/* 위아래 여백: 카드 그림자가 잘리지 않게 (늘린 만큼 바깥 간격은 당긴다) */}
+      {/* 위아래 여백: 카드 그림자가 잘리지 않게 (늘린 만큼 바깥 간격은 당긴다).
+          좌우: 보이는 영역을 섹션 안쪽 여백(px-4 · md:px-8)까지 넓혀, 끝 카드가 본문 폭 가장자리에서 잘리지 않게 한다.
+          첫 카드는 트랙 왼쪽 여백(pl)으로, 끝 카드는 오른쪽 바깥 여백(last:mr — Embla 가 끝 간격으로 읽는다)으로
+          본문 시작 · 끝선에 맞춘다 */}
       <div
         ref={viewportRef}
-        className="-mb-8 cursor-grab overflow-hidden pt-2 pb-10 active:cursor-grabbing"
+        className="-mx-4 -mb-8 cursor-grab overflow-hidden pt-2 pb-10 active:cursor-grabbing md:-mx-8"
       >
         {/* will-change: Embla 가 매 프레임 옮기는 transform 을 GPU 레이어로 그려 끊김을 줄인다 */}
-        <ul className="-ml-4 flex touch-pan-y will-change-transform">
+        <ul className="flex touch-pan-y gap-4 pl-4 will-change-transform md:pl-8">
           {Children.map(children, (child) => (
-            <li className="w-[70%] min-w-0 shrink-0 pl-4 md:w-[38%] xl:w-1/4">{child}</li>
+            <li className="w-[70%] min-w-0 shrink-0 last:mr-4 md:w-[38%] md:last:mr-8 xl:w-[calc((100%-4rem-3rem)/4)]">
+              {child}
+            </li>
           ))}
         </ul>
       </div>

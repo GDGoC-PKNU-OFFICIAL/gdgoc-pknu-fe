@@ -71,7 +71,7 @@ function StudyDetailContent({ study, titleId, onRequestClose }: StudyDetailConte
           type="button"
           aria-label="닫기"
           onClick={onRequestClose}
-          className="m-3 flex size-11 items-center justify-center rounded-full bg-surface/90 shadow-md hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+          className="m-3 flex size-11 items-center justify-center rounded-full bg-surface/90 transition-shadow hover:bg-surface hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
         >
           <svg
             aria-hidden="true"

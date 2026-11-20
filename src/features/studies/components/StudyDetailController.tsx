@@ -5,6 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { trackEvent } from "@/lib/analytics";
+import { focusWithoutRing } from "@/lib/focus";
 import { isOpenedFromList, pushFromList, replaceUrl, urlWithQuery } from "@/lib/url-query";
 import type { Study } from "@/types/api";
 
@@ -74,7 +75,8 @@ export default function StudyDetailController({ studies }: { studies: Study[] })
           `a[data-study-detail="${CSS.escape(slugToFocus)}"]`,
         )
       : null;
-    trigger?.focus();
+    // 테두리(포커스 표시) 없이 돌려준다 — 마우스 사용자에게 파란 테두리가 남지 않게. Tab 을 누르면 다시 보인다
+    focusWithoutRing(trigger);
   }, []);
 
   // 카드 클릭 가로채기. 캡처 단계라 next/link 보다 먼저 받고, preventDefault 하면 Link 는 이동하지 않는다

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { RULES } from "@/data/rules";
+import { focusWithoutRing } from "@/lib/focus";
 import { isOpenedFromList, pushFromList, replaceUrl, urlWithQuery } from "@/lib/url-query";
 
 import { RULE_QUERY } from "../lib/rule-query";
@@ -63,7 +64,8 @@ export default function RuleDetailController() {
           `a[data-rule-detail="${CSS.escape(slugToFocus)}"]`,
         )
       : null;
-    trigger?.focus();
+    // 테두리(포커스 표시) 없이 돌려준다 — 마우스 사용자에게 파란 테두리가 남지 않게. Tab 을 누르면 다시 보인다
+    focusWithoutRing(trigger);
   }, []);
 
   // 블록 클릭 가로채기 (캡처 단계라 next/link 보다 먼저 받는다)
