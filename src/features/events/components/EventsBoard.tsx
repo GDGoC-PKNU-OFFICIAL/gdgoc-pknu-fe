@@ -35,7 +35,10 @@ interface EventsBoardProps {
  */
 export default function EventsBoard({ events, serverToday }: EventsBoardProps) {
   const today = useTodayKst(serverToday);
-  const { upcoming, past } = splitEventsByToday(events, today);
+  const { upcoming, past: allPast } = splitEventsByToday(events, today);
+  // 지난 일정은 이번 달 것만 목록에 둔다. 지난달 이전 일정은 캘린더에서만 본다
+  const monthStart: IsoDate = `${today.slice(0, 7)}-01`;
+  const past = allPast.filter((event) => (event.endDate ?? event.date) >= monthStart);
 
   /** null 이면 이번 달 — 날짜가 바뀌면 따라간다 */
   const [pickedMonth, setPickedMonth] = useState<YearMonth | null>(null);
@@ -63,11 +66,7 @@ export default function EventsBoard({ events, serverToday }: EventsBoardProps) {
   return (
     <div className="mx-auto grid max-w-site gap-12 px-4 py-16 md:px-8 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start">
       <section aria-labelledby="calendar-title" className="flex flex-col gap-8">
-        <SectionHeader
-          badge={CALENDAR_SECTION.badge}
-          title={CALENDAR_SECTION.title}
-          titleId="calendar-title"
-        />
+        <SectionHeader title={CALENDAR_SECTION.title} titleId="calendar-title" variant="home" />
         <MonthCalendar
           events={events}
           yearMonth={pickedMonth ?? thisMonth}
@@ -83,11 +82,7 @@ export default function EventsBoard({ events, serverToday }: EventsBoardProps) {
       </section>
 
       <section aria-labelledby="schedule-title" className="flex min-w-0 flex-col gap-8">
-        <SectionHeader
-          badge={SCHEDULE_SECTION.badge}
-          title={SCHEDULE_SECTION.title}
-          titleId="schedule-title"
-        />
+        <SectionHeader title={SCHEDULE_SECTION.title} titleId="schedule-title" variant="home" />
         {events.length === 0 ? (
           <EmptyState message={SCHEDULE_SECTION.empty} />
         ) : (

@@ -7,14 +7,44 @@ import type { EventCategory, EventItem, IsoDate } from "@/types/api";
 
 /** Tailwind 가 찾을 수 있도록 클래스를 통째로 적는다. dot = 범례 · 일정 행의 점, bar = 캘린더 막대 */
 export const EVENT_CATEGORY_STYLES = {
-  meeting: { dot: "bg-brand-blue", bar: "border-l-brand-blue bg-brand-blue/10" },
-  seminar: { dot: "bg-brand-green", bar: "border-l-brand-green bg-brand-green/10" },
-  project: { dot: "bg-[#9334e6]", bar: "border-l-[#9334e6] bg-[#9334e6]/10" },
-  study: { dot: "bg-[#12a4af]", bar: "border-l-[#12a4af] bg-[#12a4af]/10" },
-  festival: { dot: "bg-brand-yellow", bar: "border-l-brand-yellow bg-brand-yellow/15" },
-  presentation: { dot: "bg-[#e8710a]", bar: "border-l-[#e8710a] bg-[#e8710a]/10" },
-  milestone: { dot: "bg-brand-red", bar: "border-l-brand-red bg-brand-red/10" },
-} satisfies Record<EventCategory, { dot: string; bar: string }>;
+  meeting: {
+    dot: "bg-brand-blue",
+    bar: "border-l-brand-blue bg-brand-blue/10",
+    mobileBar: "max-sm:bg-brand-blue",
+  },
+  // 정기 세션으로 합쳐 보인다 — meeting 과 같은 색
+  seminar: {
+    dot: "bg-brand-blue",
+    bar: "border-l-brand-blue bg-brand-blue/10",
+    mobileBar: "max-sm:bg-brand-blue",
+  },
+  project: {
+    dot: "bg-[#9334e6]",
+    bar: "border-l-[#9334e6] bg-[#9334e6]/10",
+    mobileBar: "max-sm:bg-[#9334e6]",
+  },
+  study: {
+    dot: "bg-brand-green",
+    bar: "border-l-brand-green bg-brand-green/10",
+    mobileBar: "max-sm:bg-brand-green",
+  },
+  festival: {
+    dot: "bg-brand-yellow",
+    bar: "border-l-brand-yellow bg-brand-yellow/15",
+    mobileBar: "max-sm:bg-brand-yellow",
+  },
+  // 프로젝트로 합쳐 보인다 — project 와 같은 색
+  presentation: {
+    dot: "bg-[#9334e6]",
+    bar: "border-l-[#9334e6] bg-[#9334e6]/10",
+    mobileBar: "max-sm:bg-[#9334e6]",
+  },
+  milestone: {
+    dot: "bg-brand-red",
+    bar: "border-l-brand-red bg-brand-red/10",
+    mobileBar: "max-sm:bg-brand-red",
+  },
+} satisfies Record<EventCategory, { dot: string; bar: string; mobileBar: string }>;
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 

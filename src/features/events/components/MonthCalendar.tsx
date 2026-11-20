@@ -5,7 +5,7 @@ import { type ReactNode, useMemo } from "react";
 import { EVENT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
 import { formatYearMonth, parseYearMonth } from "@/lib/date";
-import { EVENT_CATEGORIES, type EventItem, type IsoDate, type YearMonth } from "@/types/api";
+import { EVENT_CATEGORY_CHOICES, type EventItem, type IsoDate, type YearMonth } from "@/types/api";
 
 import { buildCalendarMatrix, type CalendarWeek } from "../lib/build-calendar-matrix";
 import { EVENT_CATEGORY_STYLES, formatEventDate, WEEKDAY_LABELS } from "../lib/event-labels";
@@ -13,8 +13,12 @@ import { EVENT_CATEGORY_STYLES, formatEventDate, WEEKDAY_LABELS } from "../lib/e
 /** 한 주에 보여 줄 일정 줄 수. 넘치면 "+n" */
 const MAX_LANES = 3;
 
-/** 날짜 숫자 · 일정 줄 · "+n" 줄. 일정이 없는 주도 높이가 같다 */
-const WEEK_ROWS = `1.75rem repeat(${MAX_LANES}, 1.5rem) 1rem`;
+/**
+ * 날짜 숫자 · 일정 줄 · "+n" 줄. 일정이 없는 주도 높이가 같다.
+ * 일정 줄 높이(--lane)는 화면 폭에 따라 다르다 — 모바일은 칸 폭이 좁아(약 50px) 제목을 못 읽으므로
+ * 글자 없는 얇은 색 막대(0.5rem)로 그려 칸이 세로로 길쭉하게 찌그러져 보이지 않게 한다. sm 이상은 제목 막대(1.5rem).
+ */
+const WEEK_ROWS = `1.75rem repeat(${MAX_LANES}, var(--lane)) 1rem`;
 
 interface MonthCalendarProps {
   events: EventItem[];
@@ -141,7 +145,7 @@ export default function MonthCalendar({
       </div>
 
       <ul aria-label="일정 색상" className="flex flex-wrap gap-x-4 gap-y-1">
-        {EVENT_CATEGORIES.map((category) => (
+        {EVENT_CATEGORY_CHOICES.map((category) => (
           <li key={category} className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
             <span
               aria-hidden="true"
@@ -212,7 +216,10 @@ function isSelectedDay(date: IsoDate, event: EventItem | null): boolean {
 
 function Week({ week, today, selectedEvent, onSelect }: WeekProps) {
   return (
-    <div className="grid grid-cols-7 border-t border-line" style={{ gridTemplateRows: WEEK_ROWS }}>
+    <div
+      className="grid grid-cols-7 border-t border-line [--lane:0.5rem] sm:[--lane:1.5rem]"
+      style={{ gridTemplateRows: WEEK_ROWS }}
+    >
       {week.days.map(({ date, day, inMonth }, column) => (
         <div
           key={date}
@@ -249,17 +256,24 @@ function Week({ week, today, selectedEvent, onSelect }: WeekProps) {
             onClick={() => onSelect(event)}
             style={{ gridColumn: `${startColumn + 1} / span ${span}`, gridRow: lane + 2 }}
             className={cn(
-              "z-10 mx-0.5 my-px cursor-pointer truncate border-l-[3px] px-1 text-left text-[11px] leading-[1.375rem] text-ink hover:brightness-95",
+              "z-10 mx-0.5 my-px cursor-pointer truncate text-left text-ink hover:brightness-95",
+              // 모바일: 글자 없는 얇은 색 막대 / sm 이상: 왼쪽 색 띠 + 제목
+              "rounded-full sm:rounded-none sm:border-l-[3px] sm:px-1 sm:text-[11px] sm:leading-[1.375rem]",
               "focus-visible:outline-2 focus-visible:outline-brand-blue",
               EVENT_CATEGORY_STYLES[event.category].bar,
-              !continuesBefore && "rounded-l-sm",
-              !continuesAfter && "rounded-r-sm",
+              // 모바일 얇은 막대는 옅은 바탕이면 안 보이므로 진한 분류 색으로 채운다
+              EVENT_CATEGORY_STYLES[event.category].mobileBar,
+              !continuesBefore && "sm:rounded-l-sm",
+              !continuesAfter && "sm:rounded-r-sm",
+              continuesBefore && "rounded-l-none",
+              continuesAfter && "rounded-r-none",
               continuesBefore && "ml-0 border-l-0",
               continuesAfter && "mr-0",
               selected && "ring-2 ring-brand-blue ring-inset",
             )}
           >
-            {event.title}
+            {/* 제목은 sm 이상에서만 보인다 (모바일은 aria-label · title 로만) */}
+            <span className="hidden sm:inline">{event.title}</span>
           </button>
         );
       })}
