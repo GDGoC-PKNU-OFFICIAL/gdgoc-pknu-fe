@@ -1,4 +1,7 @@
+import { type CSSProperties } from "react";
+
 import EmptyState from "@/components/common/EmptyState";
+import RevealOnScroll from "@/components/common/RevealOnScroll";
 import { EVENT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
 import type { EventItem, IsoDate } from "@/types/api";
@@ -111,8 +114,14 @@ export default function EventTimeline({ events, emptyMessage }: EventTimelinePro
 
   const last = events.length - 1;
 
+  // 스크롤해서 화면에 들어오면 가까운 일정부터 0.1초 간격으로 하나씩 떠오른다 — 처음 한 번만 (RevealOnScroll)
+  const reveal = (index: number) => ({
+    "data-reveal-item": true,
+    style: { "--reveal-order": index } as CSSProperties,
+  });
+
   return (
-    <>
+    <RevealOnScroll>
       {/*
         태블릿 · 데스크톱: 가운데 세로선을 따라 일정이 왼쪽 · 오른쪽으로 번갈아 놓인다.
         날짜에서 가는 가로선이 세로선 위의 점까지 이어지고, 내용은 날짜 아래에 같은 쪽으로 붙는다.
@@ -129,6 +138,7 @@ export default function EventTimeline({ events, emptyMessage }: EventTimelinePro
           return (
             <li
               key={event.id}
+              {...reveal(index)}
               className={cn(
                 "grid grid-cols-[minmax(0,1fr)_0.875rem_minmax(0,1fr)]",
                 index > 0 && "-mt-8",
@@ -171,7 +181,7 @@ export default function EventTimeline({ events, emptyMessage }: EventTimelinePro
       {/* 모바일: 세로 타임라인 */}
       <ol className="flex flex-col md:hidden">
         {events.map((event, index) => (
-          <li key={event.id} className="relative flex gap-4 pb-6 last:pb-0">
+          <li key={event.id} {...reveal(index)} className="relative flex gap-4 pb-6 last:pb-0">
             {/* 세로선: 다음 일정까지 잇는다 */}
             {index < last && (
               <span
@@ -189,6 +199,6 @@ export default function EventTimeline({ events, emptyMessage }: EventTimelinePro
           </li>
         ))}
       </ol>
-    </>
+    </RevealOnScroll>
   );
 }
