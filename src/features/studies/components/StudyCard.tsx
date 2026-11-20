@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { formatMonthPeriod } from "@/lib/date";
@@ -11,7 +10,7 @@ import { studyDetailHref } from "../lib/study-query";
  *
  * 명함 비율(90 × 50mm = 9 : 5, 좁은 모바일은 글이 들어가게 3 : 2)로 크기가 고정되고, 글은 모두 한 줄 말줄임이라 길어도 카드 밖으로 나가지 않는다.
  *   ┌──────────────────────────────────────┐
- *   │ <로고> GDGoC PKNU          2025.09 – │  ← 소속 · 기간 (로고는 헤더와 같은 심볼)
+ *   │ GDGoC PKNU                2025.09 – │  ← 소속 · 기간
  *   │                                      │
  *   │ 스터디 제목                            │  ← 이름 자리
  *   │ 한 줄 소개                             │
@@ -33,14 +32,6 @@ export default function StudyCard({ study }: { study: Study }) {
       {/* 소속 · 기간 */}
       <div className="flex items-center justify-between gap-3 text-[11px] text-ink-muted">
         <span className="flex min-w-0 items-center gap-2">
-          {/* 헤더(GNB)와 같은 GDGoC 심볼. 옆 글자가 이름을 말하므로 장식 이미지로 둔다 */}
-          <Image
-            src="/logo/gdgoc-symbol.png"
-            alt=""
-            width={174}
-            height={96}
-            className="h-3.5 w-auto shrink-0"
-          />
           <span className="truncate font-semibold tracking-[0.14em]">GDGoC PKNU</span>
         </span>
         <span className="shrink-0 tabular-nums">{formatMonthPeriod(period)}</span>
