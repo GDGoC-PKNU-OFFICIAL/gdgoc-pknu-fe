@@ -24,7 +24,7 @@ import { ADMIN_ROUTES } from "@/constants/routes";
 import { deleteEvent, getAdminEvents, reorderEvents } from "@/lib/api/admin-api";
 import { ApiError } from "@/lib/api/api-error";
 import { parseYearMonth } from "@/lib/date";
-import { EVENT_CATEGORIES, type EventItem } from "@/types/api";
+import { EVENT_CATEGORY_CHOICES, type EventItem } from "@/types/api";
 import type { Page } from "@/types/common";
 
 import {
@@ -39,7 +39,7 @@ import {
 import { loadDayIds, moveId } from "./event-order";
 import EventTable from "./EventTable";
 
-const CATEGORY_OPTIONS = EVENT_CATEGORIES.map((value) => ({
+const CATEGORY_OPTIONS = EVENT_CATEGORY_CHOICES.map((value) => ({
   value,
   label: EVENT_CATEGORY_LABELS[value],
 }));

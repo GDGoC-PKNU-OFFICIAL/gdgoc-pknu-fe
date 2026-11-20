@@ -25,7 +25,12 @@ import { useToast } from "@/hooks/use-toast";
 import { createEvent, updateEvent } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
 import { formatKstDateTime, isIsoDate } from "@/lib/date";
-import { EVENT_CATEGORIES, type EventCategory, type EventItem } from "@/types/api";
+import {
+  EVENT_CATEGORIES,
+  EVENT_CATEGORY_CHOICES,
+  type EventCategory,
+  type EventItem,
+} from "@/types/api";
 
 import { EVENT_CATEGORY_STYLES, formatEventDate } from "../lib/event-labels";
 
@@ -40,7 +45,7 @@ import {
 
 const L = EVENT_LIMITS;
 
-const CATEGORY_OPTIONS = EVENT_CATEGORIES.map((value) => ({
+const CATEGORY_OPTIONS = EVENT_CATEGORY_CHOICES.map((value) => ({
   value,
   label: EVENT_CATEGORY_LABELS[value],
 }));

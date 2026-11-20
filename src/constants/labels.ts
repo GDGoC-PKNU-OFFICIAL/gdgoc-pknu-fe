@@ -28,13 +28,14 @@ export const PROJECT_CATEGORY_LABELS = {
 } satisfies Record<ProjectCategory, string>;
 
 export const EVENT_CATEGORY_LABELS = {
-  meeting: "정기 모임",
-  seminar: "세미나",
-  project: "프로젝트 일정",
-  study: "스터디 일정",
-  festival: "행사",
-  presentation: "발표",
-  milestone: "동아리 주요 일정",
+  // seminar · presentation 은 화면에서 meeting · project 로 합쳐 보인다 (types/api.ts EVENT_CATEGORY_CHOICES)
+  meeting: "정기 세션",
+  seminar: "정기 세션",
+  project: "프로젝트",
+  study: "스터디",
+  festival: "GDG 행사",
+  presentation: "프로젝트",
+  milestone: "동아리 일정",
 } satisfies Record<EventCategory, string>;
 
 export const MEMBER_PART_LABELS = {

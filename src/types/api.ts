@@ -107,6 +107,26 @@ export const EVENT_CATEGORIES = [
 ] as const;
 export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
+/**
+ * 화면에서 쓰는 카테고리 5개 (관리자 선택지 · 캘린더 범례 순서).
+ * 서버 코드값 7개는 그대로 두고, seminar 는 meeting(정기 세션), presentation 은 project(프로젝트)로 합쳐 보여 준다.
+ */
+export const EVENT_CATEGORY_CHOICES = [
+  "meeting",
+  "study",
+  "project",
+  "festival",
+  "milestone",
+] as const satisfies readonly EventCategory[];
+export type EventCategoryChoice = (typeof EVENT_CATEGORY_CHOICES)[number];
+
+/** 합쳐진 옛 코드값을 화면 카테고리로 바꾼다 (seminar → meeting, presentation → project) */
+export function toEventCategoryChoice(category: EventCategory): EventCategoryChoice {
+  if (category === "seminar") return "meeting";
+  if (category === "presentation") return "project";
+  return category;
+}
+
 export interface EventItem extends ResourceMeta {
   title: string;
   category: EventCategory; // 캘린더 색상용 (필터 없음)

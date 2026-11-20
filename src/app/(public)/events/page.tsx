@@ -22,7 +22,11 @@ export default async function EventsPage() {
 
   return (
     <>
-      <PageHeader title={EVENTS_HEADER.title} description={EVENTS_HEADER.description} />
+      <PageHeader
+        title={EVENTS_HEADER.title}
+        description={EVENTS_HEADER.description}
+        titleVariant="home"
+      />
       <EventsBoard events={events} serverToday={todayKst()} />
     </>
   );

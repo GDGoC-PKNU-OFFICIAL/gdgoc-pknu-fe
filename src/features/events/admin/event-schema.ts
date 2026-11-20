@@ -8,7 +8,12 @@ import { z } from "zod";
 
 import { EVENT_LIMITS } from "@/constants/limits";
 import { isIsoDate } from "@/lib/date";
-import { EVENT_CATEGORIES, type EventCategory, type EventItem } from "@/types/api";
+import {
+  EVENT_CATEGORIES,
+  type EventCategory,
+  type EventItem,
+  toEventCategoryChoice,
+} from "@/types/api";
 import type { EventRequest } from "@/types/request";
 
 const L = EVENT_LIMITS;
@@ -64,7 +69,8 @@ export function emptyEventForm(): EventFormValues {
 export function eventToForm(event: EventItem): EventFormValues {
   return {
     title: event.title,
-    category: event.category,
+    // 합쳐진 옛 코드값(seminar · presentation)은 선택지에 없으므로 합쳐진 쪽으로 바꿔 연다
+    category: toEventCategoryChoice(event.category),
     date: event.date,
     endDate: event.endDate ?? "",
     time: event.time ?? "",
