@@ -6,6 +6,7 @@ import CardPager from "@/components/common/CardPager";
 import CardSlider from "@/components/common/CardSlider";
 import EmptyState from "@/components/common/EmptyState";
 import SectionHeader from "@/components/common/SectionHeader";
+import YearPicker from "@/components/common/YearPicker";
 import { trackEvent } from "@/lib/analytics";
 import { parseYearMonth } from "@/lib/date";
 import { groupByYear, latestYear } from "@/lib/group-by-year";
@@ -14,7 +15,6 @@ import type { Study } from "@/types/api";
 import { sortByLatest } from "../lib/study-sort";
 
 import StudyCard from "./StudyCard";
-import YearPicker from "./YearPicker";
 
 /** 진행 중 스터디 한 쪽의 카드 수 */
 const CURRENT_PAGE_SIZE = 6;

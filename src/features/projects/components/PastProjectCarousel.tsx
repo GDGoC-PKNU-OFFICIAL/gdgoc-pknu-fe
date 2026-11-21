@@ -6,7 +6,8 @@ import { useSearchParams } from "next/navigation";
 
 import CardSlider from "@/components/common/CardSlider";
 import EmptyState from "@/components/common/EmptyState";
-import YearButtons from "@/components/common/YearButtons";
+import SectionHeader from "@/components/common/SectionHeader";
+import YearPicker from "@/components/common/YearPicker";
 import { trackEvent } from "@/lib/analytics";
 
 import { resolveSelectedYear, type YearGroup } from "../lib/group-by-year";
@@ -17,6 +18,10 @@ interface PastProjectCarouselProps {
   groups: YearGroup<ReactNode>[];
   /** 0건일 때 문구 (IA 10-3) */
   emptyMessage: string;
+  /** 섹션 제목 — 같은 줄 오른쪽에 연도 고르기가 붙는다 */
+  title: string;
+  /** 제목 요소 id (section 의 aria-labelledby 대상) */
+  titleId: string;
 }
 
 /**
@@ -26,7 +31,12 @@ interface PastProjectCarouselProps {
  * 그래서 page.tsx 는 이 컴포넌트를 Suspense 로 감싸고, fallback 에 PastProjectCarouselView(최신 연도)를
  * 넣는다 → 과거 프로젝트 카드가 초기 HTML 에 포함된다 (SEO · 첫 화면).
  */
-export default function PastProjectCarousel({ groups, emptyMessage }: PastProjectCarouselProps) {
+export default function PastProjectCarousel({
+  groups,
+  emptyMessage,
+  title,
+  titleId,
+}: PastProjectCarouselProps) {
   const pastYearParam = useSearchParams().get(PAST_YEAR_QUERY);
   const selectedYear = resolveSelectedYear(groups, pastYearParam);
 
@@ -50,6 +60,8 @@ export default function PastProjectCarousel({ groups, emptyMessage }: PastProjec
       selectedYear={selectedYear}
       onSelectYear={selectYear}
       emptyMessage={emptyMessage}
+      title={title}
+      titleId={titleId}
     />
   );
 }
@@ -60,27 +72,44 @@ interface PastProjectCarouselViewProps extends PastProjectCarouselProps {
   onSelectYear?: (year: number) => void;
 }
 
-/** URL 을 모르는 표시 전용 버전. Suspense fallback(서버 HTML)으로도 쓴다 */
+/** 서버 HTML(fallback)에서는 연도를 바꿀 수 없다 */
+const noop = () => {};
+
+/**
+ * URL 을 모르는 표시 전용 버전. Suspense fallback(서버 HTML)으로도 쓴다.
+ * 제목 줄: 왼쪽 제목, 같은 높이 오른쪽에 연도 고르기 — /studies 의 Past Studies 와 같은 모양 (YearPicker).
+ */
 export function PastProjectCarouselView({
   groups,
   selectedYear,
-  onSelectYear,
+  onSelectYear = noop,
   emptyMessage,
+  title,
+  titleId,
 }: PastProjectCarouselViewProps) {
   const selectedGroup = groups.find((group) => group.year === selectedYear);
-  // 데이터가 없으면 연도 버튼을 숨기고 안내 문구만 (PRD 3-3-A 빈 상태)
-  if (!selectedGroup) return <EmptyState message={emptyMessage} />;
 
   return (
-    <div className="flex flex-col gap-6">
-      <YearButtons
-        years={groups.map((group) => group.year)}
-        selectedYear={selectedGroup.year}
-        onSelect={onSelectYear}
-      />
-      <CardSlider key={selectedGroup.year} label={`${selectedGroup.year}년 과거 프로젝트`}>
-        {selectedGroup.items}
-      </CardSlider>
-    </div>
+    <>
+      <div className="flex items-center justify-between gap-4">
+        <SectionHeader title={title} titleId={titleId} variant="home" />
+        {/* 데이터가 없으면 연도 고르기를 숨기고 안내 문구만 (PRD 3-3-A 빈 상태) */}
+        {selectedGroup && (
+          <YearPicker
+            years={groups.map((group) => group.year)}
+            selectedYear={selectedGroup.year}
+            onSelect={onSelectYear}
+            className="ml-auto"
+          />
+        )}
+      </div>
+      {selectedGroup ? (
+        <CardSlider key={selectedGroup.year} label={`${selectedGroup.year}년 과거 프로젝트`}>
+          {selectedGroup.items}
+        </CardSlider>
+      ) : (
+        <EmptyState message={emptyMessage} />
+      )}
+    </>
   );
 }

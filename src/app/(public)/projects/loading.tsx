@@ -9,7 +9,7 @@ const CARD_COUNT = 3;
 export default function ProjectsLoading() {
   return (
     <div aria-busy="true" aria-label="프로젝트를 불러오는 중">
-      <div className="border-b border-line bg-surface-muted">
+      <div className="bg-surface">
         <div className="mx-auto flex max-w-site flex-col gap-3 px-4 py-12 md:px-8 md:py-16">
           <Skeleton className="h-10 w-48 md:h-14" />
           <Skeleton className="h-5 w-full max-w-md" />

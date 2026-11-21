@@ -42,35 +42,43 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <PageHeader title={PROJECTS_HEADER.title} description={PROJECTS_HEADER.description} />
+      <PageHeader
+        title={PROJECTS_HEADER.title}
+        description={PROJECTS_HEADER.description}
+        titleVariant="home"
+        tone="plain"
+      />
 
       {/* 2. 현재 프로젝트 */}
       <section aria-labelledby="current-projects-title" className={CONTAINER}>
         <SectionHeader
-          badge={CURRENT_PROJECTS.badge}
           title={CURRENT_PROJECTS.title}
           titleId="current-projects-title"
+          variant="home"
         />
         <CurrentProjectGrid projects={current} emptyMessage={CURRENT_PROJECTS.empty} />
       </section>
 
       {/* 3. 과거 프로젝트 — 서버 HTML 에는 최신 연도가 들어가고, 브라우저에서 ?pastYear= 를 반영한다 */}
       <section aria-labelledby="past-projects-title" className={CONTAINER}>
-        <SectionHeader
-          badge={PAST_PROJECTS.badge}
-          title={PAST_PROJECTS.title}
-          titleId="past-projects-title"
-        />
+        {/* 제목 줄(제목 + 오른쪽 연도 고르기)은 PastProjectCarouselView 가 그린다 */}
         <Suspense
           fallback={
             <PastProjectCarouselView
               groups={pastGroups}
               selectedYear={latestYear(pastGroups)}
               emptyMessage={PAST_PROJECTS.empty}
+              title={PAST_PROJECTS.title}
+              titleId="past-projects-title"
             />
           }
         >
-          <PastProjectCarousel groups={pastGroups} emptyMessage={PAST_PROJECTS.empty} />
+          <PastProjectCarousel
+            groups={pastGroups}
+            emptyMessage={PAST_PROJECTS.empty}
+            title={PAST_PROJECTS.title}
+            titleId="past-projects-title"
+          />
         </Suspense>
       </section>
 

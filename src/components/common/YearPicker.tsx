@@ -20,7 +20,7 @@ const UNSELECTED =
   "border border-line bg-surface text-ink-muted hover:bg-surface-muted hover:text-ink";
 
 /**
- * 과거 스터디 연도 고르기 (Past Studies 제목 줄 오른쪽).
+ * 과거 스터디 · 과거 프로젝트 연도 고르기 (섹션 제목 줄 오른쪽).
  * - 접힘: 선택된 연도 하나 + "···" 버튼
  * - "···" 를 누르면 모든 연도(오래된 → 최신)가 펼쳐지고, 연도를 골라도 펼친 채로 남는다.
  *   "···" 를 다시 누르면 접힌다.
