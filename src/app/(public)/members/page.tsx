@@ -23,9 +23,14 @@ export default async function MembersPage() {
 
   return (
     <>
-      <PageHeader title={MEMBERS_HEADER.title} description={MEMBERS_HEADER.description} />
+      <PageHeader
+        title={MEMBERS_HEADER.title}
+        description={MEMBERS_HEADER.description}
+        titleVariant="home"
+        tone="plain"
+      />
 
-      <PageSection id="core-members" badge={CORE_MEMBERS.badge} title={CORE_MEMBERS.title}>
+      <PageSection id="core-members" title={CORE_MEMBERS.title} titleVariant="home">
         <MemberCarousel
           label="코어멤버"
           members={core}
@@ -34,12 +39,7 @@ export default async function MembersPage() {
         />
       </PageSection>
 
-      <PageSection
-        id="seniors"
-        badge={SENIORS.badge}
-        title={SENIORS.title}
-        subtitle={SENIORS.subtitle}
-      >
+      <PageSection id="seniors" title={SENIORS.title} titleVariant="home">
         <MemberCarousel
           label="시니어"
           members={senior}
