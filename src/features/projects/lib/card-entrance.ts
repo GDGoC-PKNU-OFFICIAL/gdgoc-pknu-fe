@@ -1,5 +1,5 @@
 // src/features/projects/lib/card-entrance.ts
-// /projects 진입 때 카드가 왼쪽부터 하나씩 올라오는 순서 (ProjectsCanvas 의 card-in 단계).
+// /projects 진입 때 카드가 왼쪽부터 하나씩 올라오는 순서 (WaveCanvas 의 card-in 단계 — Studies 는 globals.css 에 같은 값).
 // 물결이 다 올라오고 제목 · 설명 · 섹션 제목이 나온 뒤(1.7초) 시작해 한 장에 0.1초씩 늦춘다.
 // 화면 밖 카드까지 기다리지 않도록 8장째부터는 같은 시각.
 

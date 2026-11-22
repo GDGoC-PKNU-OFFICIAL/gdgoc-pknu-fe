@@ -355,6 +355,57 @@ const PRESETS = {
       className: "top-[6%] right-[22%] hidden size-9 md:block",
     },
   ],
+  // Studies 파란 띠 위쪽 (Projects 와 같은 자리 · 다른 도형). 처음 파란 배경만 보일 때부터 떠다닌다
+  studiesFrame: [
+    {
+      kind: "triangle",
+      color: "yellow",
+      delay: 0.4,
+      className: "top-4 left-[5%] size-10 -rotate-12 md:top-6 md:size-14",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 1.2,
+      className: "top-10 left-[21%] size-5 md:size-7",
+    },
+    {
+      kind: "ball",
+      color: "green",
+      delay: 2.1,
+      className: "top-6 left-[35%] hidden size-10 md:block",
+    },
+    {
+      kind: "tile",
+      color: "red",
+      delay: 2.7,
+      className: "top-9 left-[57%] hidden h-6 w-10 -rotate-12 md:block",
+    },
+    {
+      kind: "sun",
+      color: "yellow",
+      delay: 0.9,
+      className: "top-3 right-[27%] size-11 md:top-5 md:size-14",
+    },
+    { kind: "sparkle", color: "white", delay: 1.8, className: "top-8 right-[8%] size-6 md:size-9" },
+  ],
+  // Studies 흰 영역 머리말 오른쪽 — 카드가 다 나온 뒤 하나씩 나타난다 (at)
+  studiesSheet: [
+    {
+      kind: "gear",
+      color: "purple",
+      delay: 0.5,
+      at: 2.3,
+      className: "top-[4%] right-[6%] size-14 md:size-24",
+    },
+    {
+      kind: "sparkle",
+      color: "green",
+      delay: 2.2,
+      at: 2.4,
+      className: "top-[7%] right-[22%] hidden size-9 md:block",
+    },
+  ],
   // Events 컬러 배경: 블루 위에 옐로 · 레드 · 그린 큰 색 덩어리와 작은 축제 도형. 처음에 차례로 톡 튀어나온 뒤 멈춘다 (settle)
   eventsFrame: [
     {

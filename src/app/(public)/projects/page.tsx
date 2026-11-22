@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
 import SectionHeader from "@/components/common/SectionHeader";
+import WaveCanvas from "@/components/common/WaveCanvas";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CURRENT_PROJECTS, PAST_PROJECTS, PROJECTS_HEADER } from "@/data/projects";
 import CurrentProjectGrid from "@/features/projects/components/CurrentProjectGrid";
@@ -12,7 +13,6 @@ import PastProjectCarousel, {
 } from "@/features/projects/components/PastProjectCarousel";
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
-import ProjectsCanvas from "@/features/projects/components/ProjectsCanvas";
 import { cardEntrance } from "@/features/projects/lib/card-entrance";
 import { groupProjectsByStartYear, latestYear } from "@/features/projects/lib/group-by-year";
 import { sortProjectsByLatest } from "@/features/projects/lib/project-sort";
@@ -51,8 +51,8 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      {/* 머리말 + 두 섹션을 파란 프레임 위 흰 카드 영역에 담는다 (ProjectsCanvas — 색 점이 모이고 카드가 차례로 올라온다) */}
-      <ProjectsCanvas>
+      {/* 머리말 + 두 섹션을 파란 프레임 위 흰 카드 영역에 담는다 (WaveCanvas — 흰 파도가 덮치고 카드가 차례로 올라온다) */}
+      <WaveCanvas framePreset="projectsFrame" sheetPreset="projectsSheet">
         <PageHeader
           title={PROJECTS_HEADER.title}
           description={PROJECTS_HEADER.description}
@@ -92,7 +92,7 @@ export default async function ProjectsPage() {
             />
           </Suspense>
         </section>
-      </ProjectsCanvas>
+      </WaveCanvas>
 
       {/* ↳ 상세 카드 (?project=) */}
       <Suspense fallback={null}>

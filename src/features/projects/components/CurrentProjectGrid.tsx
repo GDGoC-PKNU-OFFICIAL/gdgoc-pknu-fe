@@ -19,7 +19,7 @@ interface CurrentProjectGridProps {
 /**
  * 진행 중 프로젝트 (P-02 #2). 태블릿 2열 · 데스크톱 3열 그리드를 6장씩 쪽으로 나눠
  * 스와이프 · 가로 스크롤과 좌우 버튼으로 넘긴다. 모바일은 한 줄로 이어 옆으로 넘긴다 (CardPager).
- * 페이지에 들어올 때 카드가 왼쪽부터 하나씩 올라온다 (cardEntrance, ProjectsCanvas 참고).
+ * 페이지에 들어올 때 카드가 왼쪽부터 하나씩 올라온다 (cardEntrance, WaveCanvas 참고).
  */
 export default function CurrentProjectGrid({ projects, emptyMessage }: CurrentProjectGridProps) {
   if (projects.length === 0) return <EmptyState message={emptyMessage} />;
