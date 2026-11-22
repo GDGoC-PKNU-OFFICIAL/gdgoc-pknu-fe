@@ -13,6 +13,7 @@ import PastProjectCarousel, {
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
 import { groupProjectsByStartYear, latestYear } from "@/features/projects/lib/group-by-year";
+import { sortProjectsByLatest } from "@/features/projects/lib/project-sort";
 import { getProjects } from "@/lib/api/public-api";
 import { splitByStatus } from "@/lib/split-by-status";
 
@@ -32,7 +33,8 @@ const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 // Render 콜드 스타트가 방문자에게 닿는다 (FRONT_ARCHITECTURE § 1 제약 3). 쿼리는 클라이언트 컴포넌트만 읽는다.
 export default async function ProjectsPage() {
   const projects = await getProjects();
-  const { current, past } = splitByStatus(projects);
+  // 현재 · 과거(연도 안) 모두 최신순 — 나눈 뒤에도 순서가 유지된다
+  const { current, past } = splitByStatus(sortProjectsByLatest(projects));
 
   // 카드는 서버에서 그려 넘긴다 — ProjectCard 가 클라이언트 번들에 들어가지 않는다
   const pastGroups = groupProjectsByStartYear(past).map(({ year, items }) => ({
