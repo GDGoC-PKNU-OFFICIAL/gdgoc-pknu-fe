@@ -75,7 +75,7 @@ export default function CardPager({ label, pageSize, children }: CardPagerProps)
         <div
           ref={trackRef}
           id={trackId}
-          className="relative -my-3 flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain py-3 md:gap-16 [&::-webkit-scrollbar]:hidden"
+          className="relative -my-3 scrollbar-none flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-3 md:gap-16 [&::-webkit-scrollbar]:hidden"
         >
           {pages.map((page, pageIndex) => (
             <ul

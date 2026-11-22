@@ -186,6 +186,17 @@
   --color-surface-muted: #181c23;
 }
 
+/*
+ * 스크롤 표시(스크롤바)만 숨기고 스크롤은 그대로 둔다 — 카드 슬라이드 트랙 · 상세 카드.
+ * Tailwind 에 기본 유틸리티가 없어 직접 만든다. Firefox 는 scrollbar-width, Chrome · Safari 는 ::-webkit-scrollbar.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   body {
     @apply bg-surface font-sans text-ink;
