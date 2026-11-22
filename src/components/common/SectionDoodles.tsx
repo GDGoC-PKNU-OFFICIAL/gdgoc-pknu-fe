@@ -21,8 +21,8 @@ const COLORS = {
   yellow: { fill: "bg-[#fbbc04]", text: "text-[#fbbc04]", border: "border-[#fbbc04]" },
   green: { fill: "bg-[#34a853]", text: "text-[#34a853]", border: "border-[#34a853]" },
   purple: { fill: "bg-[#b98be8]", text: "text-[#b98be8]", border: "border-[#b98be8]" },
-  // 히어로(HeroDoodles) 분홍 하트와 같은 색
-  pink: { fill: "bg-[#f0609e]", text: "text-[#f0609e]", border: "border-[#f0609e]" },
+  // 히어로(HeroDoodles) 주황 공 · 반원과 같은 색
+  orange: { fill: "bg-[#ff7a1a]", text: "text-[#ff7a1a]", border: "border-[#ff7a1a]" },
   // 파란 바탕(About 컬러 배경) 위의 반짝이용
   white: { fill: "bg-white", text: "text-white", border: "border-white" },
 } as const;
@@ -292,10 +292,10 @@ const PRESETS = {
       className: "top-10 left-[20%] size-5 md:size-7",
     },
     {
-      kind: "heart",
-      color: "pink",
+      kind: "gear",
+      color: "orange",
       delay: 2,
-      className: "top-6 left-[34%] hidden size-12 rotate-12 md:block",
+      className: "top-6 left-[34%] hidden size-12 md:block",
     },
     {
       kind: "tile",
