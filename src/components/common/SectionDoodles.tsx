@@ -69,9 +69,19 @@ interface DoodleProps {
   at?: number;
   /** at 과 함께 쓴다. true 면 톡 나타난 뒤 떠다니지 않고 그 자리에 멈춘다 (Events — 끝난 뒤 화면이 조용하도록) */
   settle?: boolean;
+  /** true 면 움직이지 않는다 — 처음부터 그 자리 그 모양 그대로 (Events 배경) */
+  still?: boolean;
 }
 
-function Doodle({ kind, color, className, delay = 0, at, settle = false }: DoodleProps) {
+function Doodle({
+  kind,
+  color,
+  className,
+  delay = 0,
+  at,
+  settle = false,
+  still = false,
+}: DoodleProps) {
   const c = COLORS[color];
   // 한 바퀴 6 ~ 8.4초 — 도형마다 달라 시간이 지나도 박자가 맞춰지지 않는다
   const driftSeconds = (6 + ((delay * 7) % 2.4)).toFixed(2);
@@ -84,8 +94,9 @@ function Doodle({ kind, color, className, delay = 0, at, settle = false }: Doodl
             animationDelay: `${at}s, ${(at + 0.45).toFixed(2)}s`,
             animationDuration: `0.45s, ${driftSeconds}s`,
           };
-  const motion =
-    at === undefined
+  const motion = still
+    ? ""
+    : at === undefined
       ? "motion-safe:animate-drift"
       : settle
         ? "motion-safe:animate-pop-in"
@@ -440,48 +451,42 @@ const PRESETS = {
       className: "top-8 left-[44%] hidden size-10 rotate-12 md:block",
     },
   ],
-  // Events 컬러 배경: 블루 위에 옐로 · 레드 · 그린 큰 색 덩어리와 작은 축제 도형. 처음에 차례로 톡 튀어나온 뒤 멈춘다 (settle)
+  // Events 컬러 배경: 블루 위에 옐로 · 레드 · 그린 큰 색 덩어리와 작은 축제 도형. 처음부터 그 자리에 그대로 있다 (still — 티켓이 그 위로 올라온다)
   eventsFrame: [
     {
       kind: "sun",
       color: "yellow",
-      at: 0.1,
-      settle: true,
+      still: true,
       className: "-top-16 -left-16 size-44 md:-top-24 md:-left-20 md:size-80",
     },
     {
       kind: "half",
       color: "red",
-      at: 0.18,
-      settle: true,
+      still: true,
       className: "top-20 -right-10 w-28 -rotate-90 md:top-28 md:-right-14 md:w-48",
     },
     {
       kind: "ball",
       color: "green",
-      at: 0.26,
-      settle: true,
+      still: true,
       className: "top-5 right-[14%] size-10 md:top-8 md:size-20",
     },
     {
       kind: "zigzag",
       color: "white",
-      at: 0.34,
-      settle: true,
+      still: true,
       className: "top-10 left-[34%] w-16 -rotate-6 md:top-14 md:w-24",
     },
     {
       kind: "triangle",
       color: "yellow",
-      at: 0.42,
-      settle: true,
+      still: true,
       className: "top-6 right-[34%] hidden size-12 rotate-12 md:block",
     },
     {
       kind: "sparkle",
       color: "white",
-      at: 0.5,
-      settle: true,
+      still: true,
       className: "top-16 left-[54%] hidden size-8 md:block",
     },
   ],

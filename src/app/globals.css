@@ -10,6 +10,18 @@
  */
 
 /* dark: 변형은 OS 설정이 아니라 data-theme 속성을 따른다 */
+/* Projects · Studies 파도 인트로(wave-reveal)의 마스크 위치 — 등록해야 키프레임 사이를 매끄럽게 움직인다 */
+@property --sweep {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --sway {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @theme {
   /* Google 4색 — 로고 · 카테고리 · 강조에만 쓴다 */
@@ -193,29 +205,29 @@
 
   /*
     Projects · Studies 진입 (WaveCanvas) — 흰 파도가 왼쪽에서 오른쪽으로 덮치며 흰 영역을 드러내고, 안의 글 · 카드가 차례로 떠오른다 (약 2.7초).
-    ① wave-sweep: 흰 영역을 덮은 파란 덮개가 오른쪽으로 빠진다. 덮개 왼쪽 가장자리가 세로 물결이라 흰 파도가 덮쳐 오는 것처럼 보인다
-       (0.3초 동안은 파란 배경만). both — 끝난 뒤에는 흰 영역 오른쪽 밖에 머문다(흰 영역의 overflow-clip 으로 안 보임)
-    ② wave-sway-y: 물결 가장자리가 위아래로 계속 흘러 출렁인다 (같은 모양 두 번 반복한 SVG 를 절반만큼 옮겨 끊김 없이 돈다)
+    ① wave-reveal: 흰 영역에 마스크를 씌워 왼쪽부터 드러낸다 — 직선 부분(그라디언트) + 그 앞 가장자리의 세로 물결 조각(위아래로 반복).
+       파란 덮개를 쓰지 않으므로 파란 띠 도형은 처음부터 온전하고, 흰 파도가 그 위를 덮으며 지나간다.
+       키프레임은 위치 값(--sweep)만 움직이고 마스크 자체는 [data-wave-intro] 규칙에 둔다 (마스크 그림을 키프레임에 넣으면 첫 프레임 값에 고정된다).
+       both — 끝나면 --sweep 이 끝 값에 머물러 흰 영역 전체가 보인다
+    ② wave-sway: 물결 조각이 위아래로 흘러 출렁인다 (같은 조각을 세로로 이어 붙여 한 조각만큼 옮기면 끊김 없이 돈다)
     ③ rise-in: 제목 → 설명 → 섹션 제목이 아래에서 떠오르며 투명 → 불투명 (WaveCanvas 의 [data-wave-intro] 규칙)
     ④ card-in: 카드가 왼쪽부터 하나씩 올라오며 투명 → 불투명, 끝에서 살짝 넘쳤다 제자리 ("뽀용")
     ③ · ④ 는 backwards 라 끝난 뒤에는 아무 스타일도 남기지 않는다 (카드 hover · 상세 전환과 겹치지 않게)
   */
-  --animate-wave-sweep: wave-sweep 1.4s cubic-bezier(0.45, 0, 0.15, 1) 0.3s both;
-  @keyframes wave-sweep {
+  @keyframes wave-reveal {
     from {
-      translate: 0 0;
+      --sweep: 0%;
     }
     to {
-      translate: calc(100% + 8rem) 0;
+      --sweep: calc(100% + 3rem);
     }
   }
-  --animate-wave-sway-y: wave-sway-y 2.2s linear infinite;
-  @keyframes wave-sway-y {
+  @keyframes wave-sway {
     from {
-      translate: 0 0;
+      --sway: 0px;
     }
     to {
-      translate: 0 -50%;
+      --sway: 360px;
     }
   }
   --animate-rise-in: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
@@ -381,6 +393,25 @@
       opacity: 1;
       translate: none;
     }
+  }
+}
+
+/* Projects · Studies 진입 ① · ② — 흰 영역 마스크 (위치 값은 wave-reveal · wave-sway 키프레임이 움직인다) */
+@media (prefers-reduced-motion: no-preference) {
+  [data-wave-intro] {
+    mask-image:
+      linear-gradient(to right, #000 calc(var(--sweep) - 3rem), transparent 0),
+      url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%20360%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%200%20H30%20Q48%2090%2030%20180%20T30%20360%20H0%20Z%22%2F%3E%3C%2Fsvg%3E");
+    mask-size:
+      100% 100%,
+      3rem 360px;
+    mask-repeat: no-repeat, repeat-y;
+    mask-position:
+      0 0,
+      calc(var(--sweep) - 3rem) var(--sway);
+    animation:
+      wave-reveal 1.4s cubic-bezier(0.45, 0, 0.15, 1) 0.3s both,
+      wave-sway 0.9s linear 0.3s 2 both;
   }
 }
 
