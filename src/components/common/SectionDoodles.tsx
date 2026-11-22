@@ -290,10 +290,10 @@ const PRESETS = {
       className: "top-10 left-[20%] size-5 md:size-7",
     },
     {
-      kind: "arc",
+      kind: "heart",
       color: "red",
       delay: 2,
-      className: "top-5 left-[34%] hidden size-14 rotate-[160deg] [--arc:9px] md:block",
+      className: "top-6 left-[34%] hidden size-12 -rotate-12 md:block",
     },
     {
       kind: "tile",

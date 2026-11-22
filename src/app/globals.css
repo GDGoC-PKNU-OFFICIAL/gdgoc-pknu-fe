@@ -191,30 +191,30 @@
   }
 
   /*
-    Projects 진입 (ProjectsCanvas) — 흰 물결이 아래에서 차올라 흰 영역을 드러내고, 안의 글 · 카드가 차례로 떠오른다 (약 2.7초).
-    ① wave-rise: 흰 영역을 덮은 파란 덮개가 위로 빠진다. 덮개 아래 가장자리가 물결 곡선이라 흰 물결이 차오르는 것처럼 보인다
-       (0.3초 동안은 파란 배경만). both — 끝난 뒤에는 흰 영역 위쪽 밖에 머문다(흰 영역의 overflow-clip 으로 안 보임)
-    ② wave-sway: 물결 곡선이 좌우로 계속 흘러 실제 파도처럼 출렁인다 (같은 모양 두 번 반복한 SVG 를 절반만큼 옮겨 끊김 없이 돈다)
+    Projects 진입 (ProjectsCanvas) — 흰 파도가 왼쪽에서 오른쪽으로 덮치며 흰 영역을 드러내고, 안의 글 · 카드가 차례로 떠오른다 (약 2.7초).
+    ① wave-sweep: 흰 영역을 덮은 파란 덮개가 오른쪽으로 빠진다. 덮개 왼쪽 가장자리가 세로 물결이라 흰 파도가 덮쳐 오는 것처럼 보인다
+       (0.3초 동안은 파란 배경만). both — 끝난 뒤에는 흰 영역 오른쪽 밖에 머문다(흰 영역의 overflow-clip 으로 안 보임)
+    ② wave-sway-y: 물결 가장자리가 위아래로 계속 흘러 출렁인다 (같은 모양 두 번 반복한 SVG 를 절반만큼 옮겨 끊김 없이 돈다)
     ③ rise-in: 제목 → 설명 → 섹션 제목이 아래에서 떠오르며 투명 → 불투명 (ProjectsCanvas 의 [data-projects-intro] 규칙)
     ④ card-in: 카드가 왼쪽부터 하나씩 올라오며 투명 → 불투명, 끝에서 살짝 넘쳤다 제자리 ("뽀용")
     ③ · ④ 는 backwards 라 끝난 뒤에는 아무 스타일도 남기지 않는다 (카드 hover · 상세 전환과 겹치지 않게)
   */
-  --animate-wave-rise: wave-rise 1.4s cubic-bezier(0.45, 0, 0.15, 1) 0.3s both;
-  @keyframes wave-rise {
+  --animate-wave-sweep: wave-sweep 1.4s cubic-bezier(0.45, 0, 0.15, 1) 0.3s both;
+  @keyframes wave-sweep {
     from {
       translate: 0 0;
     }
     to {
-      translate: 0 calc(-100svh - 6rem);
+      translate: calc(100% + 8rem) 0;
     }
   }
-  --animate-wave-sway: wave-sway 2.6s linear infinite;
-  @keyframes wave-sway {
+  --animate-wave-sway-y: wave-sway-y 2.2s linear infinite;
+  @keyframes wave-sway-y {
     from {
       translate: 0 0;
     }
     to {
-      translate: -50% 0;
+      translate: 0 -50%;
     }
   }
   --animate-rise-in: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;

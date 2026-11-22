@@ -1,23 +1,23 @@
-import { type CSSProperties, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 import SectionDoodles from "@/components/common/SectionDoodles";
 
 /**
- * 물결 한 줄 — 같은 모양 두 번(2880 = 1440 × 2)을 이어 그려, 절반만큼 옆으로 옮기면 처음 모양과 똑같아진다(끊김 없이 출렁임).
- * 위쪽(파란 덮개 쪽)을 칠하고 아래쪽 가장자리가 부드러운 곡선이다. 2차 베지어(T)로 이어 각지지 않는다.
+ * 세로 물결 한 줄 — 같은 모양 두 번(세로 2880 = 1440 × 2)을 이어 그려, 절반만큼 위로 옮기면 처음 모양과 똑같아진다(끊김 없이 출렁임).
+ * 오른쪽(파란 덮개 쪽)을 칠하고 왼쪽 가장자리가 부드러운 곡선이다. 2차 베지어(T)로 이어 각지지 않는다.
  */
-const WAVE_PATH =
-  "M0 0 H2880 V28 Q2700 60 2520 28 T2160 28 T1800 28 T1440 28 T1080 28 T720 28 T360 28 T0 28 Z";
+const WAVE_LINE =
+  "M40 0 Q4 180 40 360 T40 720 T40 1080 T40 1440 T40 1800 T40 2160 T40 2520 T40 2880";
 
-function Wave({ className, style }: { className: string; style?: CSSProperties }) {
+/** 곡선 오른쪽(파란 덮개 쪽)을 칠한 면 — 왼쪽 가장자리가 흰 파도의 앞면이 된다 */
+function Wave({ className }: { className: string }) {
   return (
     <svg
-      viewBox="0 0 2880 64"
+      viewBox="0 0 96 2880"
       preserveAspectRatio="none"
-      className={`absolute left-0 w-[200%] ${className}`}
-      style={style}
+      className={`absolute top-0 h-[200%] ${className}`}
     >
-      <path fill="currentColor" d={WAVE_PATH} />
+      <path fill="currentColor" d={`${WAVE_LINE} H96 V0 Z`} />
     </svg>
   );
 }
@@ -33,10 +33,10 @@ const TOP_EDGE_PATH =
  * Projects 페이지 틀 — About(AboutCanvas)과 같은 Google 블루 배경 위에, 윗변이 큰 물결 모양인 흰 영역을 화면 폭 가득 깐다.
  * 장식은 홈 · About 과 같은 도형(SectionDoodles — 해 · 공 · 호 · 반짝이 · 세모)을 파란 띠 위쪽과 흰 영역 머리말 오른쪽에 둔다.
  *
- * 들어올 때 (About 은 "흰 원이 올라옴", Projects 는 "흰 물결이 차오름") — 약 2.7초:
+ * 들어올 때 (About 은 "흰 원이 올라옴", Projects 는 "흰 파도가 덮침") — 약 2.7초:
  *   0 ~ 0.3초    파란 배경과 위쪽 도형만 (도형은 처음부터 둥둥 떠다닌다)
- *   0.3 ~ 1.7초  흰 영역(물결 윗변 포함)을 덮은 파란 덮개가 위로 빠진다. 덮개 아래 가장자리가 좌우로 출렁이는 물결이라
- *                흰 물결이 아래에서 차올라 물결 모양 흰 영역을 드러내는 것처럼 보인다 (wave-rise + wave-sway)
+ *   0.3 ~ 1.7초  흰 영역(물결 윗변 포함)을 덮은 파란 덮개가 오른쪽으로 빠진다. 덮개 왼쪽 가장자리가 위아래로 출렁이는
+ *                세로 물결이라 흰 파도가 왼쪽에서 오른쪽으로 덮쳐 흰 영역을 드러내는 것처럼 보인다 (wave-sweep + wave-sway-y)
  *   1.25초 ~     Projects 제목 → 설명 → 섹션 제목이 떠오른다 (globals.css 의 [data-projects-intro] 규칙)
  *   1.7초 ~      카드가 왼쪽부터 하나씩 올라온다 (card-in — CurrentProjectGrid · page.tsx 가 순서대로 지연을 준다)
  *   2.3초 ~      머리말 오른쪽 장식 도형이 톡 나타나 떠다닌다
@@ -64,18 +64,18 @@ export default function ProjectsCanvas({ children }: { children: ReactNode }) {
           {children}
         </div>
 
-        {/* 물결 덮개 — 화면 높이만큼 흰 영역 위를 파랗게 덮고 있다가 위로 빠진다. 아래 가장자리 두 겹: 짙은 물결 + 앞서 가는 옅은 물마루 */}
+        {/*
+          파도 덮개 — 화면 높이만큼 흰 영역을 파랗게 덮고 있다가 오른쪽으로 빠진다.
+          왼쪽 가장자리가 위아래로 출렁이는 물결(흰 파도의 앞면)이다. 처음엔 왼쪽 밖이라 보이지 않는다
+        */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 z-20 h-svh text-brand-blue motion-safe:animate-wave-rise motion-reduce:hidden"
+          className="pointer-events-none absolute inset-x-0 top-0 z-20 h-svh overflow-visible text-brand-blue motion-safe:animate-wave-sweep motion-reduce:hidden"
         >
           <div className="absolute inset-0 bg-current" />
-          <Wave className="top-[calc(100%-1px)] h-10 motion-safe:animate-wave-sway md:h-16" />
-          <Wave
-            className="top-[calc(100%-1.75rem)] h-12 text-white/25 motion-safe:animate-wave-sway md:top-[calc(100%-2.5rem)] md:h-20"
-            // 반대 방향 · 다른 속도로 흘러 두 겹이 엇갈리며 출렁인다 (클래스 순서와 상관없이 인라인이 이긴다)
-            style={{ animationDirection: "reverse", animationDuration: "3.4s" }}
-          />
+          <div className="absolute top-0 right-[calc(100%-1px)] h-full w-12 overflow-hidden md:w-20">
+            <Wave className="right-0 w-full motion-safe:animate-wave-sway-y" />
+          </div>
         </div>
       </div>
     </div>
