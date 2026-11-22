@@ -275,87 +275,74 @@ const PRESETS = {
       className: "top-[12%] right-[30%] hidden size-10 rotate-12 md:block",
     },
   ],
-  // Projects 파란 프레임 위쪽 띠 (rem 위치). 카드가 다 올라온 뒤 하나씩 나타난다 (at)
+  // Projects 파란 프레임 위쪽 띠 (rem 위치). 처음 파란 배경만 보일 때부터 떠다닌다
   projectsFrame: [
     {
       kind: "sun",
       color: "yellow",
       delay: 0.3,
-      at: 1.35,
       className: "top-3 left-[4%] size-12 md:top-5 md:size-16",
     },
     {
       kind: "sparkle",
       color: "white",
       delay: 1.1,
-      at: 1.5,
       className: "top-10 left-[20%] size-5 md:size-7",
     },
     {
       kind: "arc",
       color: "red",
       delay: 2,
-      at: 1.45,
       className: "top-5 left-[34%] hidden size-14 rotate-[160deg] [--arc:9px] md:block",
     },
     {
       kind: "tile",
       color: "purple",
       delay: 2.8,
-      at: 1.6,
       className: "top-9 left-[56%] hidden h-6 w-10 rotate-12 md:block",
     },
     {
       kind: "triangle",
       color: "yellow",
       delay: 0.8,
-      at: 1.55,
       className: "top-4 right-[28%] size-9 -rotate-12 md:top-6 md:size-12",
     },
     {
       kind: "ball",
       color: "green",
       delay: 1.7,
-      at: 1.4,
       className: "top-7 right-[7%] size-8 md:top-9 md:size-12",
     },
   ],
-  // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳, 섹션 사이, 카드 바깥 아래 (높이는 흰 영역 기준 %).
+  // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳, 카드 바깥 아래 (높이는 흰 영역 기준 %). 카드가 다 나온 뒤 하나씩 나타난다 (at).
   // 머리말 흰 배경에 가리지 않게 front 층으로 그린다. 글자 위에는 두지 않는다
   projectsSheet: [
     {
       kind: "sun",
       color: "blue",
       delay: 0.6,
-      at: 1.5,
+      at: 2.3,
       className: "top-[3%] right-[6%] size-14 md:size-24",
     },
     {
       kind: "sparkle",
       color: "yellow",
       delay: 2.3,
-      at: 1.65,
+      at: 2.4,
       className: "top-[6%] right-[22%] hidden size-9 md:block",
-    },
-    {
-      kind: "half",
-      color: "green",
-      delay: 1.4,
-      at: 1.75,
-      className: "top-[67%] left-[40%] hidden w-16 md:block",
     },
     {
       kind: "triangle",
       color: "red",
       delay: 3,
-      at: 1.85,
+      at: 2.5,
       className: "right-[3%] bottom-[3%] size-10 rotate-12 md:size-14",
     },
     {
       kind: "ball",
       color: "purple",
       delay: 2.1,
-      at: 1.9,
+      at: 2.6,
       className: "bottom-[6%] left-[46%] hidden size-10 md:block",
     },
   ],
