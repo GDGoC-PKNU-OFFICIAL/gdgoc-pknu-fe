@@ -178,6 +178,18 @@ const PRESETS = {
       delay: 3.1,
       className: "bottom-[16%] left-[6%] hidden size-20 md:block",
     },
+    {
+      kind: "sparkle",
+      color: "red",
+      delay: 0.9,
+      className: "top-[13%] left-[27%] hidden size-9 md:block",
+    },
+    {
+      kind: "triangle",
+      color: "blue",
+      delay: 3.6,
+      className: "right-[30%] bottom-[5%] hidden size-14 rotate-12 md:block",
+    },
   ],
   // What We Do: 카드가 한 줄 가득이라 위아래 여백과 양 끝만 쓴다
   about: [
@@ -199,6 +211,18 @@ const PRESETS = {
       delay: 3.3,
       className: "top-[10%] right-[24%] hidden size-9 md:block",
     },
+    {
+      kind: "ball",
+      color: "yellow",
+      delay: 1.7,
+      className: "top-[5%] right-[10%] size-6 md:top-[8%] md:right-auto md:left-[42%] md:size-7",
+    },
+    {
+      kind: "wave",
+      color: "purple",
+      delay: 2.7,
+      className: "right-[18%] bottom-[5%] hidden w-24 rotate-6 md:block",
+    },
   ],
   // Projects: 오른쪽 위 물결, 양 끝 아래에 톱니 · 공
   projects: [
@@ -219,6 +243,18 @@ const PRESETS = {
       color: "blue",
       delay: 2.6,
       className: "-right-6 bottom-[8%] size-14 md:-right-8 md:size-24",
+    },
+    {
+      kind: "sparkle",
+      color: "red",
+      delay: 1.9,
+      className: "top-[8%] left-[44%] hidden size-8 md:block",
+    },
+    {
+      kind: "half",
+      color: "green",
+      delay: 3.4,
+      className: "top-[42%] -right-8 hidden w-24 -rotate-90 md:block",
     },
   ],
   // Studies: 왼쪽 위 빨간 호, 오른쪽 위 반짝이, 오른쪽 아래 노란 알약
@@ -242,6 +278,18 @@ const PRESETS = {
       delay: 2.9,
       className: "right-[5%] bottom-[10%] hidden h-10 w-28 rotate-[16deg] md:block",
     },
+    {
+      kind: "ball",
+      color: "blue",
+      delay: 1.2,
+      className: "top-[9%] left-[40%] hidden size-7 md:block",
+    },
+    {
+      kind: "gear",
+      color: "purple",
+      delay: 3.8,
+      className: "top-[46%] -right-10 size-16 md:-right-12 md:size-24",
+    },
   ],
   // Upcoming Events: 오른쪽 아래 해, 왼쪽 아래 반원, 위쪽 작은 하트
   events: [
@@ -262,6 +310,25 @@ const PRESETS = {
       color: "purple",
       delay: 1.3,
       className: "top-[12%] right-[30%] hidden size-10 rotate-12 md:block",
+    },
+    {
+      kind: "arc",
+      color: "yellow",
+      delay: 2.8,
+      className:
+        "top-[6%] -left-12 size-24 rotate-45 [--arc:12px] md:-left-16 md:size-36 md:[--arc:18px]",
+    },
+    {
+      kind: "sparkle",
+      color: "red",
+      delay: 0.9,
+      className: "bottom-[30%] left-[22%] hidden size-8 md:block",
+    },
+    {
+      kind: "triangle",
+      color: "blue",
+      delay: 3.2,
+      className: "right-[18%] bottom-[26%] hidden size-12 -rotate-12 md:block",
     },
   ],
   // About 컬러 배경: 흰 원형 영역이 덮지 않는 위쪽 · 둥근 어깨 자리에만 둔다 (페이지 전체 높이 기준이라 % 대신 rem)
