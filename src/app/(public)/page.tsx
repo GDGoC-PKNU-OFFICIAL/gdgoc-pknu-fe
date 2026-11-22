@@ -11,6 +11,7 @@ import PageSection, {
   SECTION_CONTAINER,
 } from "@/components/common/PageSection";
 import SectionDivider from "@/components/common/SectionDivider";
+import SectionDoodles from "@/components/common/SectionDoodles";
 import SectionHeader from "@/components/common/SectionHeader";
 import { ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
@@ -60,9 +61,10 @@ export default async function HomePage() {
   const HERO_WORD = "GDGoC";
   const TITLE_DONE = introEnd(HERO_WORD);
 
-  // 한 화면에 섹션 하나씩 (FULL_SCREEN_SECTION). data-scroll-snap 이 이 페이지에서만 스크롤 스냅을 켠다
+  // 한 화면에 섹션 하나씩 (FULL_SCREEN_SECTION). data-scroll-snap 이 이 페이지에서만 스크롤 스냅을 켠다.
+  // 섹션마다 가장자리에 장식 도형(SectionDoodles)을 깐다 — 화면 밖으로 걸친 부분은 overflow-x-clip 으로 잘라 가로 스크롤이 생기지 않게 한다
   return (
-    <div data-scroll-snap>
+    <div data-scroll-snap className="overflow-x-clip">
       {/* 1. 히어로 — 단체 사진을 화면 가득 깔고, 선글라스 낀 듯 어둡게 톤을 눌러 그 위에 흰 글자를 올린다 */}
       <section className="relative isolate overflow-hidden bg-[#0b0f17] md:snap-start">
         <Image
@@ -151,8 +153,9 @@ export default async function HomePage() {
       {/* 2. 활동 통계 — 숫자가 주인공이라 헤더 · 설명을 가운데에 둔다 */}
       <section
         aria-labelledby="home-stats-title"
-        className={cn(SECTION_CONTAINER, FULL_SCREEN_SECTION, "gap-12")}
+        className={cn(SECTION_CONTAINER, FULL_SCREEN_SECTION, "relative isolate gap-12")}
       >
+        <SectionDoodles preset="stats" />
         <SectionHeader
           align="center"
           variant="home"
@@ -171,6 +174,7 @@ export default async function HomePage() {
         id="home-about"
         title={HOME_SECTIONS.about.title}
         link={HOME_SECTIONS.about.link}
+        decoration={<SectionDoodles preset="about" />}
       >
         <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
           {/* 홈에서는 HOME_ACTIVITY_TITLES 의 활동 4개만 한 줄로 (모바일 · 태블릿은 2개씩 두 줄 — 모바일은 비율 그대로 작게). About 도 같은 4개를 보인다.
@@ -197,6 +201,7 @@ export default async function HomePage() {
         id="home-projects"
         title={HOME_SECTIONS.projects.title}
         link={HOME_SECTIONS.projects.link}
+        decoration={<SectionDoodles preset="projects" />}
       >
         <ProjectShowcaseGrid projects={currentProjects} emptyMessage={CURRENT_PROJECTS.empty} />
       </PageSection>
@@ -208,7 +213,8 @@ export default async function HomePage() {
         aria-labelledby="home-studies-title"
         className={cn("md:flex md:flex-col", FULL_SCREEN_SECTION)}
       >
-        <div className={cn(SECTION_CONTAINER, "w-full gap-12")}>
+        <div className={cn(SECTION_CONTAINER, "relative isolate w-full gap-12")}>
+          <SectionDoodles preset="studies" />
           <SectionHeader
             variant="home"
             title={HOME_SECTIONS.studies.title}
@@ -231,6 +237,7 @@ export default async function HomePage() {
         id="home-events"
         title={HOME_SECTIONS.events.title}
         link={HOME_SECTIONS.events.link}
+        decoration={<SectionDoodles preset="events" />}
       >
         <EventTimeline events={nextEvents} emptyMessage={SCHEDULE_SECTION.upcomingEmpty} />
       </PageSection>
