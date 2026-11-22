@@ -10,8 +10,19 @@ interface CardSliderProps {
   label: string;
   /** 카드 목록. 각 자식이 슬라이드 한 칸이 된다 */
   children: ReactNode;
+  /**
+   * 한 화면에 보이는 카드 수.
+   * - "default": 모바일 1장(+다음 카드 일부) · 태블릿 2장 · 데스크톱 3장
+   * - "dense": 모바일 1장 · 태블릿 2장 · 노트북(lg) 3장 · 데스크톱 4장 — 세로로 긴 카드(멤버)용
+   */
+  density?: "default" | "dense";
   className?: string;
 }
+
+const ITEM_WIDTH = {
+  default: "w-[85%] md:w-[calc((100%-1rem)/2)] xl:w-[calc((100%-2rem)/3)]",
+  dense: "w-[85%] md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)] xl:w-[calc((100%-3rem)/4)]",
+} as const;
 
 /**
  * 카드 좌우 슬라이드 (C-12, IA 5-4). 과거 프로젝트 · 코어멤버 · 시니어가 공유한다.
@@ -22,7 +33,12 @@ interface CardSliderProps {
  * 스크롤 위치를 처음으로 되돌리려면(연도 변경 등) 호출하는 쪽에서 key 를 바꿔 다시 마운트한다.
  * 카드 안의 링크 · 버튼에 Tab 으로 포커스가 가면 브라우저가 트랙을 스크롤해 화면 안으로 가져온다.
  */
-export default function CardSlider({ label, children, className }: CardSliderProps) {
+export default function CardSlider({
+  label,
+  children,
+  density = "default",
+  className,
+}: CardSliderProps) {
   const trackId = useId();
   const { trackRef, canScrollPrev, canScrollNext, hasOverflow, scrollByPage } =
     useCarousel<HTMLUListElement>();
@@ -36,12 +52,10 @@ export default function CardSlider({ label, children, className }: CardSliderPro
       <ul
         ref={trackRef}
         id={trackId}
-        className="relative -my-3 flex snap-x snap-mandatory scrollbar-none gap-4 overflow-x-auto overscroll-x-contain py-3 [&::-webkit-scrollbar]:hidden"
+        className="relative -my-3 scrollbar-none flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain py-3 [&::-webkit-scrollbar]:hidden"
       >
         {Children.map(children, (child) => (
-          <li className="w-[85%] shrink-0 snap-start md:w-[calc((100%-1rem)/2)] xl:w-[calc((100%-2rem)/3)]">
-            {child}
-          </li>
+          <li className={cn("min-w-0 shrink-0 snap-start", ITEM_WIDTH[density])}>{child}</li>
         ))}
       </ul>
 

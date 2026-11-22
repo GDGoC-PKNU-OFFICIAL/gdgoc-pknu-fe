@@ -5,7 +5,7 @@
 
 export const MEMBERS_HEADER = {
   title: "Members",
-  description: "GDG on Campus PKNU를 이끄는 코어멤버와 활동을 마친 시니어를 소개합니다.",
+  description: "GDG on Campus PKNU를 이끄는 코어멤버와 시니어를 소개합니다.",
 } as const;
 
 export const CORE_MEMBERS = {
@@ -17,6 +17,5 @@ export const CORE_MEMBERS = {
 export const SENIORS = {
   badge: "멤버",
   title: "Seniors",
-  subtitle: "활동을 마친 멤버",
   empty: "아직 등록된 시니어가 없습니다.",
 } as const;
