@@ -59,18 +59,29 @@ interface DoodleProps {
   className: string;
   /** 떠다니는 박자를 엇갈릴 시간 (초). 음수로 넣어 처음부터 서로 다른 높이에서 시작한다. 속도도 이 값으로 조금씩 다르게 한다 */
   delay?: number;
+  /**
+   * 주면 페이지에 들어온 뒤 이 시각(초)에 톡 나타난 다음 떠다닌다 (doodle-pop = pop-in + drift, Projects 진입 마지막 단계).
+   * 없으면 처음부터 떠다닌다.
+   */
+  at?: number;
 }
 
-const FLOAT = "absolute motion-safe:animate-drift";
-
-function Doodle({ kind, color, className, delay = 0 }: DoodleProps) {
+function Doodle({ kind, color, className, delay = 0, at }: DoodleProps) {
   const c = COLORS[color];
   // 한 바퀴 6 ~ 8.4초 — 도형마다 달라 시간이 지나도 박자가 맞춰지지 않는다
-  const style: CSSProperties = {
-    animationDelay: `${-delay}s`,
-    animationDuration: `${(6 + ((delay * 7) % 2.4)).toFixed(2)}s`,
-  };
-  const base = cn(FLOAT, className);
+  const driftSeconds = (6 + ((delay * 7) % 2.4)).toFixed(2);
+  const style: CSSProperties =
+    at === undefined
+      ? { animationDelay: `${-delay}s`, animationDuration: `${driftSeconds}s` }
+      : {
+          animationDelay: `${at}s, ${(at + 0.45).toFixed(2)}s`,
+          animationDuration: `0.45s, ${driftSeconds}s`,
+        };
+  const base = cn(
+    "absolute",
+    at === undefined ? "motion-safe:animate-drift" : "motion-safe:animate-doodle-pop",
+    className,
+  );
 
   switch (kind) {
     case "ball":
@@ -264,6 +275,90 @@ const PRESETS = {
       className: "top-[12%] right-[30%] hidden size-10 rotate-12 md:block",
     },
   ],
+  // Projects 파란 프레임 위쪽 띠 (rem 위치). 카드가 다 올라온 뒤 하나씩 나타난다 (at)
+  projectsFrame: [
+    {
+      kind: "sun",
+      color: "yellow",
+      delay: 0.3,
+      at: 1.35,
+      className: "top-3 left-[4%] size-12 md:top-5 md:size-16",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 1.1,
+      at: 1.5,
+      className: "top-10 left-[20%] size-5 md:size-7",
+    },
+    {
+      kind: "arc",
+      color: "red",
+      delay: 2,
+      at: 1.45,
+      className: "top-5 left-[34%] hidden size-14 rotate-[160deg] [--arc:9px] md:block",
+    },
+    {
+      kind: "tile",
+      color: "purple",
+      delay: 2.8,
+      at: 1.6,
+      className: "top-9 left-[56%] hidden h-6 w-10 rotate-12 md:block",
+    },
+    {
+      kind: "triangle",
+      color: "yellow",
+      delay: 0.8,
+      at: 1.55,
+      className: "top-4 right-[28%] size-9 -rotate-12 md:top-6 md:size-12",
+    },
+    {
+      kind: "ball",
+      color: "green",
+      delay: 1.7,
+      at: 1.4,
+      className: "top-7 right-[7%] size-8 md:top-9 md:size-12",
+    },
+  ],
+  // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳, 섹션 사이, 카드 바깥 아래 (높이는 흰 영역 기준 %).
+  // 머리말 흰 배경에 가리지 않게 front 층으로 그린다. 글자 위에는 두지 않는다
+  projectsSheet: [
+    {
+      kind: "sun",
+      color: "blue",
+      delay: 0.6,
+      at: 1.5,
+      className: "top-[3%] right-[6%] size-14 md:size-24",
+    },
+    {
+      kind: "sparkle",
+      color: "yellow",
+      delay: 2.3,
+      at: 1.65,
+      className: "top-[6%] right-[22%] hidden size-9 md:block",
+    },
+    {
+      kind: "half",
+      color: "green",
+      delay: 1.4,
+      at: 1.75,
+      className: "top-[67%] left-[40%] hidden w-16 md:block",
+    },
+    {
+      kind: "triangle",
+      color: "red",
+      delay: 3,
+      at: 1.85,
+      className: "right-[3%] bottom-[3%] size-10 rotate-12 md:size-14",
+    },
+    {
+      kind: "ball",
+      color: "purple",
+      delay: 2.1,
+      at: 1.9,
+      className: "bottom-[6%] left-[46%] hidden size-10 md:block",
+    },
+  ],
   // About 컬러 배경: 흰 원형 영역이 덮지 않는 위쪽 · 둥근 어깨 자리에만 둔다 (페이지 전체 높이 기준이라 % 대신 rem)
   aboutBackdrop: [
     {
@@ -308,12 +403,25 @@ const PRESETS = {
 
 export type SectionDoodlesPreset = keyof typeof PRESETS;
 
-export default function SectionDoodles({ preset }: { preset: SectionDoodlesPreset }) {
+export default function SectionDoodles({
+  preset,
+  front = false,
+}: {
+  preset: SectionDoodlesPreset;
+  /**
+   * true 면 콘텐츠 뒤(-z-10)가 아니라 문서 순서대로 그린다 — 배경색만 있는 머리말 등에 가려지지 않는다.
+   * 뒤에 오는 카드 같은 위치 지정 요소는 여전히 위에 온다. 글자 위에 도형을 두지 않을 때만 쓴다
+   */
+  front?: boolean;
+}) {
   return (
     <div
       aria-hidden="true"
       // 섹션 높이 × 화면 전체 폭. 넘치는 도형은 여기서 잘린다 (가로 넘침은 페이지 쪽 overflow-x-clip 도 막는다)
-      className="pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden"
+      className={cn(
+        "pointer-events-none absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 overflow-hidden",
+        !front && "-z-10",
+      )}
     >
       {PRESETS[preset].map((doodle, index) => (
         <Doodle key={index} {...doodle} />

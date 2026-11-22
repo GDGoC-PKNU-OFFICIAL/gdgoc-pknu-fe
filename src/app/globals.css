@@ -191,9 +191,9 @@
   }
 
   /*
-    Projects 진입 (ProjectsCanvas) — About 의 "흰 원이 올라옴" 대신 "픽셀이 모여 흰 영역이 생기고 카드가 차례로 올라옴".
-    ① pixel-gather: 흩어진 작은 색 픽셀들이 흰 영역 윗변으로 모였다가 사라진다 (위치는 각 픽셀의 --gx · --gy 에서 출발)
-    ② sheet-form: 픽셀이 모인 자리에서 흰 영역이 살짝 아래에서 커지며 생긴다
+    Projects 진입 (ProjectsCanvas) — About 의 "흰 원이 올라옴" 대신 "색 점이 모여 흰 영역이 생기고 카드가 차례로 올라옴".
+    ① pixel-gather: 흩어진 작은 색 점들이 흰 영역 윗변으로 모였다가 사라진다 (위치는 각 점의 --gx · --gy 에서 출발)
+    ② sheet-form: 점이 모인 자리에서 흰 영역이 살짝 아래에서 커지며 생긴다
     ③ card-in: 카드가 왼쪽부터 하나씩 아래에서 올라오며 투명 → 불투명, 끝에서 살짝 넘쳤다 제자리 ("뽀용")
     모두 backwards 라 끝난 뒤에는 아무 스타일도 남기지 않는다 (카드 hover · 상세 전환과 겹치지 않게)
   */
@@ -231,8 +231,8 @@
       scale: 1;
     }
   }
-  /* ④ 카드가 다 나온 뒤 주변 픽셀 장식이 톡 나타나고(pop-in) 계속 둥둥 떠다닌다(drift). delay 는 "나타날 시각, 떠다니기 시작할 시각" */
-  --animate-pixel-pop:
+  /* ④ 카드가 다 나온 뒤 주변 장식 도형이 톡 나타나고(pop-in) 계속 둥둥 떠다닌다(drift). delay 는 "나타날 시각, 떠다니기 시작할 시각" */
+  --animate-doodle-pop:
     pop-in 0.45s cubic-bezier(0.22, 1.25, 0.36, 1) both, drift 7s ease-in-out infinite;
   --animate-card-in: card-in 0.6s cubic-bezier(0.22, 1.25, 0.36, 1) backwards;
   @keyframes card-in {

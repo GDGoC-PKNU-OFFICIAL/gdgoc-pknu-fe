@@ -51,7 +51,7 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      {/* 머리말 + 두 섹션을 파란 프레임 위 흰 카드 영역에 담는다 (ProjectsCanvas — 픽셀이 모이고 카드가 차례로 올라온다) */}
+      {/* 머리말 + 두 섹션을 파란 프레임 위 흰 카드 영역에 담는다 (ProjectsCanvas — 색 점이 모이고 카드가 차례로 올라온다) */}
       <ProjectsCanvas>
         <PageHeader
           title={PROJECTS_HEADER.title}
