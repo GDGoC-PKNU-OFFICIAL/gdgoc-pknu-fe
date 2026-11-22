@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
  *   도형 일부가 화면 · 섹션 경계에서 잘려 "밖에서 들어온" 느낌을 준다. 섹션은 relative isolate 여야 한다.
  * - 콘텐츠 뒤(-z-10)에 깔리므로 카드와 겹쳐도 카드가 위에 온다. 그래도 대부분 여백 · 가장자리에 둔다.
  * - 모바일은 도형을 작게, 개수를 줄여(md:block) 화면 끝에만 걸친다.
- * - 천천히 위아래로 떠다니고, 도형마다 박자를 엇갈린다. "모션 줄이기"면 멈춘다.
+ * - 둥둥 떠다닌다(drift: 위아래 + 살짝 옆으로). 도형마다 박자 · 속도를 엇갈려 함께 오르내리지 않는다. "모션 줄이기"면 멈춘다.
  *
  * 색은 Google 4색 + 보라(히어로 보라 #b98be8). 섹션마다 배치를 정해 둔 preset 으로 쓴다.
  */
@@ -21,6 +21,8 @@ const COLORS = {
   yellow: { fill: "bg-[#fbbc04]", text: "text-[#fbbc04]", border: "border-[#fbbc04]" },
   green: { fill: "bg-[#34a853]", text: "text-[#34a853]", border: "border-[#34a853]" },
   purple: { fill: "bg-[#b98be8]", text: "text-[#b98be8]", border: "border-[#b98be8]" },
+  // 파란 바탕(About 컬러 배경) 위의 반짝이용
+  white: { fill: "bg-white", text: "text-white", border: "border-white" },
 } as const;
 
 type DoodleColor = keyof typeof COLORS;
@@ -55,15 +57,19 @@ interface DoodleProps {
   color: DoodleColor;
   /** 위치 · 크기 · 회전 · 보이는 화면 폭 (Tailwind) */
   className: string;
-  /** 떠다니는 박자를 엇갈릴 시간 (초). 음수라 처음부터 서로 다른 높이에서 시작한다 */
+  /** 떠다니는 박자를 엇갈릴 시간 (초). 음수로 넣어 처음부터 서로 다른 높이에서 시작한다. 속도도 이 값으로 조금씩 다르게 한다 */
   delay?: number;
 }
 
-const FLOAT = "absolute motion-safe:animate-float";
+const FLOAT = "absolute motion-safe:animate-drift";
 
 function Doodle({ kind, color, className, delay = 0 }: DoodleProps) {
   const c = COLORS[color];
-  const style: CSSProperties = { animationDelay: `${-delay}s` };
+  // 한 바퀴 6 ~ 8.4초 — 도형마다 달라 시간이 지나도 박자가 맞춰지지 않는다
+  const style: CSSProperties = {
+    animationDelay: `${-delay}s`,
+    animationDuration: `${(6 + ((delay * 7) % 2.4)).toFixed(2)}s`,
+  };
   const base = cn(FLOAT, className);
 
   switch (kind) {
@@ -170,7 +176,7 @@ const PRESETS = {
       kind: "ball",
       color: "green",
       delay: 3.1,
-      className: "bottom-[18%] left-[9%] hidden size-8 md:block",
+      className: "bottom-[16%] left-[6%] hidden size-20 md:block",
     },
   ],
   // What We Do: 카드가 한 줄 가득이라 위아래 여백과 양 끝만 쓴다
@@ -256,6 +262,46 @@ const PRESETS = {
       color: "purple",
       delay: 1.3,
       className: "top-[12%] right-[30%] hidden size-10 rotate-12 md:block",
+    },
+  ],
+  // About 컬러 배경: 흰 원형 영역이 덮지 않는 위쪽 · 둥근 어깨 자리에만 둔다 (페이지 전체 높이 기준이라 % 대신 rem)
+  aboutBackdrop: [
+    {
+      kind: "sun",
+      color: "yellow",
+      delay: 0,
+      className: "-top-16 -left-16 size-44 md:-top-28 md:-left-24 md:size-96",
+    },
+    {
+      kind: "ball",
+      color: "green",
+      delay: 1.4,
+      className: "top-6 right-[10%] size-12 md:top-10 md:size-24",
+    },
+    {
+      kind: "arc",
+      color: "red",
+      delay: 2.2,
+      className:
+        "top-20 -right-16 size-36 rotate-[120deg] [--arc:16px] md:top-36 md:-right-24 md:size-72 md:[--arc:34px]",
+    },
+    {
+      kind: "half",
+      color: "purple",
+      delay: 3,
+      className: "top-[13rem] -left-12 hidden w-40 rotate-90 md:block",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 0.7,
+      className: "top-10 left-[30%] size-7 md:top-14 md:size-11",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 2.6,
+      className: "top-24 right-[32%] hidden size-6 md:block",
     },
   ],
 } satisfies Record<string, DoodleProps[]>;
