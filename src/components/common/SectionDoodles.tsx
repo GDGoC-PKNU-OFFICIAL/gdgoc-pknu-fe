@@ -179,12 +179,6 @@ const PRESETS = {
       className: "bottom-[16%] left-[6%] hidden size-20 md:block",
     },
     {
-      kind: "sparkle",
-      color: "red",
-      delay: 0.9,
-      className: "top-[13%] left-[27%] hidden size-9 md:block",
-    },
-    {
       kind: "triangle",
       color: "blue",
       delay: 3.6,
@@ -215,7 +209,7 @@ const PRESETS = {
       kind: "ball",
       color: "yellow",
       delay: 1.7,
-      className: "top-[5%] right-[10%] size-6 md:top-[8%] md:right-auto md:left-[42%] md:size-7",
+      className: "top-[4%] left-[46%] size-10 md:top-[7%] md:left-[30%] md:size-14",
     },
     {
       kind: "wave",
@@ -224,14 +218,8 @@ const PRESETS = {
       className: "right-[18%] bottom-[5%] hidden w-24 rotate-6 md:block",
     },
   ],
-  // Projects: 오른쪽 위 물결, 양 끝 아래에 톱니 · 공
+  // Projects: 제목 왼쪽 위 반짝이, 오른쪽 위 초록 반원, 양 끝 아래에 톱니 · 공
   projects: [
-    {
-      kind: "wave",
-      color: "yellow",
-      delay: 1,
-      className: "top-[9%] right-[22%] hidden w-28 rotate-[-8deg] md:block",
-    },
     {
       kind: "gear",
       color: "purple",
@@ -248,29 +236,23 @@ const PRESETS = {
       kind: "sparkle",
       color: "red",
       delay: 1.9,
-      className: "top-[8%] left-[44%] hidden size-8 md:block",
+      className: "top-[3%] left-[2%] hidden size-9 md:block",
     },
     {
       kind: "half",
       color: "green",
       delay: 3.4,
-      className: "top-[42%] -right-8 hidden w-24 -rotate-90 md:block",
+      className: "top-[4%] right-[20%] hidden w-28 rotate-[-10deg] md:block",
     },
   ],
-  // Studies: 왼쪽 위 빨간 호, 오른쪽 위 반짝이, 오른쪽 아래 노란 알약
+  // Studies: 왼쪽 가운데 빨간 호, 오른쪽 가운데 톱니, 오른쪽 아래 노란 알약
   studies: [
     {
       kind: "arc",
       color: "red",
       delay: 1.8,
       className:
-        "-bottom-10 -left-14 size-28 rotate-[20deg] [--arc:14px] md:-bottom-16 md:-left-20 md:size-44 md:[--arc:22px]",
-    },
-    {
-      kind: "sparkle",
-      color: "green",
-      delay: 0.6,
-      className: "top-[12%] right-[6%] size-8 md:right-[18%] md:size-11",
+        "top-[40%] -left-14 size-28 rotate-[20deg] [--arc:14px] md:top-[38%] md:-left-20 md:size-44 md:[--arc:22px]",
     },
     {
       kind: "pill",
@@ -317,12 +299,6 @@ const PRESETS = {
       delay: 2.8,
       className:
         "top-[6%] -left-12 size-24 rotate-45 [--arc:12px] md:-left-16 md:size-36 md:[--arc:18px]",
-    },
-    {
-      kind: "sparkle",
-      color: "red",
-      delay: 0.9,
-      className: "bottom-[30%] left-[22%] hidden size-8 md:block",
     },
     {
       kind: "triangle",
