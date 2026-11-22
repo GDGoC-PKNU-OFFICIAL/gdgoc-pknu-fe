@@ -22,6 +22,8 @@ interface StudyDetailOverlayProps {
  * 스터디 상세 카드. 프로젝트 상세(ProjectDetailOverlay)와 같은 틀 —
  * 네이티브 <dialog>.showModal() 로 포커스 가두기 · 뒤 페이지 inert 를 브라우저에 맡긴다.
  * 모바일 전체 화면, 태블릿 이상 가운데 모달. 목록 응답에 내용이 다 있어 추가 fetch 가 없다.
+ * 모달 <dialog> 는 브라우저 기본값으로 위아래(inset-block: 0)가 화면에 붙어 있어, 높이가 auto 면 최대 높이까지 늘어난다 —
+ * 내용이 짧을 때 아래가 비지 않도록 태블릿 이상은 h-fit(내용 높이)으로 둔다.
  */
 export default function StudyDetailOverlay({
   ref,
@@ -45,7 +47,7 @@ export default function StudyDetailOverlay({
       onClick={(event) => {
         if (event.target === event.currentTarget) onRequestClose();
       }}
-      className="m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-surface p-0 text-ink backdrop:bg-ink/60 md:m-auto md:h-auto md:max-h-[90dvh] md:w-[min(40rem,calc(100vw-4rem))] md:rounded-2xl md:shadow-xl"
+      className="m-0 scrollbar-none h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-surface p-0 text-ink backdrop:bg-ink/60 md:m-auto md:h-fit md:max-h-[90dvh] md:w-[min(40rem,calc(100vw-4rem))] md:rounded-2xl md:shadow-xl"
     >
       {study && (
         <StudyDetailContent study={study} titleId={titleId} onRequestClose={onRequestClose} />
@@ -87,6 +89,11 @@ function StudyDetailContent({ study, titleId, onRequestClose }: StudyDetailConte
         </button>
       </div>
 
+      {/*
+        서식은 프로젝트 상세(ProjectDetailOverlay)와 맞춘다 —
+        머리(주제 배지 · 제목 · 한 줄 소개 · 기간 · 상태 · 방식을 한 줄로) → 구역마다 회색 소제목 → 내용.
+        멤버는 프로젝트의 "팀"처럼 이름 왼쪽 · 역할 오른쪽 목록으로 리더부터 보여 준다.
+      */}
       <div className="flex flex-col gap-8 p-6 pt-16 md:p-8 md:pt-10">
         <header className="flex min-w-0 flex-col gap-3 pr-10">
           <Badge tone="green" className="self-start [overflow-wrap:anywhere]">
@@ -98,39 +105,42 @@ function StudyDetailContent({ study, titleId, onRequestClose }: StudyDetailConte
           >
             {title}
           </h2>
-          <p className="[overflow-wrap:anywhere] break-keep text-ink-muted">{summary}</p>
+          <p className="leading-relaxed [overflow-wrap:anywhere] break-keep text-ink-muted">
+            {summary}
+          </p>
+          <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <div className="flex gap-2">
+              <dt className="text-ink-muted">기간</dt>
+              <dd className="tabular-nums">{formatMonthPeriod(period)}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-ink-muted">상태</dt>
+              <dd>{STUDY_STATUS_LABELS[status]}</dd>
+            </div>
+            {format && (
+              <div className="flex min-w-0 gap-2">
+                <dt className="shrink-0 text-ink-muted">방식</dt>
+                <dd className="[overflow-wrap:anywhere]">{format}</dd>
+              </div>
+            )}
+          </dl>
         </header>
 
-        <DetailSection title="스터디 정보">
-          <dl className="grid grid-cols-[4rem_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
-            <dt className="text-ink-muted">기간</dt>
-            <dd className="tabular-nums">{formatMonthPeriod(period)}</dd>
-            <dt className="text-ink-muted">상태</dt>
-            <dd>{STUDY_STATUS_LABELS[status]}</dd>
-            <dt className="text-ink-muted">리더</dt>
-            <dd className="[overflow-wrap:anywhere]">{leader}</dd>
-            <dt className="text-ink-muted">인원</dt>
-            <dd>{1 + participants.length}명</dd>
-            <dt className="text-ink-muted">방식</dt>
-            <dd className="[overflow-wrap:anywhere]">{format ?? "–"}</dd>
-          </dl>
+        <DetailSection title={`멤버 ${1 + participants.length}명`}>
+          {/* 리더 다음 참여자는 입력 순서 그대로 */}
+          <ul className="flex flex-col gap-2 text-sm">
+            <li className="flex justify-between gap-4">
+              <span className="min-w-0 font-medium [overflow-wrap:anywhere]">{leader}</span>
+              <span className="shrink-0 text-ink-muted">리더</span>
+            </li>
+            {participants.map((name, index) => (
+              <li key={`${name}-${index}`} className="flex justify-between gap-4">
+                <span className="min-w-0 font-medium [overflow-wrap:anywhere]">{name}</span>
+                <span className="shrink-0 text-ink-muted">참여자</span>
+              </li>
+            ))}
+          </ul>
         </DetailSection>
-
-        {participants.length > 0 && (
-          <DetailSection title="참여자">
-            {/* 입력 순서 그대로. 리더는 위 정보에 있다 */}
-            <ul className="flex flex-wrap gap-1.5">
-              {participants.map((name, index) => (
-                <li
-                  key={`${name}-${index}`}
-                  className="max-w-full rounded-full bg-surface-muted px-3 py-1 text-sm [overflow-wrap:anywhere]"
-                >
-                  {name}
-                </li>
-              ))}
-            </ul>
-          </DetailSection>
-        )}
 
         {outputs.length > 0 && (
           <DetailSection title="결과물">
