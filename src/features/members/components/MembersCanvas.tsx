@@ -25,9 +25,9 @@ interface MembersCanvasProps {
  *   0.25초 ~     흰 아치가 화면 아래에서 "뽀용" 올라와 자리 잡는다 (sheet-rise — About · Events 와 같은 움직임)
  *   1.05초 ~     제목 → 설명 → 섹션 제목이 떠오른다
  *   1.2초 ~      멤버 카드가 한 장씩 모여든다 — 화면 왼쪽 카드는 왼쪽에서, 오른쪽 카드는 오른쪽에서, 가운데 카드는 아래에서
- *                (member-in, 끝에서 살짝 넘쳤다 제자리). 카드가 자리 잡는 순간 사진 둘레에 작은 별 · 점 · 세모가 팡 나타나 멈춘다
+ *                (member-in, 끝에서 살짝 넘쳤다 제자리). 카드 · 사진 둘레에는 도형을 넣지 않는다
  *   (globals.css 의 [data-members-intro] 규칙 — 슬라이드 · 카드 컴포넌트는 순서를 모른다)
- * 끝나면 아무것도 움직이지 않는다. 도형은 사진 · 이름을 가리지 않고 클릭을 막지 않는다. "모션 줄이기"면 처음부터 제자리.
+ * 끝나면 아무것도 움직이지 않는다. 배경 도형은 클릭을 막지 않는다. "모션 줄이기"면 처음부터 제자리.
  */
 export default function MembersCanvas({ title, description, children }: MembersCanvasProps) {
   return (

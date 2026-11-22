@@ -277,29 +277,6 @@
       translate: 0 0;
     }
   }
-  /*
-    사진 둘레 "팡" (Members) — 작은 도형 묶음이 안쪽(--bx · --by)에서 회전(--br)하며 튀어나와 살짝 넘쳤다가 제자리에 멈춘다.
-    backwards — 끝나면 스타일을 남기지 않아 정지 상태다
-  */
-  --animate-burst: burst 0.55s cubic-bezier(0.22, 1.6, 0.36, 1) backwards;
-  @keyframes burst {
-    0% {
-      opacity: 0;
-      scale: 0.2;
-      translate: var(--bx, 0) var(--by, 0);
-      rotate: var(--br, 0deg);
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-      scale: 1;
-      translate: 0 0;
-      rotate: 0deg;
-    }
-  }
-
   /* 눈 깜빡임 (GooglyEyes) — 4초에 한 번 */
   --animate-blink: blink 4s ease-in-out infinite;
   @keyframes blink {
@@ -478,8 +455,7 @@
  * 슬라이드 · 카드 컴포넌트는 고치지 않고 여기서 고른다. 화면에 보이는 칸 수(CardSlider dense)에 맞춰 방향을 정한다:
  *   모바일 1장 — 아래에서 / 태블릿 2장 — 왼쪽 · 오른쪽 / 노트북 3장 — 왼쪽 · 아래 · 오른쪽 / 데스크톱 4장 — 왼쪽 둘 · 오른쪽 둘
  *   (화면 밖 카드는 오른쪽에서). 순서(--n)는 목록 안 위치, 9번째부터는 같은 시각.
- * 카드가 자리 잡는 순간 사진 둘레(data-member-photo)에 작은 별 · 점 · 세모가 팡 나타나 멈춘다 — 사진 바깥 여백에만, 이름과 겹치지 않게.
- * 도형 자체는 "모션 줄이기"여도 보인다(장식). 움직임만 끈다.
+ * 카드 · 사진 둘레에는 도형을 넣지 않는다 — 도형은 파란 배경에만.
  */
 [data-members-intro] [role="region"] li {
   --n: 8;
@@ -533,52 +509,6 @@
   }
 }
 
-[data-members-intro] [data-member-photo]::before,
-[data-members-intro] [data-member-photo]::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  background-repeat: no-repeat;
-}
-/* 사진 오른쪽 위 바깥: 별 + 빨간 점 */
-[data-members-intro] [data-member-photo]::before {
-  top: -0.9rem;
-  right: -1.3rem;
-  width: 1.5rem;
-  height: 1.4rem;
-  background-image:
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23fbbc04%22%20d%3D%22M12%200c1%207%205%2011%2012%2012-7%201-11%205-12%2012-1-7-5-11-12-12%207-1%2011-5%2012-12z%22%2F%3E%3C%2Fsvg%3E"),
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2010%2010%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%225%22%20r%3D%225%22%20fill%3D%22%23ea4335%22%2F%3E%3C%2Fsvg%3E");
-  background-position:
-    0 0,
-    1.05rem 0.95rem;
-  background-size:
-    0.95rem 0.95rem,
-    0.42rem 0.42rem;
-  --bx: -10px;
-  --by: 10px;
-  --br: -30deg;
-}
-/* 사진 왼쪽 아래 바깥: 초록 세모 + 파란 점 */
-[data-members-intro] [data-member-photo]::after {
-  bottom: 0.1rem;
-  left: -1.4rem;
-  width: 1.2rem;
-  height: 1.5rem;
-  background-image:
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20fill%3D%22%2334a853%22%20d%3D%22M12%2078%20L52%2014%20Q58%206%2064%2014%20L94%2072%20Q98%2082%2086%2084%20L22%2090%20Q6%2090%2012%2078z%22%2F%3E%3C%2Fsvg%3E"),
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2010%2010%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%225%22%20r%3D%225%22%20fill%3D%22%234285f4%22%2F%3E%3C%2Fsvg%3E");
-  background-position:
-    0 0.5rem,
-    0.85rem 0;
-  background-size:
-    0.85rem 0.85rem,
-    0.35rem 0.35rem;
-  --bx: 10px;
-  --by: -8px;
-  --br: 25deg;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   [data-members-intro] header h1 {
     animation: var(--animate-rise-in);
@@ -596,14 +526,6 @@
   [data-members-intro] [role="region"] li > * {
     animation: var(--animate-member-in);
     animation-delay: calc(1.2s + var(--n) * 0.1s);
-  }
-  [data-members-intro] [role="region"] li [data-member-photo]::before,
-  [data-members-intro] [role="region"] li [data-member-photo]::after {
-    animation: var(--animate-burst);
-    animation-delay: calc(1.6s + var(--n) * 0.1s);
-  }
-  [data-members-intro] [role="region"] li [data-member-photo]::after {
-    animation-delay: calc(1.68s + var(--n) * 0.1s);
   }
 }
 
