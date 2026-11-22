@@ -314,7 +314,7 @@ const PRESETS = {
       className: "top-7 right-[7%] size-8 md:top-9 md:size-12",
     },
   ],
-  // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳, 카드 바깥 아래 (높이는 흰 영역 기준 %). 카드가 다 나온 뒤 하나씩 나타난다 (at).
+  // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳에만 (높이는 흰 영역 기준 %). 카드가 다 나온 뒤 하나씩 나타난다 (at).
   // 머리말 흰 배경에 가리지 않게 front 층으로 그린다. 글자 위에는 두지 않는다
   projectsSheet: [
     {
@@ -330,20 +330,6 @@ const PRESETS = {
       delay: 2.3,
       at: 2.4,
       className: "top-[6%] right-[22%] hidden size-9 md:block",
-    },
-    {
-      kind: "triangle",
-      color: "red",
-      delay: 3,
-      at: 2.5,
-      className: "right-[3%] bottom-[3%] size-10 rotate-12 md:size-14",
-    },
-    {
-      kind: "ball",
-      color: "purple",
-      delay: 2.1,
-      at: 2.6,
-      className: "bottom-[6%] left-[46%] hidden size-10 md:block",
     },
   ],
   // About 컬러 배경: 흰 원형 영역이 덮지 않는 위쪽 · 둥근 어깨 자리에만 둔다 (페이지 전체 높이 기준이라 % 대신 rem)
