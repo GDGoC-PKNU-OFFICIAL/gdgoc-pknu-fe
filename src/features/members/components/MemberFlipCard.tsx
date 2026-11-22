@@ -127,16 +127,19 @@ export default function MemberFlipCard({
           preview ? PREVIEW_FADE_OUT : FADE_OUT,
         )}
       >
-        <span className="relative size-32 shrink-0 overflow-hidden rounded-2xl bg-surface-muted">
-          {/* 이름이 바로 아래 있으므로 장식 이미지로 둔다 */}
-          <SafeImage
-            src={photoUrl}
-            fallbackSrc={DEFAULT_MEMBER_IMAGE}
-            alt=""
-            fill
-            sizes="128px"
-            className="object-cover"
-          />
+        {/* data-member-photo: Members 페이지가 사진 바깥 둘레에 작은 장식 도형을 붙이는 자리 (MembersCanvas · globals.css) */}
+        <span data-member-photo className="relative shrink-0">
+          <span className="relative block size-32 overflow-hidden rounded-2xl bg-surface-muted">
+            {/* 이름이 바로 아래 있으므로 장식 이미지로 둔다 */}
+            <SafeImage
+              src={photoUrl}
+              fallbackSrc={DEFAULT_MEMBER_IMAGE}
+              alt=""
+              fill
+              sizes="128px"
+              className="object-cover"
+            />
+          </span>
         </span>
 
         <span className="flex w-full min-w-0 flex-col gap-2 text-center">

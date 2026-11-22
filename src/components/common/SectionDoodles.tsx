@@ -304,37 +304,37 @@ const PRESETS = {
       kind: "sun",
       color: "yellow",
       delay: 0.3,
-      className: "top-3 left-[4%] size-12 md:top-5 md:size-16",
-    },
-    {
-      kind: "sparkle",
-      color: "white",
-      delay: 1.1,
-      className: "top-10 left-[20%] size-5 md:size-7",
-    },
-    {
-      kind: "gear",
-      color: "orange",
-      delay: 2,
-      className: "top-6 left-[34%] hidden size-12 md:block",
-    },
-    {
-      kind: "tile",
-      color: "purple",
-      delay: 2.8,
-      className: "top-9 left-[56%] hidden h-6 w-10 rotate-12 md:block",
-    },
-    {
-      kind: "triangle",
-      color: "yellow",
-      delay: 0.8,
-      className: "top-4 right-[28%] size-9 -rotate-12 md:top-6 md:size-12",
+      className: "-top-16 -left-16 size-44 md:-top-24 md:-left-20 md:size-72",
     },
     {
       kind: "ball",
       color: "green",
       delay: 1.7,
-      className: "top-7 right-[7%] size-8 md:top-9 md:size-12",
+      className: "-top-10 -right-10 size-32 md:-top-16 md:-right-14 md:size-56",
+    },
+    {
+      kind: "gear",
+      color: "orange",
+      delay: 2,
+      className: "top-6 left-[36%] hidden size-12 md:block",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 1.1,
+      className: "top-10 left-[24%] size-5 md:size-8",
+    },
+    {
+      kind: "triangle",
+      color: "yellow",
+      delay: 0.8,
+      className: "top-5 right-[30%] size-9 -rotate-12 md:top-7 md:size-12",
+    },
+    {
+      kind: "tile",
+      color: "purple",
+      delay: 2.8,
+      className: "top-10 left-[58%] hidden h-6 w-10 rotate-12 md:block",
     },
   ],
   // Projects 흰 카드 영역 안 — 머리말 오른쪽 빈 곳에만 (높이는 흰 영역 기준 %). 카드가 다 나온 뒤 하나씩 나타난다 (at).
@@ -358,36 +358,31 @@ const PRESETS = {
   // Studies 파란 띠 위쪽 (Projects 와 같은 자리 · 다른 도형). 처음 파란 배경만 보일 때부터 떠다닌다
   studiesFrame: [
     {
-      kind: "triangle",
-      color: "yellow",
-      delay: 0.4,
-      className: "top-4 left-[5%] size-10 -rotate-12 md:top-6 md:size-14",
-    },
-    {
-      kind: "sparkle",
-      color: "white",
-      delay: 1.2,
-      className: "top-10 left-[21%] size-5 md:size-7",
-    },
-    {
-      kind: "ball",
-      color: "green",
-      delay: 2.1,
-      className: "top-6 left-[35%] hidden size-10 md:block",
-    },
-    {
-      kind: "tile",
+      kind: "arc",
       color: "red",
-      delay: 2.7,
-      className: "top-9 left-[57%] hidden h-6 w-10 -rotate-12 md:block",
+      delay: 0.4,
+      className:
+        "-top-20 -left-16 size-48 rotate-[200deg] [--arc:26px] md:-top-32 md:-left-24 md:size-80 md:[--arc:44px]",
     },
     {
       kind: "sun",
       color: "yellow",
       delay: 0.9,
-      className: "top-3 right-[27%] size-11 md:top-5 md:size-14",
+      className: "-top-12 -right-12 size-40 md:-top-20 md:-right-16 md:size-64",
     },
-    { kind: "sparkle", color: "white", delay: 1.8, className: "top-8 right-[8%] size-6 md:size-9" },
+    {
+      kind: "triangle",
+      color: "yellow",
+      delay: 1.5,
+      className: "top-8 left-[30%] hidden size-12 -rotate-12 md:block",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      delay: 1.2,
+      className: "top-10 left-[48%] size-6 md:size-8",
+    },
+    { kind: "ball", color: "green", delay: 2.1, className: "top-6 right-[30%] size-8 md:size-12" },
   ],
   // Studies 흰 영역 머리말 오른쪽 — 카드가 다 나온 뒤 하나씩 나타난다 (at)
   studiesSheet: [
@@ -404,6 +399,45 @@ const PRESETS = {
       delay: 2.2,
       at: 2.4,
       className: "top-[7%] right-[22%] hidden size-9 md:block",
+    },
+  ],
+  // Members 파란 배경: 옐로 해 · 그린 호 큰 덩어리 + 레드 공 · 흰 반짝이 · 노란 세모. 차례로 톡 튀어나와 멈춘다 (settle)
+  membersFrame: [
+    {
+      kind: "sun",
+      color: "yellow",
+      at: 0.1,
+      settle: true,
+      className: "-top-14 -left-14 size-40 md:-top-24 md:-left-20 md:size-72",
+    },
+    {
+      kind: "arc",
+      color: "green",
+      at: 0.18,
+      settle: true,
+      className:
+        "-top-10 -right-14 size-36 rotate-[110deg] [--arc:20px] md:-top-16 md:-right-20 md:size-64 md:[--arc:36px]",
+    },
+    {
+      kind: "ball",
+      color: "red",
+      at: 0.26,
+      settle: true,
+      className: "top-6 right-[24%] size-8 md:top-10 md:size-14",
+    },
+    {
+      kind: "sparkle",
+      color: "white",
+      at: 0.34,
+      settle: true,
+      className: "top-10 left-[28%] size-6 md:size-9",
+    },
+    {
+      kind: "triangle",
+      color: "yellow",
+      at: 0.42,
+      settle: true,
+      className: "top-8 left-[44%] hidden size-10 rotate-12 md:block",
     },
   ],
   // Events 컬러 배경: 블루 위에 옐로 · 레드 · 그린 큰 색 덩어리와 작은 축제 도형. 처음에 차례로 톡 튀어나온 뒤 멈춘다 (settle)
