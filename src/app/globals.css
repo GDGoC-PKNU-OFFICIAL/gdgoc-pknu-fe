@@ -246,6 +246,29 @@
     }
   }
 
+  /*
+    Events "팡" (EventsCanvas) — 작은 도형 묶음이 안쪽(--bx · --by)에서 회전(--br)하며 튀어나와 살짝 넘쳤다가 제자리에 멈춘다.
+    backwards — 끝나면 스타일을 남기지 않아 정지 상태다
+  */
+  --animate-burst: burst 0.55s cubic-bezier(0.22, 1.6, 0.36, 1) backwards;
+  @keyframes burst {
+    0% {
+      opacity: 0;
+      scale: 0.2;
+      translate: var(--bx, 0) var(--by, 0);
+      rotate: var(--br, 0deg);
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      scale: 1;
+      translate: 0 0;
+      rotate: 0deg;
+    }
+  }
+
   /* 눈 깜빡임 (GooglyEyes) — 4초에 한 번 */
   --animate-blink: blink 4s ease-in-out infinite;
   @keyframes blink {
@@ -359,6 +382,191 @@
   [data-projects-intro] #past-projects-title {
     animation: var(--animate-rise-in);
     animation-delay: 1.55s;
+  }
+}
+
+/*
+ * Events 진입 (EventsCanvas 가 data-events-intro 를 단다) — 티켓이 자리 잡은 뒤 글 · 카드가 떠오르고,
+ * 카드 · 오늘 날짜 · 제목 주변에 작은 도형이 "팡" 튀어나와 멈춘다. 캘린더 · 일정 컴포넌트는 고치지 않고 여기서 고른다.
+ * - 도형은 ::before · ::after 에 배경 그림 여러 장(별 · 점 · 세모 · 지그재그)을 겹쳐 그린다 — 클릭을 막지 않는다(pointer-events: none)
+ * - 일정 카드는 아래 여백을 조금 늘려(2rem) 오른쪽 아래 도형이 글자와 겹치지 않게 한다
+ * - 카드 순서(--n)는 목록 안 위치로 정한다. 9번째부터는 같은 시각 (화면 밖 카드까지 오래 기다리지 않게)
+ * 도형 자체는 "모션 줄이기"여도 보인다(장식). 움직임만 끈다.
+ */
+[data-events-intro] {
+  --burst-a:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23fbbc04%22%20d%3D%22M12%200c1%207%205%2011%2012%2012-7%201-11%205-12%2012-1-7-5-11-12-12%207-1%2011-5%2012-12z%22%2F%3E%3C%2Fsvg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2010%2010%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%225%22%20r%3D%225%22%20fill%3D%22%23ea4335%22%2F%3E%3C%2Fsvg%3E");
+  --burst-b:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20fill%3D%22%2334a853%22%20d%3D%22M12%2078%20L52%2014%20Q58%206%2064%2014%20L94%2072%20Q98%2082%2086%2084%20L22%2090%20Q6%2090%2012%2078z%22%2F%3E%3C%2Fsvg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20120%2040%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%234285f4%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M8%2030%20L32%2010%20L56%2030%20L80%2010%20L104%2030%22%2F%3E%3C%2Fsvg%3E");
+  --burst-c:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23fbbc04%22%20d%3D%22M12%200c1%207%205%2011%2012%2012-7%201-11%205-12%2012-1-7-5-11-12-12%207-1%2011-5%2012-12z%22%2F%3E%3C%2Fsvg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2010%2010%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%225%22%20r%3D%225%22%20fill%3D%22%23b98be8%22%2F%3E%3C%2Fsvg%3E");
+}
+
+[data-events-intro] [data-event-id] {
+  --n: 8;
+  position: relative;
+  padding-bottom: 2rem;
+}
+[data-events-intro] li:nth-child(1) > [data-event-id] {
+  --n: 0;
+}
+[data-events-intro] li:nth-child(2) > [data-event-id] {
+  --n: 1;
+}
+[data-events-intro] li:nth-child(3) > [data-event-id] {
+  --n: 2;
+}
+[data-events-intro] li:nth-child(4) > [data-event-id] {
+  --n: 3;
+}
+[data-events-intro] li:nth-child(5) > [data-event-id] {
+  --n: 4;
+}
+[data-events-intro] li:nth-child(6) > [data-event-id] {
+  --n: 5;
+}
+[data-events-intro] li:nth-child(7) > [data-event-id] {
+  --n: 6;
+}
+[data-events-intro] li:nth-child(8) > [data-event-id] {
+  --n: 7;
+}
+
+[data-events-intro] [data-event-id]::before,
+[data-events-intro] [data-event-id]::after,
+[data-events-intro] [aria-current="date"]::after,
+[data-events-intro] header h1::after,
+[data-events-intro] #calendar-title::after,
+[data-events-intro] #schedule-title::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+
+/* 일정 카드 오른쪽 아래: 별 + 빨간 점 / 그 왼쪽: 초록 세모 + 파란 지그재그 */
+[data-events-intro] [data-event-id]::before {
+  right: 0.875rem;
+  bottom: 0.5rem;
+  width: 2.25rem;
+  height: 1.25rem;
+  background-image: var(--burst-a);
+  background-position:
+    0 0,
+    1.5rem 0.6rem;
+  background-size:
+    0.9rem 0.9rem,
+    0.5rem 0.5rem;
+  --bx: -10px;
+  --by: 8px;
+  --br: -30deg;
+}
+[data-events-intro] [data-event-id]::after {
+  right: 3.5rem;
+  bottom: 0.45rem;
+  width: 2.25rem;
+  height: 1.1rem;
+  background-image: var(--burst-b);
+  background-position:
+    0 0.15rem,
+    1rem 0.2rem;
+  background-size:
+    0.8rem 0.8rem,
+    1.15rem 0.6rem;
+  --bx: 8px;
+  --by: 10px;
+  --br: 25deg;
+}
+
+/* 캘린더 오늘 날짜 오른쪽 위: 별 + 보라 점 */
+[data-events-intro] [aria-current="date"] {
+  position: relative;
+}
+[data-events-intro] [aria-current="date"]::after {
+  top: -0.7rem;
+  right: -1.1rem;
+  width: 1.2rem;
+  height: 1.1rem;
+  background-image: var(--burst-c);
+  background-position:
+    0 0,
+    0.8rem 0.65rem;
+  background-size:
+    0.75rem 0.75rem,
+    0.35rem 0.35rem;
+  z-index: 1;
+  --bx: -6px;
+  --by: 6px;
+  --br: -20deg;
+}
+
+/* 제목(Events · Calendar · Schedule) 첫 글자 위: 별 + 빨간 점 (글자와 겹치지 않게 위로) */
+[data-events-intro] header h1,
+[data-events-intro] #calendar-title,
+[data-events-intro] #schedule-title {
+  position: relative;
+}
+[data-events-intro] header h1::after,
+[data-events-intro] #calendar-title::after,
+[data-events-intro] #schedule-title::after {
+  top: -1.15rem;
+  left: -0.15rem;
+  width: 1.6rem;
+  height: 0.9rem;
+  background-image: var(--burst-a);
+  background-position:
+    0 0,
+    1.05rem 0.2rem;
+  background-size:
+    0.85rem 0.85rem,
+    0.4rem 0.4rem;
+  --bx: 8px;
+  --by: 8px;
+  --br: 30deg;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-events-intro] header h1 {
+    animation: var(--animate-rise-in);
+    animation-delay: 1.05s;
+  }
+  [data-events-intro] header p {
+    animation: var(--animate-rise-in);
+    animation-delay: 1.15s;
+  }
+  [data-events-intro] #calendar-title,
+  [data-events-intro] #schedule-title {
+    animation: var(--animate-rise-in);
+    animation-delay: 1.2s;
+  }
+  [data-events-intro] [data-event-id] {
+    animation: var(--animate-card-in);
+    animation-delay: calc(1.3s + var(--n) * 0.1s);
+  }
+
+  [data-events-intro] [data-event-id]::before,
+  [data-events-intro] [data-event-id]::after {
+    animation: var(--animate-burst);
+    animation-delay: calc(1.55s + var(--n) * 0.1s);
+  }
+  [data-events-intro] [data-event-id]::after {
+    animation-delay: calc(1.62s + var(--n) * 0.1s);
+  }
+  [data-events-intro] [aria-current="date"]::after {
+    animation: var(--animate-burst);
+    animation-delay: 1.45s;
+  }
+  [data-events-intro] header h1::after {
+    animation: var(--animate-burst);
+    animation-delay: 1.3s;
+  }
+  [data-events-intro] #calendar-title::after,
+  [data-events-intro] #schedule-title::after {
+    animation: var(--animate-burst);
+    animation-delay: 1.4s;
   }
 }
 

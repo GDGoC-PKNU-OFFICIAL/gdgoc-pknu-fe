@@ -4,6 +4,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { EVENTS_HEADER } from "@/data/events";
 import EventsBoard from "@/features/events/components/EventsBoard";
+import EventsCanvas from "@/features/events/components/EventsCanvas";
 import { getEvents } from "@/lib/api/public-api";
 import { todayKst } from "@/lib/date";
 
@@ -21,7 +22,8 @@ export default async function EventsPage() {
   const events = await getEvents();
 
   return (
-    <>
+    // 머리말 + 캘린더 · 일정을 파란 배경 위 흰 티켓에 담는다 (EventsCanvas — 티켓이 올라오고 카드 주변에 도형이 팡팡)
+    <EventsCanvas>
       <PageHeader
         title={EVENTS_HEADER.title}
         description={EVENTS_HEADER.description}
@@ -29,6 +31,6 @@ export default async function EventsPage() {
         tone="plain"
       />
       <EventsBoard events={events} serverToday={todayKst()} />
-    </>
+    </EventsCanvas>
   );
 }
