@@ -56,7 +56,7 @@ export default function ProjectDetailOverlay({
       onClick={(event) => {
         if (event.target === event.currentTarget) onRequestClose();
       }}
-      className="m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-surface p-0 text-ink backdrop:bg-ink/60 md:m-auto md:h-auto md:max-h-[90dvh] md:w-[min(56rem,calc(100vw-4rem))] md:rounded-2xl md:shadow-xl"
+      className="m-0 scrollbar-none h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-surface p-0 text-ink backdrop:bg-ink/60 md:m-auto md:h-auto md:max-h-[90dvh] md:w-[min(56rem,calc(100vw-4rem))] md:rounded-2xl md:shadow-xl"
     >
       {project && (
         <ProjectDetailContent project={project} titleId={titleId} onRequestClose={onRequestClose} />

@@ -43,7 +43,8 @@ const FACE = cn(
 );
 
 const CARD = cn(
-  "group block h-[24rem] rounded-2xl perspective-distant",
+  // 높이를 고정하지 않고 비율(4 : 5)로 맞춘다 — 슬라이드 · 관리자 미리보기 어디서든 카드 모양이 같고, 넓은 칸에서 아래가 비지 않는다
+  "group block aspect-[4/5] w-full rounded-2xl perspective-distant",
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
 );
 
@@ -122,7 +123,7 @@ export default function MemberFlipCard({
       <span
         className={cn(
           FACE,
-          "items-center gap-3 bg-surface p-5",
+          "items-center justify-center gap-3 bg-surface p-5",
           preview ? PREVIEW_FADE_OUT : FADE_OUT,
         )}
       >
@@ -158,7 +159,7 @@ export default function MemberFlipCard({
             </span>
           )}
           {interests.length > 0 && (
-            <span className="flex flex-wrap justify-center gap-1.5">
+            <span className="flex max-w-full flex-wrap justify-center gap-1.5">
               {interests.map((interest) => (
                 <Tag key={interest}>#{interest}</Tag>
               ))}
@@ -180,9 +181,12 @@ export default function MemberFlipCard({
           {/* 관리자 미리보기에서는 분야를 아직 고르지 않았을 수 있다 */}
           <span className="text-lg font-semibold">{MEMBER_PART_LABELS[part] ?? "—"}</span>
         </span>
-        <span className="flex flex-col gap-1">
+        <span className="flex max-w-full min-w-0 flex-col gap-1">
           <span className="text-xs text-ink-muted">한 줄 소개</span>
-          <span className="text-sm leading-relaxed break-keep">{bio}</span>
+          {/* 띄어쓰기 없는 긴 글도 카드 밖으로 나가지 않게 아무 데서나 줄을 바꾼다 */}
+          <span className="line-clamp-5 text-sm leading-relaxed [overflow-wrap:anywhere] break-keep">
+            {bio}
+          </span>
         </span>
       </span>
     </span>

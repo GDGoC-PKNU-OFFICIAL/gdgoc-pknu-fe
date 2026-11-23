@@ -25,7 +25,8 @@ export default function MemberCarousel({
   if (members.length === 0) return <EmptyState message={emptyMessage} />;
 
   return (
-    <CardSlider label={label}>
+    // 세로로 긴 4 : 5 카드라 데스크톱에서 한 줄에 4장씩 — 카드가 너무 커지지 않게 한다
+    <CardSlider label={label} density="dense">
       {members.map((member) => (
         <MemberFlipCard key={member.id} member={member} analyticsSection={analyticsSection} />
       ))}

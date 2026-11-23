@@ -27,6 +27,8 @@ interface PageSectionProps {
   fullScreen?: boolean;
   /** 타이틀 모양 (SectionHeader variant). 메인 페이지는 home */
   titleVariant?: "default" | "home";
+  /** 콘텐츠 뒤에 까는 장식 층 (예: SectionDoodles). 주면 섹션이 relative isolate 가 되어 층의 기준이 된다 */
+  decoration?: ReactNode;
   children: ReactNode;
 }
 
@@ -39,14 +41,20 @@ export default function PageSection({
   link,
   fullScreen = false,
   titleVariant = "default",
+  decoration,
   children,
 }: PageSectionProps) {
   const titleId = `${id}-title`;
   return (
     <section
       aria-labelledby={titleId}
-      className={cn(SECTION_CONTAINER, fullScreen && FULL_SCREEN_SECTION)}
+      className={cn(
+        SECTION_CONTAINER,
+        fullScreen && FULL_SCREEN_SECTION,
+        decoration != null && "relative isolate",
+      )}
     >
+      {decoration}
       <SectionHeader
         badge={badge}
         title={title}

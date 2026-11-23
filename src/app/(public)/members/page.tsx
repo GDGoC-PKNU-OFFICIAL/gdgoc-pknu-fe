@@ -1,10 +1,10 @@
 import { type Metadata } from "next";
 
-import PageHeader from "@/components/common/PageHeader";
 import PageSection from "@/components/common/PageSection";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CORE_MEMBERS, MEMBERS_HEADER, SENIORS } from "@/data/members";
 import MemberCarousel from "@/features/members/components/MemberCarousel";
+import MembersCanvas from "@/features/members/components/MembersCanvas";
 import { groupMembers } from "@/features/members/lib/sort-members";
 import { getMembers } from "@/lib/api/public-api";
 
@@ -22,14 +22,8 @@ export default async function MembersPage() {
   const { core, senior } = groupMembers(await getMembers());
 
   return (
-    <>
-      <PageHeader
-        title={MEMBERS_HEADER.title}
-        description={MEMBERS_HEADER.description}
-        titleVariant="home"
-        tone="plain"
-      />
-
+    // 머리말 + 두 섹션을 파란 배경 위 흰 아치에 담는다 (MembersCanvas — 아치가 올라오고 카드가 좌우에서 모여든다)
+    <MembersCanvas title={MEMBERS_HEADER.title} description={MEMBERS_HEADER.description}>
       <PageSection id="core-members" title={CORE_MEMBERS.title} titleVariant="home">
         <MemberCarousel
           label="코어멤버"
@@ -47,6 +41,6 @@ export default async function MembersPage() {
           analyticsSection="seniors"
         />
       </PageSection>
-    </>
+    </MembersCanvas>
   );
 }

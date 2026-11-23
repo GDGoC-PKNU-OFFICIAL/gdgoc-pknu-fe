@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 
 import PageHeader from "@/components/common/PageHeader";
 import SectionHeader from "@/components/common/SectionHeader";
+import WaveCanvas from "@/components/common/WaveCanvas";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { CURRENT_PROJECTS, PAST_PROJECTS, PROJECTS_HEADER } from "@/data/projects";
 import CurrentProjectGrid from "@/features/projects/components/CurrentProjectGrid";
@@ -12,7 +13,9 @@ import PastProjectCarousel, {
 } from "@/features/projects/components/PastProjectCarousel";
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import ProjectDetailController from "@/features/projects/components/ProjectDetailController";
+import { cardEntrance } from "@/features/projects/lib/card-entrance";
 import { groupProjectsByStartYear, latestYear } from "@/features/projects/lib/group-by-year";
+import { sortProjectsByLatest } from "@/features/projects/lib/project-sort";
 import { getProjects } from "@/lib/api/public-api";
 import { splitByStatus } from "@/lib/split-by-status";
 
@@ -32,55 +35,64 @@ const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 // Render 콜드 스타트가 방문자에게 닿는다 (FRONT_ARCHITECTURE § 1 제약 3). 쿼리는 클라이언트 컴포넌트만 읽는다.
 export default async function ProjectsPage() {
   const projects = await getProjects();
-  const { current, past } = splitByStatus(projects);
+  // 현재 · 과거(연도 안) 모두 최신순 — 나눈 뒤에도 순서가 유지된다
+  const { current, past } = splitByStatus(sortProjectsByLatest(projects));
 
-  // 카드는 서버에서 그려 넘긴다 — ProjectCard 가 클라이언트 번들에 들어가지 않는다
+  // 카드는 서버에서 그려 넘긴다 — ProjectCard 가 클라이언트 번들에 들어가지 않는다.
+  // 진입 때 현재 프로젝트 다음 순서로 올라온다 (cardEntrance)
   const pastGroups = groupProjectsByStartYear(past).map(({ year, items }) => ({
     year,
-    items: items.map((project) => <ProjectCard key={project.id} project={project} />),
+    items: items.map((project, index) => (
+      <div key={project.id} {...cardEntrance(current.length + index)}>
+        <ProjectCard project={project} />
+      </div>
+    )),
   }));
 
   return (
     <>
-      <PageHeader
-        title={PROJECTS_HEADER.title}
-        description={PROJECTS_HEADER.description}
-        titleVariant="home"
-        tone="plain"
-      />
-
-      {/* 2. 현재 프로젝트 */}
-      <section aria-labelledby="current-projects-title" className={CONTAINER}>
-        <SectionHeader
-          title={CURRENT_PROJECTS.title}
-          titleId="current-projects-title"
-          variant="home"
+      {/* 머리말 + 두 섹션을 파란 프레임 위 흰 카드 영역에 담는다 (WaveCanvas — 흰 파도가 덮치고 카드가 차례로 올라온다) */}
+      <WaveCanvas framePreset="projectsFrame" sheetPreset="projectsSheet">
+        <PageHeader
+          title={PROJECTS_HEADER.title}
+          description={PROJECTS_HEADER.description}
+          titleVariant="home"
+          tone="plain"
         />
-        <CurrentProjectGrid projects={current} emptyMessage={CURRENT_PROJECTS.empty} />
-      </section>
 
-      {/* 3. 과거 프로젝트 — 서버 HTML 에는 최신 연도가 들어가고, 브라우저에서 ?pastYear= 를 반영한다 */}
-      <section aria-labelledby="past-projects-title" className={CONTAINER}>
-        {/* 제목 줄(제목 + 오른쪽 연도 고르기)은 PastProjectCarouselView 가 그린다 */}
-        <Suspense
-          fallback={
-            <PastProjectCarouselView
+        {/* 2. 현재 프로젝트 */}
+        <section aria-labelledby="current-projects-title" className={CONTAINER}>
+          <SectionHeader
+            title={CURRENT_PROJECTS.title}
+            titleId="current-projects-title"
+            variant="home"
+          />
+          <CurrentProjectGrid projects={current} emptyMessage={CURRENT_PROJECTS.empty} />
+        </section>
+
+        {/* 3. 과거 프로젝트 — 서버 HTML 에는 최신 연도가 들어가고, 브라우저에서 ?pastYear= 를 반영한다 */}
+        <section aria-labelledby="past-projects-title" className={CONTAINER}>
+          {/* 제목 줄(제목 + 오른쪽 연도 고르기)은 PastProjectCarouselView 가 그린다 */}
+          <Suspense
+            fallback={
+              <PastProjectCarouselView
+                groups={pastGroups}
+                selectedYear={latestYear(pastGroups)}
+                emptyMessage={PAST_PROJECTS.empty}
+                title={PAST_PROJECTS.title}
+                titleId="past-projects-title"
+              />
+            }
+          >
+            <PastProjectCarousel
               groups={pastGroups}
-              selectedYear={latestYear(pastGroups)}
               emptyMessage={PAST_PROJECTS.empty}
               title={PAST_PROJECTS.title}
               titleId="past-projects-title"
             />
-          }
-        >
-          <PastProjectCarousel
-            groups={pastGroups}
-            emptyMessage={PAST_PROJECTS.empty}
-            title={PAST_PROJECTS.title}
-            titleId="past-projects-title"
-          />
-        </Suspense>
-      </section>
+          </Suspense>
+        </section>
+      </WaveCanvas>
 
       {/* ↳ 상세 카드 (?project=) */}
       <Suspense fallback={null}>

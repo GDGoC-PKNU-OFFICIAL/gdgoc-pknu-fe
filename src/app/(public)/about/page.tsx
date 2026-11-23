@@ -4,12 +4,12 @@ import { type Metadata } from "next";
 
 import ActivityPoster from "@/components/common/ActivityPoster";
 import EmblaSlider from "@/components/common/EmblaSlider";
-import PageHeader from "@/components/common/PageHeader";
 import SectionHeader from "@/components/common/SectionHeader";
 import { PUBLIC_ROUTES } from "@/constants/routes";
 import { ABOUT_ACTIVITY_GROUPS, ABOUT_HEADER, ACTIVITIES, IDENTITY } from "@/data/about";
 import { FAQ } from "@/data/faq";
 import { RULES } from "@/data/rules";
+import AboutCanvas from "@/features/about/components/AboutCanvas";
 import RuleDetailController from "@/features/about/components/RuleDetailController";
 import RuleDocBlock from "@/features/about/components/RuleDocBlock";
 
@@ -40,63 +40,59 @@ function activityPosters() {
 export default function AboutPage() {
   return (
     <>
-      <PageHeader
-        title={ABOUT_HEADER.title}
-        description={ABOUT_HEADER.description}
-        titleVariant="home"
-        tone="plain"
-      />
+      {/* 1. 머리말 + 본문 전체를 컬러 배경 위 흰 원형 영역에 담는다 (AboutCanvas) */}
+      <AboutCanvas title={ABOUT_HEADER.title} description={ABOUT_HEADER.description}>
+        {/* 2. 정체성 */}
+        <section aria-labelledby="identity-title" className={CONTAINER}>
+          <SectionHeader title={IDENTITY.title} titleId="identity-title" variant="home" />
+          <div className="flex max-w-3xl flex-col gap-4 text-base leading-relaxed break-keep md:text-lg">
+            {IDENTITY.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
 
-      {/* 2. 정체성 */}
-      <section aria-labelledby="identity-title" className={CONTAINER}>
-        <SectionHeader title={IDENTITY.title} titleId="identity-title" variant="home" />
-        <div className="flex max-w-3xl flex-col gap-4 text-base leading-relaxed break-keep md:text-lg">
-          {IDENTITY.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. 활동 방식 */}
-      <section aria-labelledby="activities-title" className={CONTAINER}>
-        <SectionHeader title={ACTIVITIES.title} titleId="activities-title" variant="home" />
-        {/* 앨범 카드처럼 세로로 긴 색 카드를 옆으로 넘긴다 (홈 활동 4개 + 무료 학습 콘텐츠 3개).
+        {/* 3. 활동 방식 */}
+        <section aria-labelledby="activities-title" className={CONTAINER}>
+          <SectionHeader title={ACTIVITIES.title} titleId="activities-title" variant="home" />
+          {/* 앨범 카드처럼 세로로 긴 색 카드를 옆으로 넘긴다 (홈 활동 4개 + 무료 학습 콘텐츠 3개).
             끌기 · 관성 · 끝 저항 · 트랙패드 스와이프는 Embla 가 맡는다 */}
-        <EmblaSlider label="What We Do 활동 목록">{activityPosters()}</EmblaSlider>
-      </section>
+          <EmblaSlider label="What We Do 활동 목록">{activityPosters()}</EmblaSlider>
+        </section>
 
-      {/* 4. 활동 규칙 — 규칙 문서 3개를 아이콘 블록으로 (모바일 한 줄에 하나, md 이상 세 개). 누르면 ?rule= 상세 카드 */}
-      <section aria-labelledby="rules-title" className={CONTAINER}>
-        <SectionHeader title={RULES.title} titleId="rules-title" variant="home" />
-        <ul className="grid gap-3 md:grid-cols-3 md:gap-4">
-          {RULES.items.map((doc) => (
-            <RuleDocBlock key={doc.title} doc={doc} />
-          ))}
-        </ul>
-      </section>
+        {/* 4. 활동 규칙 — 규칙 문서 3개를 아이콘 블록으로 (모바일 한 줄에 하나, md 이상 세 개). 누르면 ?rule= 상세 카드 */}
+        <section aria-labelledby="rules-title" className={CONTAINER}>
+          <SectionHeader title={RULES.title} titleId="rules-title" variant="home" />
+          <ul className="grid gap-3 md:grid-cols-3 md:gap-4">
+            {RULES.items.map((doc) => (
+              <RuleDocBlock key={doc.title} doc={doc} />
+            ))}
+          </ul>
+        </section>
 
-      {/* 5. FAQ — 네이티브 <details> 아코디언: JS 없이 키보드 · 스크린리더 지원 */}
-      <section aria-labelledby="faq-title" className={CONTAINER}>
-        <SectionHeader title={FAQ.title} titleId="faq-title" variant="home" />
-        <div className="flex max-w-3xl flex-col divide-y divide-line border-y border-line">
-          {FAQ.items.map((item) => (
-            <details key={item.question} className="group">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium break-keep [&::-webkit-details-marker]:hidden">
-                {item.question}
-                <span
-                  aria-hidden="true"
-                  className="text-xl text-ink-muted transition-transform group-open:rotate-45 motion-reduce:transition-none"
-                >
-                  +
-                </span>
-              </summary>
-              <p className="pb-5 text-sm leading-relaxed break-keep text-ink-muted">
-                {item.answer}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
+        {/* 5. FAQ — 네이티브 <details> 아코디언: JS 없이 키보드 · 스크린리더 지원 */}
+        <section aria-labelledby="faq-title" className={CONTAINER}>
+          <SectionHeader title={FAQ.title} titleId="faq-title" variant="home" />
+          <div className="flex max-w-3xl flex-col divide-y divide-line border-y border-line">
+            {FAQ.items.map((item) => (
+              <details key={item.question} className="group">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium break-keep [&::-webkit-details-marker]:hidden">
+                  {item.question}
+                  <span
+                    aria-hidden="true"
+                    className="text-xl text-ink-muted transition-transform group-open:rotate-45 motion-reduce:transition-none"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="pb-5 text-sm leading-relaxed break-keep text-ink-muted">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </AboutCanvas>
 
       {/* ↳ 활동 규칙 상세 카드 (?rule=) */}
       <Suspense fallback={null}>
