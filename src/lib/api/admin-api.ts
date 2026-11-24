@@ -83,7 +83,7 @@ function deleteResource(path: string): Promise<void> {
 
 /**
  * 로그인. 성공하면 BFF 가 httpOnly 쿠키를 굽고 만료 시각만 돌려준다 (토큰은 브라우저로 오지 않는다).
- * 실패: 400 VALIDATION_FAILED(fieldErrors) · 401 LOGIN_FAILED · 502/504(Spring 응답 없음)
+ * 실패: 400 VALIDATION_FAILED(fieldErrors) · 401 LOGIN_FAILED · 429 LOGIN_LOCKED(Retry-After) · 502/504(Spring 응답 없음)
  */
 export function login(body: LoginRequest): Promise<SessionResponse> {
   return sendJson<SessionResponse>("POST", "/login", body);

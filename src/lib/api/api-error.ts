@@ -22,7 +22,15 @@ function codeForStatus(status: number): ErrorCode {
   if (status === 401) return "UNAUTHORIZED";
   if (status === 404) return "NOT_FOUND";
   if (status === 409) return "SLUG_DUPLICATED";
+  if (status === 429) return "LOGIN_LOCKED";
   return "INTERNAL_ERROR";
+}
+
+/** Retry-After 헤더(초). 없거나 숫자가 아니면 undefined — HTTP 날짜 형식은 Spring 이 쓰지 않는다 */
+function parseRetryAfter(res: Response): number | undefined {
+  const raw = res.headers.get("Retry-After");
+  if (raw === null || !/^\d+$/.test(raw.trim())) return undefined;
+  return Number(raw.trim());
 }
 
 function isErrorResponse(body: unknown): body is ErrorResponse {
@@ -38,30 +46,36 @@ export class ApiError extends Error {
   readonly code: ErrorResponse["code"] | ClientErrorCode;
   /** 필드별 에러. 없으면 빈 배열 — 호출하는 쪽에서 undefined 확인이 필요 없다 */
   readonly fieldErrors: ApiFieldError[];
+  /** 서버가 Retry-After(초)를 보냈으면 그 값. 지금은 429 LOGIN_LOCKED 만 보낸다 */
+  readonly retryAfterSeconds: number | undefined;
 
   constructor(
     status: number,
     code: ApiError["code"],
     message: string,
     fieldErrors: ApiFieldError[] = [],
-    options?: ErrorOptions,
+    options?: ErrorOptions & { retryAfterSeconds?: number },
   ) {
     super(message, options);
     this.status = status;
     this.code = code;
     this.fieldErrors = fieldErrors;
+    this.retryAfterSeconds = options?.retryAfterSeconds;
   }
 
   /** 실패 응답(!res.ok)을 ApiError 로 바꾼다. 본문은 여기서 소비된다 */
   static async fromResponse(res: Response): Promise<ApiError> {
     const body: unknown = await res.json().catch(() => null);
+    const options = { retryAfterSeconds: parseRetryAfter(res) };
     if (isErrorResponse(body)) {
-      return new ApiError(res.status, body.code, body.message, body.fieldErrors ?? []);
+      return new ApiError(res.status, body.code, body.message, body.fieldErrors ?? [], options);
     }
     return new ApiError(
       res.status,
       codeForStatus(res.status),
       `요청에 실패했습니다. (HTTP ${res.status})`,
+      [],
+      options,
     );
   }
 
