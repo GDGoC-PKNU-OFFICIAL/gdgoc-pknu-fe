@@ -3,12 +3,12 @@ import Link from "next/link";
 import SafeImage from "@/components/common/SafeImage";
 import Badge from "@/components/ui/Badge";
 import { buttonStyles } from "@/components/ui/Button";
-import { CONTENT_STATUS_LABELS, PROJECT_CATEGORY_LABELS } from "@/constants/labels";
+import { CONTENT_STATUS_LABELS } from "@/constants/labels";
 import { ADMIN_EDIT_SEGMENT, ADMIN_ROUTES } from "@/constants/routes";
 import { formatKstDateTime, formatMonthPeriod } from "@/lib/date";
 import type { Project } from "@/types/api";
 
-import { DEFAULT_PROJECT_IMAGE, PROJECT_CATEGORY_TONES } from "../lib/project-labels";
+import { DEFAULT_PROJECT_IMAGE, projectBadge } from "../lib/project-labels";
 
 export function projectEditHref(id: number): string {
   return `${ADMIN_ROUTES.projects}/${id}/${ADMIN_EDIT_SEGMENT}`;
@@ -78,9 +78,7 @@ export default function ProjectTable({ projects, onDelete }: ProjectTableProps) 
                 </span>
               </th>
               <td className="px-4 py-2">
-                <Badge tone={PROJECT_CATEGORY_TONES[project.category]}>
-                  {PROJECT_CATEGORY_LABELS[project.category]}
-                </Badge>
+                <Badge tone={projectBadge(project).tone}>{projectBadge(project).label}</Badge>
               </td>
               <td className="px-4 py-2">
                 <Badge tone={project.status === "current" ? "green" : "neutral"}>

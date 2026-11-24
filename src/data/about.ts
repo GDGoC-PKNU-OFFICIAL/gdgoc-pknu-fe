@@ -9,11 +9,12 @@ export const ABOUT_HEADER = {
   description: "GDG on Campus PKNU가 어떤 커뮤니티이고, 어떻게 활동하는지 소개합니다.",
 } as const;
 
+/** paragraphs 안의 \n 은 화면에서 줄바꿈이 된다 (문장마다 줄을 바꾼다) */
 export const IDENTITY = {
   title: "Who We Are",
   paragraphs: [
-    "Google Developer Groups On Campus(이하 GDG)는 대학 기반의 커뮤니티입니다. GDG on Campus PKNU는 이 프로그램에 속한 국립부경대학교 학생 개발자 커뮤니티입니다.",
-    "개발자로 성장하는 데 관심이 있는 모든 학부생을(재학, 휴학 모두 가능) 환영합니다. GDG에 가입하면 동료들과의 학습을 통해 지식을 쌓고 지역 커뮤니티를 위한 솔루션을 구축할 수 있습니다.",
+    "Google Developer Groups On Campus(이하 GDG)는 대학 기반의 커뮤니티입니다.\nGDG on Campus PKNU는 이 프로그램에 속한 국립부경대학교 학생 개발자 커뮤니티입니다.",
+    "개발자로 성장하는 데 관심이 있는 모든 학부생을(재학, 휴학 모두 가능) 환영합니다.\nGDG에 가입하면 동료들과의 학습을 통해 지식을 쌓고 지역 커뮤니티를 위한 솔루션을 구축할 수 있습니다.",
     "동아리의 최종 목표는 학생들이 이론과 실무의 격차를 해소할 수 있도록 지원하는 것입니다.",
   ],
 } as const;

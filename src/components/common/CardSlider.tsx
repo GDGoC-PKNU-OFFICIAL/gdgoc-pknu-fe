@@ -5,6 +5,8 @@ import { Children, type ReactNode, useId } from "react";
 import { useCarousel } from "@/hooks/use-carousel";
 import { cn } from "@/lib/cn";
 
+import { SLIDER_ARROW_VISIBILITY } from "./slider-arrow";
+
 interface CardSliderProps {
   /** 영역 이름 — 스크린리더가 읽는다 (예: "2025년 과거 프로젝트") */
   label: string;
@@ -44,7 +46,7 @@ export default function CardSlider({
     useCarousel<HTMLUListElement>();
 
   return (
-    <div role="region" aria-label={label} className={cn("relative", className)}>
+    <div role="region" aria-label={label} className={cn("group/slider relative", className)}>
       {/* py-3 · -my-3: 마우스를 올리면 카드가 위로 떠오르고 그림자가 커지는데, 가로 스크롤 트랙이 위아래를 잘라 내지 않도록
             여유를 두고 바깥 간격은 그대로 둔다 */}
       {/* relative: 카드 안의 absolute 요소(sr-only 등)가 트랙 기준으로 잡혀 트랙 안에서 잘리게 한다.
@@ -99,7 +101,7 @@ function ArrowButton({ direction, controls, disabled, onClick }: ArrowButtonProp
         // 모바일은 스와이프만 쓴다 → md 이상에서만 보인다. 트랙 좌우 가장자리에 반쯤 걸쳐 둔다
         "absolute top-1/2 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface shadow-md md:flex",
         "transition-opacity hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
-        "disabled:pointer-events-none disabled:opacity-0",
+        SLIDER_ARROW_VISIBILITY,
         isPrev ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2",
       )}
     >

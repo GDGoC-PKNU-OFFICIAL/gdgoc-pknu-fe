@@ -39,6 +39,7 @@ import { type ContentStatus, PROJECT_CATEGORIES, type Project } from "@/types/ap
 
 import { DEFAULT_PROJECT_IMAGE, PROJECT_STATUS_LABELS } from "../lib/project-labels";
 
+import BadgeField from "./BadgeField";
 import {
   emptyProjectForm,
   type ProjectFormOutput,
@@ -264,6 +265,14 @@ export default function ProjectForm({ project }: ProjectFormProps) {
               />
             )}
           </FormField>
+
+          <BadgeField
+            register={register}
+            label={values.badge?.label ?? ""}
+            color={values.badge?.color ?? "blue"}
+            category={values.category ?? ""}
+            error={errors.badge?.label?.message ?? errors.badge?.color?.message}
+          />
         </FormSection>
 
         <FormSection

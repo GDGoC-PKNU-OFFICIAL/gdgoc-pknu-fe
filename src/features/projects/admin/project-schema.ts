@@ -11,8 +11,10 @@ import { z } from "zod";
 import { HTTP_URL_PATTERN, PROJECT_LIMITS, SLUG_PATTERN } from "@/constants/limits";
 import { isYearMonth } from "@/lib/date";
 import { publicEnv } from "@/lib/env/client";
-import { PROJECT_CATEGORIES, type Project, type ProjectCategory } from "@/types/api";
+import { BADGE_COLORS, PROJECT_CATEGORIES, type Project, type ProjectCategory } from "@/types/api";
 import type { ProjectRequest } from "@/types/request";
+
+import { defaultBadgeColor } from "../lib/project-labels";
 
 const L = PROJECT_LIMITS;
 
@@ -30,6 +32,7 @@ const MESSAGES = {
   duplicate: "중복된 항목이 있습니다.",
   url: "http:// 또는 https:// 로 시작하는 주소를 입력해 주세요.",
   thumbnailUrl: "업로드한 썸네일 주소가 아닙니다.",
+  badgeColor: "배지 색을 골라 주세요.",
 } as const;
 
 /** 앞뒤 공백을 지운 뒤 검사한다 (명세 4장 도입부) */
@@ -100,6 +103,14 @@ export const projectFormSchema = z.object({
     .array(listItem(L.outcomes.itemLength))
     .max(L.outcomes.max, MESSAGES.maxItems(L.outcomes.max)),
   links: z.object({ github: optionalUrl, demo: optionalUrl }),
+  // 배지: 글자를 비우면 배지 없음(null) → 화면은 유형 라벨 · 색. 색은 글자가 있을 때만 쓰인다.
+  // 배지가 생기기 전에 저장된 임시 저장본에는 badge 가 없으므로 기본값을 채운다
+  badge: z
+    .object({
+      label: z.string().trim().max(L.badgeLabel, MESSAGES.maxLength(L.badgeLabel)),
+      color: z.enum(BADGE_COLORS, MESSAGES.badgeColor),
+    })
+    .default({ label: "", color: "blue" }),
 });
 
 /** 폼이 들고 있는 값 (입력 중 · 임시 저장본) */
@@ -122,6 +133,7 @@ export function emptyProjectForm(): ProjectFormValues {
     features: [],
     outcomes: [],
     links: { github: "", demo: "" },
+    badge: { label: "", color: "blue" },
   };
 }
 
@@ -140,6 +152,10 @@ export function projectToForm(project: Project): ProjectFormValues {
     features: [...project.features],
     outcomes: [...project.outcomes],
     links: { github: project.links.github ?? "", demo: project.links.demo ?? "" },
+    // 배지가 없던 프로젝트는 지금 보이는 유형 색을 골라 둔다 — 글자만 입력해도 색이 그대로 이어진다
+    badge: project.badge
+      ? { label: project.badge.label, color: project.badge.color }
+      : { label: "", color: defaultBadgeColor(project.category) },
   };
 }
 
@@ -158,5 +174,6 @@ export function toProjectRequest(values: ProjectFormOutput): ProjectRequest {
     features: values.features,
     outcomes: values.outcomes,
     links: { github: values.links.github || null, demo: values.links.demo || null },
+    badge: values.badge.label ? { label: values.badge.label, color: values.badge.color } : null,
   };
 }

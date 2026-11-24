@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import SafeImage from "@/components/common/SafeImage";
+import { BADGE_TEXT_CLASSES } from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
-import { PROJECT_CATEGORY_LABELS } from "@/constants/labels";
 import { cn } from "@/lib/cn";
 import type { Project } from "@/types/api";
 
-import { DEFAULT_PROJECT_IMAGE, PROJECT_STATUS_LABELS } from "../lib/project-labels";
+import { DEFAULT_PROJECT_IMAGE, PROJECT_STATUS_LABELS, projectBadge } from "../lib/project-labels";
 import { projectDetailHref } from "../lib/project-query";
 
 /** 카드 앞면에 보여 줄 기술 스택 수. 나머지는 "+n" (IA 5-2) */
@@ -15,13 +15,6 @@ const VISIBLE_TECH_COUNT = 3;
 const VISIBLE_FEATURE_COUNT = 3;
 
 const STATUS_DOT = { current: "bg-brand-green", past: "bg-ink-muted" } as const;
-
-/** 분류 글자 색 — 다른 카드의 분류 배지(PROJECT_CATEGORY_TONES)와 같은 색 계열 */
-const CATEGORY_TEXT = {
-  "solution-challenge": "text-brand-blue",
-  "team-project": "text-[#1e7e34] dark:text-[#81c995]",
-  official: "text-brand-red",
-} satisfies Record<Project["category"], string>;
 
 /** 마우스 · 키보드 포커스 때 상세 정보를 보여 주는 조건 */
 const REVEAL = "group-hover:opacity-100 group-has-[a:focus-visible]:opacity-100";
@@ -60,8 +53,8 @@ export default function ProjectShowcaseCard({
   layout?: ShowcaseLayout;
 }) {
   const overlay = layout !== "standard";
-  const { slug, title, summary, description, category, status, period, techStack, features } =
-    project;
+  const { slug, title, summary, description, status, period, techStack, features } = project;
+  const badge = projectBadge(project);
   const visibleTech = techStack.slice(0, VISIBLE_TECH_COUNT);
   const hiddenTechCount = techStack.length - visibleTech.length;
   const visibleFeatures = features.slice(0, VISIBLE_FEATURE_COUNT);
@@ -145,7 +138,7 @@ export default function ProjectShowcaseCard({
               layout === "tile" ? "text-[10px] md:text-xs" : "text-xs",
             )}
           >
-            {PROJECT_CATEGORY_LABELS[category]}
+            {badge.label}
           </span>
           <h3
             className={cn(
@@ -173,9 +166,9 @@ export default function ProjectShowcaseCard({
             )}
           >
             <div className="flex items-center justify-between gap-3">
-              {/* 분류는 배경 없는 글자로만. 색은 분류별 배지 색을 그대로 쓴다 */}
-              <span className={cn("text-xs font-semibold", CATEGORY_TEXT[category])}>
-                {PROJECT_CATEGORY_LABELS[category]}
+              {/* 배지는 배경 없는 글자로만. 색은 다른 카드의 배지 색을 그대로 쓴다 (라이트 · 다크) */}
+              <span className={cn("text-xs font-semibold", BADGE_TEXT_CLASSES[badge.tone])}>
+                {badge.label}
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs text-ink-muted">
                 <span

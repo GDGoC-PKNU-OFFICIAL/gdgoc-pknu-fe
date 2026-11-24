@@ -4,7 +4,7 @@ import { type ReactNode, useEffect } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import CardSlider from "@/components/common/CardSlider";
+import CardPager from "@/components/common/CardPager";
 import EmptyState from "@/components/common/EmptyState";
 import SectionHeader from "@/components/common/SectionHeader";
 import YearPicker from "@/components/common/YearPicker";
@@ -12,6 +12,9 @@ import { trackEvent } from "@/lib/analytics";
 
 import { resolveSelectedYear, type YearGroup } from "../lib/group-by-year";
 import { PAST_YEAR_QUERY, replaceUrl, urlWithQuery } from "../lib/project-query";
+
+/** 과거 프로젝트 한 쪽의 카드 수 (진행 중 프로젝트와 같은 3 × 2줄) */
+const PAST_PAGE_SIZE = 6;
 
 interface PastProjectCarouselProps {
   /** 연도별 카드. 오래된 → 최신 순 (group-by-year.ts). 카드는 서버에서 그린 ProjectCard 다 */
@@ -49,7 +52,7 @@ export default function PastProjectCarousel({
 
   const selectYear = (year: number) => {
     if (year === selectedYear) return;
-    // 연도 변경은 히스토리를 쌓지 않는다 (IA 6-3). 슬라이드는 CardSlider 의 key 가 바뀌며 맨 앞으로 간다
+    // 연도 변경은 히스토리를 쌓지 않는다 (IA 6-3). 카드는 CardPager 의 key 가 바뀌며 첫 쪽으로 간다
     replaceUrl(urlWithQuery({ [PAST_YEAR_QUERY]: String(year) }));
     trackEvent("year_select", { section: "past_projects", year });
   };
@@ -104,9 +107,14 @@ export function PastProjectCarouselView({
         )}
       </div>
       {selectedGroup ? (
-        <CardSlider key={selectedGroup.year} label={`${selectedGroup.year}년 과거 프로젝트`}>
+        // 진행 중 프로젝트처럼 한 쪽에 6개(데스크톱 3 × 2줄). 6개를 넘으면 다음 쪽으로 넘어간다
+        <CardPager
+          key={selectedGroup.year}
+          label={`${selectedGroup.year}년 과거 프로젝트`}
+          pageSize={PAST_PAGE_SIZE}
+        >
           {selectedGroup.items}
-        </CardSlider>
+        </CardPager>
       ) : (
         <EmptyState message={emptyMessage} />
       )}

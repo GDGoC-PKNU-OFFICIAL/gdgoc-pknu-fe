@@ -47,7 +47,9 @@ export default function AboutPage() {
           <SectionHeader title={IDENTITY.title} titleId="identity-title" variant="home" />
           <div className="flex max-w-3xl flex-col gap-4 text-base leading-relaxed break-keep md:text-lg">
             {IDENTITY.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
+              <p key={paragraph} className="whitespace-pre-line">
+                {paragraph}
+              </p>
             ))}
           </div>
         </section>

@@ -49,6 +49,16 @@ export type AdminResource = (typeof ADMIN_RESOURCES)[number];
 export const PROJECT_CATEGORIES = ["solution-challenge", "team-project", "official"] as const;
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
 
+/** 프로젝트 배지 색 (정해진 팔레트). 실제 색은 projects/lib/project-labels.ts 가 라이트 · 다크로 매핑한다 */
+export const BADGE_COLORS = ["blue", "green", "red", "yellow", "purple", "gray"] as const;
+export type BadgeColor = (typeof BADGE_COLORS)[number];
+
+/** 프로젝트마다 직접 정한 배지. 없으면 화면은 category 라벨 · 색을 쓴다 */
+export interface ProjectBadge {
+  label: string;
+  color: BadgeColor;
+}
+
 export interface ProjectTeamMember {
   name: string; // 멤버 테이블과 연결되지 않는 문자열
   role: string;
@@ -60,6 +70,7 @@ export interface Project extends ResourceMeta {
   summary: string;
   description: string[]; // 문단 단위
   category: ProjectCategory;
+  badge?: ProjectBadge; // 없으면 category 라벨 · 색
   status: ContentStatus;
   period: MonthPeriod; // start 연도 = 과거 프로젝트 연도 버튼
   team: ProjectTeamMember[];

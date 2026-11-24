@@ -6,14 +6,13 @@ import SafeImage from "@/components/common/SafeImage";
 import Badge from "@/components/ui/Badge";
 import { buttonStyles } from "@/components/ui/Button";
 import Tag from "@/components/ui/Tag";
-import { PROJECT_CATEGORY_LABELS } from "@/constants/labels";
 import { trackEvent } from "@/lib/analytics";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Project } from "@/types/api";
 
 import {
   DEFAULT_PROJECT_IMAGE,
-  PROJECT_CATEGORY_TONES,
+  projectBadge,
   PROJECT_OUTCOMES_TITLES,
   PROJECT_STATUS_LABELS,
   PROJECT_THUMB_TRANSITION_NAME,
@@ -75,7 +74,6 @@ function ProjectDetailContent({ project, titleId, onRequestClose }: ProjectDetai
   const {
     title,
     summary,
-    category,
     status,
     period,
     description,
@@ -86,6 +84,7 @@ function ProjectDetailContent({ project, titleId, onRequestClose }: ProjectDetai
     thumbnailUrl,
     links,
   } = project;
+  const badge = projectBadge(project);
   const hasLinks = Boolean(links.github || links.demo);
 
   return (
@@ -119,8 +118,8 @@ function ProjectDetailContent({ project, titleId, onRequestClose }: ProjectDetai
 
       <div className="flex flex-col gap-8 p-6 md:p-8">
         <header className="flex flex-col gap-3">
-          <Badge tone={PROJECT_CATEGORY_TONES[category]} className="self-start">
-            {PROJECT_CATEGORY_LABELS[category]}
+          <Badge tone={badge.tone} className="self-start">
+            {badge.label}
           </Badge>
           <h2 id={titleId} className="text-2xl font-bold tracking-tight break-keep md:text-3xl">
             {title}

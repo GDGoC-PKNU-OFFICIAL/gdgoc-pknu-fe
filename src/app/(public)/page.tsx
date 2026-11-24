@@ -2,8 +2,9 @@ import Image from "next/image";
 
 import { type Metadata } from "next";
 
-import ActivityCard from "@/components/common/ActivityCard";
+import ActivityPoster from "@/components/common/ActivityPoster";
 import BouncyTitle, { introEnd } from "@/components/common/BouncyTitle";
+import EmblaSlider from "@/components/common/EmblaSlider";
 import GooglyEyes from "@/components/common/GooglyEyes";
 import HeroDoodles from "@/components/common/HeroDoodles";
 import PageSection, {
@@ -13,7 +14,7 @@ import PageSection, {
 import SectionDivider from "@/components/common/SectionDivider";
 import SectionDoodles from "@/components/common/SectionDoodles";
 import SectionHeader from "@/components/common/SectionHeader";
-import { ACTIVITIES } from "@/data/about";
+import { ABOUT_ACTIVITY_GROUPS, ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
 import {
   HERO,
@@ -176,20 +177,20 @@ export default async function HomePage() {
         link={HOME_SECTIONS.about.link}
         decoration={<SectionDoodles preset="about" />}
       >
-        <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
-          {/* 홈에서는 HOME_ACTIVITY_TITLES 의 활동 4개만 한 줄로 (모바일 · 태블릿은 2개씩 두 줄 — 모바일은 비율 그대로 작게). About 도 같은 4개를 보인다.
-              카드 위쪽에 활동 그림(4:3, 양옆을 살짝 잘라 세로로 넉넉하게), 아래에 제목 · 설명. 주기(격주 등)는 홈에서 보여 주지 않는다.
-              마우스를 올리면 4px 떠오르고 그림자가 짙어진다 ("모션 줄이기"면 그림자만) */}
+        {/* About What We Do 와 같은 포스터 카드 (HOME_ACTIVITY_TITLES 의 4개, About 첫 묶음과 같은 순서 · 같은 색).
+            데스크톱(xl)은 4장이 한 줄에 다 들어와 넘길 게 없고, 그보다 좁으면 About 처럼 옆으로 끌어 넘긴다 */}
+        <EmblaSlider label="What We Do 활동 목록">
           {HOME_ACTIVITY_TITLES.flatMap((name) =>
             ACTIVITIES.items.filter((item) => item.title === name),
-          ).map((activity) => (
-            <ActivityCard
+          ).map((activity, index) => (
+            <ActivityPoster
               key={activity.title}
               activity={activity}
-              sizes="(min-width: 1024px) 25vw, 50vw"
+              eyebrow={ABOUT_ACTIVITY_GROUPS[0].eyebrow}
+              index={index}
             />
           ))}
-        </ul>
+        </EmblaSlider>
       </PageSection>
 
       <SectionDivider />

@@ -5,6 +5,8 @@ import { Children, type ReactNode, useEffect, useId, useState } from "react";
 import { useCarousel } from "@/hooks/use-carousel";
 import { cn } from "@/lib/cn";
 
+import { SLIDER_ARROW_VISIBILITY } from "./slider-arrow";
+
 interface CardPagerProps {
   /** 영역 이름 — 스크린리더가 읽는다 (예: "진행 중 스터디") */
   label: string;
@@ -66,7 +68,7 @@ export default function CardPager({ label, pageSize, children }: CardPagerProps)
   const multiPage = pages.length > 1;
 
   return (
-    <div role="region" aria-label={label} className="flex flex-col gap-6">
+    <div role="region" aria-label={label} className="group/slider flex flex-col gap-6">
       <div className="relative">
         {/* py-3 · -my-3: 마우스를 올리면 카드가 위로 떠오르고 그림자가 커지는데, 가로 스크롤 트랙이 위아래를 잘라 내지 않도록
             여유를 두고 바깥 간격은 그대로 둔다 */}
@@ -156,7 +158,7 @@ function ArrowButton({ direction, controls, disabled, onClick }: ArrowButtonProp
       className={cn(
         "absolute top-1/2 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface shadow-md md:flex",
         "transition-opacity hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
-        "disabled:pointer-events-none disabled:opacity-0",
+        SLIDER_ARROW_VISIBILITY,
         isPrev ? "left-0 -translate-x-1/2" : "right-0 translate-x-1/2",
       )}
     >
