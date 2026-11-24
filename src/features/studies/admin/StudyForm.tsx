@@ -21,6 +21,7 @@ import { draftKey } from "@/components/admin/lib/draft-storage";
 import { listErrors } from "@/components/admin/lib/list-errors";
 import { suggestSlug } from "@/components/admin/lib/suggest-slug";
 import { adminYears } from "@/components/admin/lib/year-options";
+import StringListField from "@/components/admin/StringListField";
 import TagInput from "@/components/admin/TagInput";
 import YearMonthSelect from "@/components/admin/YearMonthSelect";
 import Button from "@/components/ui/Button";
@@ -352,6 +353,31 @@ export default function StudyForm({ study }: StudyFormProps) {
                 limits={L.participants}
                 errors={listErrors(fieldState.error)}
                 placeholder="이름 입력 후 Enter"
+              />
+            )}
+          />
+        </FormSection>
+
+        <FormSection
+          title="소개"
+          description="자세히 보기에서 한 줄 소개 아래에 보입니다. 비워 두면 숨겨집니다."
+        >
+          <Controller
+            control={control}
+            name="description"
+            render={({ field, fieldState }) => (
+              <StringListField
+                id="study-description"
+                legend="스터디 소개"
+                hint={`문단 최대 ${L.description.max}개, 문단당 ${L.description.itemLength.toLocaleString()}자`}
+                value={field.value ?? []}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                limits={L.description}
+                errors={listErrors(fieldState.error)}
+                itemLabel={(i) => `소개 ${i + 1}문단`}
+                addLabel="문단 추가"
+                multiline
               />
             )}
           />

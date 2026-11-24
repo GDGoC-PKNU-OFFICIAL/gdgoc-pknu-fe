@@ -74,6 +74,7 @@ export interface StudyRequest {
   participants: string[]; // 최대 30개, 각 20자 이하 (리더 제외)
   format: string | null; // 30자 이하
   outputs: { label: string; url: string }[]; // 최대 5개, label 30자 이하, url 필수
+  description: string[]; // 0~10문단, 문단당 1,000자 이하
 }
 
 // ============================================================

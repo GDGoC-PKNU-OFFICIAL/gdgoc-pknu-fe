@@ -60,6 +60,7 @@ export const STUDY_LIMITS = {
   participants: { max: 30, itemLength: 20 }, // 리더 제외
   format: 30,
   outputs: { max: 5, labelLength: 30, url: URL_MAX }, // label · url 모두 필수
+  description: { max: 10, itemLength: 1000 }, // 문단. 비워도 된다
 } as const;
 
 // ============================================================

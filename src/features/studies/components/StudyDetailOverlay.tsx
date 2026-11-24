@@ -64,6 +64,7 @@ interface StudyDetailContentProps {
 
 function StudyDetailContent({ study, titleId, onRequestClose }: StudyDetailContentProps) {
   const { topic, title, summary, status, period, leader, participants, format, outputs } = study;
+  const description = study.description ?? [];
 
   return (
     <>
@@ -125,6 +126,18 @@ function StudyDetailContent({ study, titleId, onRequestClose }: StudyDetailConte
             )}
           </dl>
         </header>
+
+        {description.length > 0 && (
+          <DetailSection title="스터디 소개">
+            {/* 프로젝트 상세의 "프로젝트 소개"와 같은 모양 */}
+            <div className="flex flex-col gap-3 leading-relaxed [overflow-wrap:anywhere] break-keep">
+              {description.map((paragraph, index) => (
+                // 같은 문장이 반복될 수 있고 순서만 바뀌는 일이 없어 인덱스를 key 로 쓴다
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+          </DetailSection>
+        )}
 
         <DetailSection title={`멤버 ${1 + participants.length}명`}>
           {/* 리더 다음 참여자는 입력 순서 그대로 */}

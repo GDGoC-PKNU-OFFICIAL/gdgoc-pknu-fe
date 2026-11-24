@@ -94,6 +94,8 @@ export interface Study extends ResourceMeta {
   slug: string;
   title: string;
   summary: string;
+  /** 스터디 소개 문단. 나중에 생긴 필드라 없을 수 있다 → 빈 배열과 같다 (상세에서 소개 칸을 숨김) */
+  description?: string[];
   topic: string;
   status: ContentStatus;
   period: MonthPeriod;
