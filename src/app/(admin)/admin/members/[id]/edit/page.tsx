@@ -25,7 +25,7 @@ export default async function AdminMemberEditPage({
   if (!isValidId(id)) notFound();
 
   return (
-    <section className="flex flex-col gap-6 px-4 pt-8 md:px-8">
+    <section className="flex flex-col gap-6 px-4 pt-5 md:px-6">
       <AdminPageHeader title="멤버 수정" />
       <MemberEditScreen id={Number(id)} />
     </section>

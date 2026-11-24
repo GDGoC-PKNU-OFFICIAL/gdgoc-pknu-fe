@@ -30,6 +30,7 @@ const MESSAGES = {
   role: "역할을 선택해 주세요.",
   part: "분야를 선택해 주세요.",
   url: "http:// 또는 https:// 로 시작하는 주소를 입력해 주세요.",
+  email: "이메일 형식으로 입력해 주세요. (예: name@example.com)",
   photoUrl: "업로드한 프로필 사진 주소가 아닙니다.",
   // IA 8-5
   consent: "본인 공개 동의를 확인해 주세요.",
@@ -47,6 +48,13 @@ const optionalUrl = z
   .trim()
   .max(L.url, MESSAGES.maxLength(L.url))
   .refine((value) => value === "" || HTTP_URL_PATTERN.test(value), MESSAGES.url);
+
+/** 비우면 링크 없음. 형식은 Spring @Email 과 같은 수준(간단한 a@b.c)으로 본다 */
+const optionalEmail = z
+  .string()
+  .trim()
+  .max(L.email, MESSAGES.maxLength(L.email))
+  .refine((value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), MESSAGES.email);
 
 function oneOf<T extends string>(values: readonly T[]) {
   return (value: string): value is T => (values as readonly string[]).includes(value);
@@ -81,7 +89,7 @@ export const memberFormSchema = z
       .refine(isMemberPart, MESSAGES.part)
       .transform((value) => value as MemberPart),
     bio: requiredText(L.bio),
-    links: z.object({ github: optionalUrl, homepage: optionalUrl }),
+    links: z.object({ github: optionalUrl, email: optionalEmail }),
     consentConfirmed: z.boolean().refine((value) => value, MESSAGES.consent),
   })
   .superRefine(({ status, role }, ctx) => {
@@ -107,7 +115,7 @@ export function emptyMemberForm(): MemberFormValues {
     interests: [],
     part: "",
     bio: "",
-    links: { github: "", homepage: "" },
+    links: { github: "", email: "" },
     consentConfirmed: false,
   };
 }
@@ -127,7 +135,7 @@ export function memberToForm(member: AdminMember): MemberFormValues {
     interests: [...member.interests],
     part: member.part,
     bio: member.bio,
-    links: { github: member.links.github ?? "", homepage: member.links.homepage ?? "" },
+    links: { github: member.links.github ?? "", email: member.links.email ?? "" },
     consentConfirmed: true,
   };
 }
@@ -142,7 +150,7 @@ export function toMemberRequest(values: MemberFormOutput): MemberRequest {
     interests: values.interests,
     part: values.part,
     bio: values.bio,
-    links: { github: values.links.github || null, homepage: values.links.homepage || null },
+    links: { github: values.links.github || null, email: values.links.email || null },
     consentConfirmed: values.consentConfirmed,
   };
   return values.status === "core"

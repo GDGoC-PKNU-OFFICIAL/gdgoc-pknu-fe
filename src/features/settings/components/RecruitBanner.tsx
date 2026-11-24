@@ -8,7 +8,6 @@ type RecruitBannerProps = Pick<SiteSetting, "recruiting" | "recruitPeriod">;
  * 모집 상태 (C-01, P-00 히어로). 타이틀 위에 놓는 작은 보조 정보라 카드 · 배너 모양으로 만들지 않는다.
  * 표시만 하고 지원 버튼은 없다 — 지원 접수는 사이트 밖에서 한다 (PRD MVP 범위).
  * 모집 상태 · 기간은 관리자 사이트 설정(A-50)에서 바꾼다. 기간이 없으면 상태만 보여 준다.
- * 배너 문구(bannerText)는 화면에 표시하지 않기로 했다.
  */
 export default function RecruitBanner({ recruiting, recruitPeriod }: RecruitBannerProps) {
   return (

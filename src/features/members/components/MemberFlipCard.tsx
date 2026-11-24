@@ -1,6 +1,6 @@
 "use client";
 
-import { type FocusEvent, type MouseEvent, useRef, useState } from "react";
+import { type FocusEvent, type MouseEvent, type ReactNode, useRef, useState } from "react";
 
 import Link from "next/link";
 
@@ -16,17 +16,21 @@ import { DEFAULT_MEMBER_IMAGE } from "../lib/member-labels";
 /** 카드를 뒤집는 조건: 마우스를 올림 · 키보드 포커스 · 터치로 뒤집어 둠 */
 const ROTATE = cn(
   "motion-safe:group-hover:rotate-y-180 motion-safe:group-focus-visible:rotate-y-180",
+  // 뒷면의 GitHub · 메일 링크에 Tab 으로 들어와도 뒤집힌 채로 둔다
+  "motion-safe:group-has-[a:focus-visible]:rotate-y-180",
   "motion-safe:group-data-[flipped=true]:rotate-y-180",
 );
 
 /** "모션 줄이기": 회전 대신 앞면이 사라지고 뒷면이 나타난다 */
 const FADE_OUT = cn(
   "motion-reduce:group-hover:opacity-0 motion-reduce:group-focus-visible:opacity-0",
+  "motion-reduce:group-has-[a:focus-visible]:opacity-0",
   "motion-reduce:group-data-[flipped=true]:opacity-0",
 );
 const FADE_IN = cn(
   "motion-reduce:opacity-0 motion-reduce:group-hover:opacity-100",
   "motion-reduce:group-focus-visible:opacity-100",
+  "motion-reduce:group-has-[a:focus-visible]:opacity-100",
   "motion-reduce:group-data-[flipped=true]:opacity-100",
 );
 
@@ -74,7 +78,9 @@ export default function MemberFlipCard({
   previewFace,
   analyticsSection,
 }: MemberFlipCardProps) {
-  const { name, department, history, interests, part, bio, photoUrl } = member;
+  const { name, department, history, interests, part, bio, photoUrl, links } = member;
+  // 카드 전체가 링크(href)면 안에 다른 링크를 둘 수 없어 아이콘을 빼고, 미리보기는 누를 수 없어 모양만 보여 준다
+  const showLinks = !href && Boolean(links?.github || links?.email);
   /** 터치에서만 쓴다. 마우스 · 키보드는 CSS 로 뒤집는다 */
   const [flipped, setFlipped] = useState(false);
   /** 같은 카드는 화면에 있는 동안 한 번만 센다 — hover 로 뒤집힐 때마다 이벤트가 쏟아지지 않게 */
@@ -185,6 +191,27 @@ export default function MemberFlipCard({
             {bio}
           </span>
         </span>
+        {showLinks && (
+          <span className="flex items-center gap-2">
+            {links.github && (
+              <ContactLink
+                href={links.github}
+                label={`${name} GitHub (새 탭)`}
+                external
+                disabled={preview}
+                icon={GITHUB_ICON}
+              />
+            )}
+            {links.email && (
+              <ContactLink
+                href={`mailto:${links.email}`}
+                label={`${name}에게 메일 보내기 (${links.email})`}
+                disabled={preview}
+                icon={MAIL_ICON}
+              />
+            )}
+          </span>
+        )}
       </span>
     </span>
   );
@@ -221,5 +248,64 @@ export default function MemberFlipCard({
     >
       {faces}
     </Link>
+  );
+}
+
+const GITHUB_ICON = (
+  <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="currentColor">
+    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z" />
+  </svg>
+);
+
+const MAIL_ICON = (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 24 24"
+    className="size-5"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z" />
+    <path d="m3.5 7 8.5 6 8.5-6" />
+  </svg>
+);
+
+/** 뒷면의 GitHub · 메일 아이콘 버튼. 누르면 카드가 다시 뒤집히지 않도록 click 을 카드까지 올리지 않는다 */
+function ContactLink({
+  href,
+  label,
+  icon,
+  external,
+  disabled,
+}: {
+  href: string;
+  label: string;
+  icon: ReactNode;
+  external?: boolean;
+  disabled?: boolean;
+}) {
+  const className =
+    "flex size-11 items-center justify-center rounded-full bg-surface text-ink shadow-sm transition-colors hover:bg-ink hover:text-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue";
+  if (disabled) {
+    return (
+      <span aria-hidden="true" className={className}>
+        {icon}
+      </span>
+    );
+  }
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      title={label}
+      onClick={(event) => event.stopPropagation()}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className={className}
+    >
+      {icon}
+    </a>
   );
 }

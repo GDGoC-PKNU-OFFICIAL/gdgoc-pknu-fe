@@ -80,7 +80,7 @@ export default function MemberCardPreview({ values }: { values: DeepPartial<Memb
               className={cn(
                 "min-h-11 rounded-full px-4 text-sm font-medium transition-colors",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
-                face === value ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink",
+                face === value ? "bg-surface text-ink" : "text-ink-muted hover:text-ink",
               )}
             >
               {label}

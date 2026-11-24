@@ -83,7 +83,7 @@ export default function ConfirmDialog({
       onClick={(event) => {
         if (event.target === event.currentTarget) requestCancel();
       }}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-2xl bg-surface p-0 text-ink shadow-xl backdrop:bg-ink/60"
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-lg bg-surface p-0 text-ink shadow-xl backdrop:bg-ink/60"
     >
       {open && (
         <div className="flex flex-col gap-5 p-6">

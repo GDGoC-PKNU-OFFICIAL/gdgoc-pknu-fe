@@ -29,7 +29,7 @@ export default function FormFooter({ cancelHref, pending, slow, draftSavedAt }: 
       : "";
 
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8">
+    <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
       <p aria-live="polite" className="min-h-5 text-xs text-ink-muted">
         {status}
       </p>

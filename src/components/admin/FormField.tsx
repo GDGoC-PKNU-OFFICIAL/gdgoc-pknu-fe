@@ -152,15 +152,18 @@ interface FormSectionProps {
   children: ReactNode;
 }
 
-/** 폼 그룹 카드 — IA 8-4 표의 "그룹"(기본 · 기간 · 썸네일 …) */
+/**
+ * 폼 그룹 패널 — IA 8-4 표의 "그룹"(기본 · 기간 · 썸네일 …).
+ * 업무용 화면(ERP)처럼 회색 제목 띠 + 흰 본문으로 나눠, 긴 폼에서도 구역 경계가 한눈에 보이게 한다.
+ */
 export function FormSection({ title, description, children }: FormSectionProps) {
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 md:p-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-base font-bold">{title}</h2>
-        {description && <p className="text-sm text-ink-muted">{description}</p>}
+    <section className="overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex flex-col gap-0.5 border-b border-line bg-surface-muted px-4 py-2.5">
+        <h2 className="text-sm font-semibold">{title}</h2>
+        {description && <p className="text-xs text-ink-muted">{description}</p>}
       </div>
-      {children}
+      <div className="flex flex-col gap-5 p-4 md:p-5">{children}</div>
     </section>
   );
 }

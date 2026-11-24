@@ -65,8 +65,7 @@ export default function StatsGrid({ stats }: { stats: SiteStat[] }) {
 
   return (
     <dl ref={listRef} className="grid w-full auto-rows-fr grid-cols-2">
-      {stats.map(({ label, value, unit, suffix }, index) => {
-        const mark = `${unit ?? ""}${suffix ?? ""}`;
+      {stats.map(({ label, value }, index) => {
         const finalText = value.toLocaleString("ko-KR");
         return (
           <div
@@ -79,10 +78,7 @@ export default function StatsGrid({ stats }: { stats: SiteStat[] }) {
           >
             <dt className="text-sm whitespace-nowrap text-ink-muted md:text-base">{label}</dt>
             <dd className="flex items-start">
-              <span className="sr-only">
-                {finalText}
-                {mark}
-              </span>
+              <span className="sr-only">{finalText}</span>
               {/* 최종 값 자리를 미리 잡아 두어 숫자가 올라가는 동안 폭이 흔들리지 않는다 */}
               <span
                 aria-hidden="true"
@@ -93,14 +89,6 @@ export default function StatsGrid({ stats }: { stats: SiteStat[] }) {
                   {Math.round(value * progress).toLocaleString("ko-KR")}
                 </span>
               </span>
-              {mark && (
-                <span
-                  aria-hidden="true"
-                  className="ml-1 text-lg leading-none font-bold text-brand-blue sm:text-2xl lg:text-3xl"
-                >
-                  {mark}
-                </span>
-              )}
             </dd>
           </div>
         );

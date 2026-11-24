@@ -5,6 +5,7 @@
 
 import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
 import type {
+  AboutContent,
   AdminMember,
   Dashboard,
   EventItem,
@@ -18,6 +19,7 @@ import type {
 } from "@/types/api";
 import type { Page } from "@/types/common";
 import type {
+  AboutRequest,
   EventListQuery,
   EventOrderRequest,
   EventRequest,
@@ -257,6 +259,16 @@ export function getAdminSettings(signal?: AbortSignal): Promise<SiteSetting> {
 /** A-50 저장 — 단일 레코드를 통째로 교체 (없으면 만든다). 통계는 정확히 4개 */
 export function updateSettings(body: SettingRequest): Promise<SiteSetting> {
   return sendJson<SiteSetting>("PUT", "/settings", body);
+}
+
+/** About 수정 폼 초기값. 아직 한 번도 저장하지 않았으면 404 NOT_FOUND — 코드 기본 내용으로 시작한다 */
+export function getAdminAbout(signal?: AbortSignal): Promise<AboutContent> {
+  return getJson<AboutContent>("/about", signal);
+}
+
+/** About 저장 — 단일 레코드를 통째로 교체 (없으면 만든다). 성공하면 BFF 가 / · /about 을 재검증한다 */
+export function updateAbout(body: AboutRequest): Promise<AboutContent> {
+  return sendJson<AboutContent>("PUT", "/about", body);
 }
 
 /** A-00 요약 — 모집 상태 · 콘텐츠별 건수 · 다가오는 일정 3건 · 최근 수정 5건 */

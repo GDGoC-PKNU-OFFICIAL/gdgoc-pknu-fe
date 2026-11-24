@@ -10,6 +10,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import DraftRestoreDialog from "@/components/admin/DraftRestoreDialog";
 import FormField, { FormFieldset, FormSection } from "@/components/admin/FormField";
 import FormFooter from "@/components/admin/FormFooter";
+import FormWithPreview from "@/components/admin/FormWithPreview";
 import { useAdminMutation } from "@/components/admin/hooks/use-admin-mutation";
 import { useCurrentYearMonth } from "@/components/admin/hooks/use-current-year-month";
 import { useDraft } from "@/components/admin/hooks/use-draft";
@@ -33,6 +34,8 @@ import { checkStudySlug, createStudy, updateStudy } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
 import { formatKstDateTime, isYearMonth, parseYearMonth } from "@/lib/date";
 import type { ContentStatus, Study } from "@/types/api";
+import { previewStudy } from "@/components/admin/lib/preview-values";
+import StudyCard from "@/features/studies/components/StudyCard";
 
 import { STUDY_STATUS_LABELS } from "../lib/study-labels";
 
@@ -169,322 +172,330 @@ export default function StudyForm({ study }: StudyFormProps) {
           </p>
         )}
 
-        <FormSection title="기본 정보">
-          <FormField
-            id="study-title"
-            label="제목"
-            required
-            error={errors.title?.message}
-            counter={{ length: values.title?.length ?? 0, max: L.title }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.title}
-                {...register("title", {
-                  onChange: (event: { target: { value: string } }) => {
-                    if (!slugEdited) {
-                      setValue("slug", suggestSlug(event.target.value, L.slug), {
-                        shouldDirty: true,
-                      });
-                    }
-                  },
-                })}
-              />
-            )}
-          </FormField>
-
-          <FormField
-            id="study-slug"
-            label="슬러그"
-            required
-            hint={
-              <span className={cn(slugStatus === "available" && "text-[#1e7e34]")}>{slugHint}</span>
-            }
-            error={
-              errors.slug?.message ?? (slugStatus === "taken" ? MESSAGES.slugTaken : undefined)
-            }
-            counter={{ length: values.slug?.length ?? 0, max: L.slug }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.slug}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder="android-basic"
-                {...register("slug", { onChange: () => setSlugEdited(true) })}
-              />
-            )}
-          </FormField>
-
-          <FormField
-            id="study-topic"
-            label="주제"
-            required
-            hint="카드 상단 태그로 표시됩니다."
-            error={errors.topic?.message}
-            counter={{ length: values.topic?.length ?? 0, max: L.topic }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.topic}
-                placeholder="Android"
-                {...register("topic")}
-              />
-            )}
-          </FormField>
-
-          <FormField
-            id="study-summary"
-            label="한 줄 요약"
-            required
-            error={errors.summary?.message}
-            counter={{ length: values.summary?.length ?? 0, max: L.summary }}
-          >
-            {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
-          </FormField>
-        </FormSection>
-
-        <FormSection
-          title="기간"
-          description="진행 상태는 입력하지 않습니다. 종료월로 자동 계산됩니다."
+        <FormWithPreview
+          title="스터디 카드 미리보기"
+          note="Studies 페이지 · 홈 진행 중 스터디에 이렇게 보입니다."
+          preview={<StudyCard study={previewStudy(values)} />}
         >
-          <div className="grid gap-5 md:grid-cols-2">
+          <FormSection title="기본 정보">
             <FormField
-              id="study-period-start"
-              label="시작"
+              id="study-title"
+              label="제목"
               required
-              error={errors.period?.start?.message}
+              error={errors.title?.message}
+              counter={{ length: values.title?.length ?? 0, max: L.title }}
             >
-              {(controlProps) => (
-                <Controller
-                  control={control}
-                  name="period.start"
-                  render={({ field }) => (
-                    <YearMonthSelect
-                      {...controlProps}
-                      ref={field.ref}
-                      value={field.value}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      years={years}
-                      emptyYearLabel="연도"
-                      monthLabel="시작 월"
-                    />
-                  )}
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.title}
+                  {...register("title", {
+                    onChange: (event: { target: { value: string } }) => {
+                      if (!slugEdited) {
+                        setValue("slug", suggestSlug(event.target.value, L.slug), {
+                          shouldDirty: true,
+                        });
+                      }
+                    },
+                  })}
                 />
               )}
             </FormField>
+
             <FormField
-              id="study-period-end"
-              label="종료"
-              hint="진행 중이면 비워 두세요. 종료 예정월을 넣어도 됩니다."
-              error={errors.period?.end?.message}
+              id="study-slug"
+              label="슬러그"
+              required
+              hint={
+                <span className={cn(slugStatus === "available" && "text-[#1e7e34]")}>
+                  {slugHint}
+                </span>
+              }
+              error={
+                errors.slug?.message ?? (slugStatus === "taken" ? MESSAGES.slugTaken : undefined)
+              }
+              counter={{ length: values.slug?.length ?? 0, max: L.slug }}
             >
-              {(controlProps) => (
-                <Controller
-                  control={control}
-                  name="period.end"
-                  render={({ field }) => (
-                    <YearMonthSelect
-                      {...controlProps}
-                      ref={field.ref}
-                      value={field.value}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      years={years}
-                      emptyYearLabel="진행 중"
-                      monthLabel="종료 월"
-                    />
-                  )}
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.slug}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder="android-basic"
+                  {...register("slug", { onChange: () => setSlugEdited(true) })}
                 />
               )}
             </FormField>
-          </div>
-          <p className="text-sm">
-            진행 상태:{" "}
-            <strong className="font-semibold">
-              {status === null ? "—" : STUDY_STATUS_LABELS[status]}
-            </strong>
-            <span className="ml-2 text-xs text-ink-muted">
-              {status === "past"
-                ? "과거 스터디에 표시됩니다."
-                : status === "current"
-                  ? "현재 스터디에 표시됩니다."
-                  : ""}
-            </span>
-          </p>
-        </FormSection>
 
-        <FormSection
-          title="사람"
-          description="리더 · 참여자 이름은 멤버 목록과 연결되지 않는 문자열입니다. 입력 순서대로 표시됩니다."
-        >
-          <FormField
-            id="study-leader"
-            label="리더"
-            required
-            error={errors.leader?.message}
-            counter={{ length: values.leader?.length ?? 0, max: L.leader }}
+            <FormField
+              id="study-topic"
+              label="주제"
+              required
+              hint="카드 상단 태그로 표시됩니다."
+              error={errors.topic?.message}
+              counter={{ length: values.topic?.length ?? 0, max: L.topic }}
+            >
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.topic}
+                  placeholder="Android"
+                  {...register("topic")}
+                />
+              )}
+            </FormField>
+
+            <FormField
+              id="study-summary"
+              label="한 줄 요약"
+              required
+              error={errors.summary?.message}
+              counter={{ length: values.summary?.length ?? 0, max: L.summary }}
+            >
+              {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
+            </FormField>
+          </FormSection>
+
+          <FormSection
+            title="기간"
+            description="진행 상태는 입력하지 않습니다. 종료월로 자동 계산됩니다."
           >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.leader}
-                placeholder="홍길동"
-                {...register("leader")}
-              />
-            )}
-          </FormField>
-          <Controller
-            control={control}
-            name="participants"
-            render={({ field, fieldState }) => (
-              <TagInput
-                id="study-participants"
-                legend="참여자"
-                hint={`리더는 빼고 입력합니다. 최대 ${L.participants.max}명, 이름 ${L.participants.itemLength}자`}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.participants}
-                errors={listErrors(fieldState.error)}
-                placeholder="이름 입력 후 Enter"
-              />
-            )}
-          />
-        </FormSection>
-
-        <FormSection
-          title="소개"
-          description="자세히 보기에서 한 줄 소개 아래에 보입니다. 비워 두면 숨겨집니다."
-        >
-          <Controller
-            control={control}
-            name="description"
-            render={({ field, fieldState }) => (
-              <StringListField
-                id="study-description"
-                legend="스터디 소개"
-                hint={`문단 최대 ${L.description.max}개, 문단당 ${L.description.itemLength.toLocaleString()}자`}
-                value={field.value ?? []}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.description}
-                errors={listErrors(fieldState.error)}
-                itemLabel={(i) => `소개 ${i + 1}문단`}
-                addLabel="문단 추가"
-                multiline
-              />
-            )}
-          />
-        </FormSection>
-
-        <FormSection title="진행">
-          <FormField
-            id="study-format"
-            label="진행 방식"
-            error={errors.format?.message}
-            counter={{ length: values.format?.length ?? 0, max: L.format }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.format}
-                placeholder="주 1회 오프라인 · 발표"
-                {...register("format")}
-              />
-            )}
-          </FormField>
-        </FormSection>
-
-        <FormSection title="결과물" description="발표 자료 · 저장소 같은 링크를 남깁니다.">
-          <FormFieldset
-            id="study-outputs"
-            legend="결과물 링크"
-            hint={`최대 ${L.outputs.max}개. 이름 ${L.outputs.labelLength}자, 주소는 http(s):// 로 시작`}
-            error={listErrors(errors.outputs).message}
-          >
-            {outputs.fields.length > 0 && (
-              <ol className="flex flex-col gap-3">
-                {outputs.fields.map((output, index) => {
-                  const outputErrors = errors.outputs?.[index];
-                  return (
-                    <li key={output.id} className="flex items-start gap-2">
-                      <div className="grid flex-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-                        <FormField
-                          id={`study-outputs-${index}-label`}
-                          label={`결과물 ${index + 1} 이름`}
-                          error={outputErrors?.label?.message}
-                          counter={{
-                            length: values.outputs?.[index]?.label?.length ?? 0,
-                            max: L.outputs.labelLength,
-                          }}
-                        >
-                          {(controlProps) => (
-                            <Input
-                              {...controlProps}
-                              maxLength={L.outputs.labelLength}
-                              placeholder="발표 자료"
-                              {...register(`outputs.${index}.label`)}
-                            />
-                          )}
-                        </FormField>
-                        <FormField
-                          id={`study-outputs-${index}-url`}
-                          label={`결과물 ${index + 1} 주소`}
-                          error={outputErrors?.url?.message}
-                        >
-                          {(controlProps) => (
-                            <Input
-                              {...controlProps}
-                              type="url"
-                              inputMode="url"
-                              maxLength={L.outputs.url}
-                              placeholder="https://…"
-                              {...register(`outputs.${index}.url`)}
-                            />
-                          )}
-                        </FormField>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`결과물 ${index + 1} 삭제`}
-                        onClick={() => outputs.remove(index)}
-                        className="mt-7 shrink-0 text-ink-muted"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 24 24"
-                          className="size-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                        >
-                          <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-            <div>
-              <Button
-                variant="secondary"
-                disabled={outputs.fields.length >= L.outputs.max}
-                onClick={() => outputs.append({ label: "", url: "" })}
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField
+                id="study-period-start"
+                label="시작"
+                required
+                error={errors.period?.start?.message}
               >
-                + 결과물 추가
-              </Button>
+                {(controlProps) => (
+                  <Controller
+                    control={control}
+                    name="period.start"
+                    render={({ field }) => (
+                      <YearMonthSelect
+                        {...controlProps}
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        years={years}
+                        emptyYearLabel="연도"
+                        monthLabel="시작 월"
+                      />
+                    )}
+                  />
+                )}
+              </FormField>
+              <FormField
+                id="study-period-end"
+                label="종료"
+                hint="진행 중이면 비워 두세요. 종료 예정월을 넣어도 됩니다."
+                error={errors.period?.end?.message}
+              >
+                {(controlProps) => (
+                  <Controller
+                    control={control}
+                    name="period.end"
+                    render={({ field }) => (
+                      <YearMonthSelect
+                        {...controlProps}
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        years={years}
+                        emptyYearLabel="진행 중"
+                        monthLabel="종료 월"
+                      />
+                    )}
+                  />
+                )}
+              </FormField>
             </div>
-          </FormFieldset>
-        </FormSection>
+            <p className="text-sm">
+              진행 상태:{" "}
+              <strong className="font-semibold">
+                {status === null ? "—" : STUDY_STATUS_LABELS[status]}
+              </strong>
+              <span className="ml-2 text-xs text-ink-muted">
+                {status === "past"
+                  ? "과거 스터디에 표시됩니다."
+                  : status === "current"
+                    ? "현재 스터디에 표시됩니다."
+                    : ""}
+              </span>
+            </p>
+          </FormSection>
+
+          <FormSection
+            title="사람"
+            description="리더 · 참여자 이름은 멤버 목록과 연결되지 않는 문자열입니다. 입력 순서대로 표시됩니다."
+          >
+            <FormField
+              id="study-leader"
+              label="리더"
+              required
+              error={errors.leader?.message}
+              counter={{ length: values.leader?.length ?? 0, max: L.leader }}
+            >
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.leader}
+                  placeholder="홍길동"
+                  {...register("leader")}
+                />
+              )}
+            </FormField>
+            <Controller
+              control={control}
+              name="participants"
+              render={({ field, fieldState }) => (
+                <TagInput
+                  id="study-participants"
+                  legend="참여자"
+                  hint={`리더는 빼고 입력합니다. 최대 ${L.participants.max}명, 이름 ${L.participants.itemLength}자`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.participants}
+                  errors={listErrors(fieldState.error)}
+                  placeholder="이름 입력 후 Enter"
+                />
+              )}
+            />
+          </FormSection>
+
+          <FormSection
+            title="소개"
+            description="자세히 보기에서 한 줄 소개 아래에 보입니다. 비워 두면 숨겨집니다."
+          >
+            <Controller
+              control={control}
+              name="description"
+              render={({ field, fieldState }) => (
+                <StringListField
+                  id="study-description"
+                  legend="스터디 소개"
+                  hint={`문단 최대 ${L.description.max}개, 문단당 ${L.description.itemLength.toLocaleString()}자`}
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.description}
+                  errors={listErrors(fieldState.error)}
+                  itemLabel={(i) => `소개 ${i + 1}문단`}
+                  addLabel="문단 추가"
+                  multiline
+                />
+              )}
+            />
+          </FormSection>
+
+          <FormSection title="진행">
+            <FormField
+              id="study-format"
+              label="진행 방식"
+              error={errors.format?.message}
+              counter={{ length: values.format?.length ?? 0, max: L.format }}
+            >
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.format}
+                  placeholder="주 1회 오프라인 · 발표"
+                  {...register("format")}
+                />
+              )}
+            </FormField>
+          </FormSection>
+
+          <FormSection title="결과물" description="발표 자료 · 저장소 같은 링크를 남깁니다.">
+            <FormFieldset
+              id="study-outputs"
+              legend="결과물 링크"
+              hint={`최대 ${L.outputs.max}개. 이름 ${L.outputs.labelLength}자, 주소는 http(s):// 로 시작`}
+              error={listErrors(errors.outputs).message}
+            >
+              {outputs.fields.length > 0 && (
+                <ol className="flex flex-col gap-3">
+                  {outputs.fields.map((output, index) => {
+                    const outputErrors = errors.outputs?.[index];
+                    return (
+                      <li key={output.id} className="flex items-start gap-2">
+                        <div className="grid flex-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+                          <FormField
+                            id={`study-outputs-${index}-label`}
+                            label={`결과물 ${index + 1} 이름`}
+                            error={outputErrors?.label?.message}
+                            counter={{
+                              length: values.outputs?.[index]?.label?.length ?? 0,
+                              max: L.outputs.labelLength,
+                            }}
+                          >
+                            {(controlProps) => (
+                              <Input
+                                {...controlProps}
+                                maxLength={L.outputs.labelLength}
+                                placeholder="발표 자료"
+                                {...register(`outputs.${index}.label`)}
+                              />
+                            )}
+                          </FormField>
+                          <FormField
+                            id={`study-outputs-${index}-url`}
+                            label={`결과물 ${index + 1} 주소`}
+                            error={outputErrors?.url?.message}
+                          >
+                            {(controlProps) => (
+                              <Input
+                                {...controlProps}
+                                type="url"
+                                inputMode="url"
+                                maxLength={L.outputs.url}
+                                placeholder="https://…"
+                                {...register(`outputs.${index}.url`)}
+                              />
+                            )}
+                          </FormField>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`결과물 ${index + 1} 삭제`}
+                          onClick={() => outputs.remove(index)}
+                          className="mt-7 shrink-0 text-ink-muted"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            className="size-4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                          >
+                            <path d="M6 6l12 12M18 6L6 18" />
+                          </svg>
+                        </Button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+              <div>
+                <Button
+                  variant="secondary"
+                  disabled={outputs.fields.length >= L.outputs.max}
+                  onClick={() => outputs.append({ label: "", url: "" })}
+                >
+                  + 결과물 추가
+                </Button>
+              </div>
+            </FormFieldset>
+          </FormSection>
+        </FormWithPreview>
 
         <FormFooter
           cancelHref={ADMIN_ROUTES.studies}

@@ -139,7 +139,7 @@ export default function MemberForm({ member }: MemberFormProps) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           {/* 미리보기: 넓은 화면은 오른쪽에 고정, 좁은 화면은 폼 위에 둔다 */}
           <aside className="lg:sticky lg:top-6 lg:order-last lg:self-start">
-            <div className="rounded-2xl border border-line bg-surface p-5">
+            <div className="rounded-lg border border-line bg-surface p-5">
               <MemberCardPreview values={values} />
             </div>
           </aside>
@@ -323,19 +323,20 @@ export default function MemberForm({ member }: MemberFormProps) {
                   )}
                 </FormField>
                 <FormField
-                  id="member-links-homepage"
-                  label="소개 페이지"
-                  error={errors.links?.homepage?.message}
-                  counter={{ length: values.links?.homepage?.length ?? 0, max: L.url }}
+                  id="member-links-email"
+                  label="이메일"
+                  hint="멤버 카드의 메일 아이콘으로 공개됩니다."
+                  error={errors.links?.email?.message}
                 >
                   {(control) => (
                     <Input
                       {...control}
-                      type="url"
-                      inputMode="url"
-                      maxLength={L.url}
-                      placeholder="https://…"
-                      {...register("links.homepage")}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="off"
+                      maxLength={L.email}
+                      placeholder="name@example.com"
+                      {...register("links.email")}
                     />
                   )}
                 </FormField>

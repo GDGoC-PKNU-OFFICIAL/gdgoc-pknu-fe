@@ -11,6 +11,7 @@ const REVALIDATE_MAP: Readonly<Record<string, readonly RevalidatablePath[]>> = {
   events: ["/", "/events"], // 같은 날 순서 변경(PUT /events/order) 포함
   members: ["/", "/members"],
   settings: ["/"],
+  about: ["/", "/about"], // 홈 What We Do 도 About 활동 카드를 쓴다
 };
 
 /** 재검증 대상인 쓰기 메서드. GET(목록 · 단건 · slug-check · dashboard)은 공개 페이지를 바꾸지 않는다 */

@@ -125,7 +125,7 @@ function CountCard({
   return (
     <section
       aria-labelledby={`dashboard-${resource}`}
-      className="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 shadow-sm"
+      className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5"
     >
       <div className="flex items-center gap-3">
         <ResourceIcon resource={resource} />
@@ -181,7 +181,7 @@ function Panel({
   return (
     <section
       aria-labelledby={id}
-      className="flex min-w-0 flex-col gap-3 rounded-2xl border border-line bg-surface p-5 shadow-sm"
+      className="flex min-w-0 flex-col gap-3 rounded-lg border border-line bg-surface p-5"
     >
       <h2 id={id} className="flex items-center gap-2 text-base font-semibold">
         {title}
@@ -216,7 +216,7 @@ export default function DashboardView({ data, today, now }: DashboardViewProps) 
       <section
         aria-label="모집 상태"
         className={cn(
-          "flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5 md:p-6",
+          "flex flex-wrap items-center justify-between gap-4 rounded-lg border p-5 md:p-6",
           recruiting
             ? "border-brand-green/40 bg-brand-green/10 dark:bg-brand-green/15"
             : "border-line bg-surface",

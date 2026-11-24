@@ -29,6 +29,7 @@ export const ADMIN_ROUTES = {
   eventsNew: "/admin/events/new",
   members: "/admin/members",
   membersNew: "/admin/members/new",
+  about: "/admin/about",
   settings: "/admin/settings",
 } as const;
 
@@ -37,18 +38,50 @@ export type AdminRoute = (typeof ADMIN_ROUTES)[keyof typeof ADMIN_ROUTES];
 /** 수정 폼 경로의 마지막 세그먼트 — /admin/projects/{id}/edit (IA 1-2) */
 export const ADMIN_EDIT_SEGMENT = "edit";
 
+/** 관리자 메뉴 아이콘 (AdminSidebar 가 선 아이콘으로 그린다) */
+export type AdminNavIcon =
+  "dashboard" | "project" | "study" | "event" | "member" | "about" | "settings";
+
 /**
- * 관리자 사이드바 메뉴 (IA 8-1). 배열 순서 = 화면 순서 = 공개 GNB 순서 (PRD 4-1).
+ * 관리자 사이드바 메뉴 (IA 8-1). 업무용 화면(ERP)처럼 묶음 제목 아래에 나눠 둔다.
+ * 묶음 안 순서 = 공개 GNB 순서 (PRD 4-1).
  * 대시보드는 하위 경로가 전부 /admin/... 이라 정확히 일치할 때만 활성으로 본다 (exact).
  */
-export const ADMIN_NAV_ITEMS = [
-  { label: "대시보드", href: ADMIN_ROUTES.dashboard, exact: true },
-  { label: "프로젝트", href: ADMIN_ROUTES.projects, exact: false },
-  { label: "스터디", href: ADMIN_ROUTES.studies, exact: false },
-  { label: "일정", href: ADMIN_ROUTES.events, exact: false },
-  { label: "멤버", href: ADMIN_ROUTES.members, exact: false },
-  { label: "사이트 설정", href: ADMIN_ROUTES.settings, exact: false },
-] as const satisfies readonly { label: string; href: AdminRoute; exact: boolean }[];
+export const ADMIN_NAV_GROUPS = [
+  {
+    label: "현황",
+    items: [{ label: "대시보드", href: ADMIN_ROUTES.dashboard, exact: true, icon: "dashboard" }],
+  },
+  {
+    label: "콘텐츠 관리",
+    items: [
+      { label: "프로젝트", href: ADMIN_ROUTES.projects, exact: false, icon: "project" },
+      { label: "스터디", href: ADMIN_ROUTES.studies, exact: false, icon: "study" },
+      { label: "일정", href: ADMIN_ROUTES.events, exact: false, icon: "event" },
+      { label: "멤버", href: ADMIN_ROUTES.members, exact: false, icon: "member" },
+      { label: "About", href: ADMIN_ROUTES.about, exact: false, icon: "about" },
+    ],
+  },
+  {
+    label: "환경 설정",
+    items: [{ label: "사이트 설정", href: ADMIN_ROUTES.settings, exact: false, icon: "settings" }],
+  },
+] as const satisfies readonly {
+  label: string;
+  items: readonly { label: string; href: AdminRoute; exact: boolean; icon: AdminNavIcon }[];
+}[];
+
+export interface AdminNavItem {
+  label: string;
+  href: AdminRoute;
+  exact: boolean;
+  icon: AdminNavIcon;
+}
+
+/** 묶음을 펼친 메뉴 목록 (현재 위치 찾기 등) */
+export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = ADMIN_NAV_GROUPS.flatMap(
+  (group): readonly AdminNavItem[] => group.items,
+);
 
 /** 로그인 후 돌아갈 경로를 담는 쿼리 키 — /admin/login?next=/admin/projects (IA 8-2) */
 export const ADMIN_NEXT_PARAM = "next";

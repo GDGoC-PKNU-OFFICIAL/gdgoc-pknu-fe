@@ -47,8 +47,6 @@ function previewStats(stats: DeepPartial<SettingFormValues>["stats"]): SiteStat[
   return (stats ?? []).map((stat) => ({
     label: stat?.label?.trim() || "라벨",
     value: Number.isInteger(stat?.value) && (stat?.value ?? 0) >= 0 ? (stat?.value ?? 0) : 0,
-    unit: stat?.unit?.trim() || undefined,
-    suffix: stat?.suffix?.trim() || undefined,
   }));
 }
 
@@ -125,7 +123,7 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
           <aside className="lg:sticky lg:top-6 lg:order-last lg:self-start">
             <section
               aria-labelledby="settings-preview-title"
-              className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5"
+              className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-5"
             >
               <h2 id="settings-preview-title" className="text-base font-bold">
                 홈 미리보기
@@ -172,24 +170,6 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
                 </span>
               </label>
 
-              <FormField
-                id="settings-bannerText"
-                label="배너 문구"
-                required
-                hint="현재 홈 화면에는 표시하지 않습니다 (모집 배지 · 기간만 표시). API 필수 값이라 저장합니다."
-                error={errors.bannerText?.message}
-                counter={{ length: values.bannerText?.length ?? 0, max: L.bannerText }}
-              >
-                {(control) => (
-                  <Input
-                    {...control}
-                    maxLength={L.bannerText}
-                    placeholder="2026 2기 코어멤버 모집 중"
-                    {...register("bannerText")}
-                  />
-                )}
-              </FormField>
-
               <FormFieldset
                 id="settings-recruitPeriod"
                 legend="모집 기간"
@@ -234,7 +214,7 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
                   return (
                     <li key={index}>
                       <FormFieldset id={`settings-stats-${index}`} legend={`통계 ${index + 1}`}>
-                        <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                        <div className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                           <FormField
                             id={`settings-stats-${index}-label`}
                             label="라벨"
@@ -267,34 +247,6 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
                                 min={L.stats.minValue}
                                 step={1}
                                 {...register(`stats.${index}.value`, { valueAsNumber: true })}
-                              />
-                            )}
-                          </FormField>
-                          <FormField
-                            id={`settings-stats-${index}-unit`}
-                            label="단위"
-                            error={statErrors?.unit?.message}
-                          >
-                            {(control) => (
-                              <Input
-                                {...control}
-                                maxLength={L.stats.unitLength}
-                                placeholder="명"
-                                {...register(`stats.${index}.unit`)}
-                              />
-                            )}
-                          </FormField>
-                          <FormField
-                            id={`settings-stats-${index}-suffix`}
-                            label="접미사"
-                            error={statErrors?.suffix?.message}
-                          >
-                            {(control) => (
-                              <Input
-                                {...control}
-                                maxLength={L.stats.suffixLength}
-                                placeholder="+"
-                                {...register(`stats.${index}.suffix`)}
                               />
                             )}
                           </FormField>

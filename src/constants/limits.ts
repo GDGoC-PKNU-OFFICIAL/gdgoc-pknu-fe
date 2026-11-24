@@ -84,7 +84,8 @@ export const MEMBER_LIMITS = {
   history: { max: 2, itemLength: 40 }, // 입력폼 자체가 3개째 추가를 막는다 (PRD 4-2-1)
   interests: { max: 3, itemLength: 15 }, // 중복 불가
   bio: 60,
-  url: URL_MAX, // links.github · links.homepage
+  url: URL_MAX, // links.github
+  email: 254, // links.email
 } as const;
 
 // ============================================================
@@ -92,12 +93,9 @@ export const MEMBER_LIMITS = {
 // ============================================================
 
 export const SETTING_LIMITS = {
-  bannerText: 60,
   stats: {
     count: 4, // 정확히 4개
     labelLength: 20,
-    unitLength: 10,
-    suffixLength: 5,
     minValue: 0, // 0 이상 정수
   },
 } as const;

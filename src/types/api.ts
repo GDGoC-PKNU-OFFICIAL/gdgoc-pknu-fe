@@ -173,7 +173,7 @@ interface MemberBase extends ResourceMeta {
   interests: string[]; // 최대 3개
   part: MemberPart;
   bio: string; // 최대 60자
-  links: { github?: string; homepage?: string };
+  links: { github?: string; email?: string };
 }
 
 /** 코어멤버 — role 이 반드시 있다 */
@@ -204,13 +204,10 @@ export type AdminMember = Member & { consentConfirmedAt: IsoDateTime };
 export interface SiteStat {
   label: string;
   value: number;
-  unit?: string;
-  suffix?: string;
 }
 
 export interface SiteSetting {
   recruiting: boolean;
-  bannerText: string;
   recruitPeriod?: DatePeriod;
   stats: SiteStat[]; // 정확히 4개
   updatedAt: IsoDateTime;
@@ -259,7 +256,7 @@ export interface SlugCheckResponse {
 }
 
 /** 업로드 대상 → 파일 키 접두사 projects/ · members/ */
-export const UPLOAD_TARGETS = ["project", "member"] as const;
+export const UPLOAD_TARGETS = ["project", "member", "about"] as const;
 export type UploadTarget = (typeof UPLOAD_TARGETS)[number];
 
 /** 허용 이미지 형식 (PresignRequest · ImageUploadField accept · config 공용) */
@@ -281,11 +278,95 @@ export interface HealthResponse {
 }
 
 /** 재검증 가능한 공개 경로 (4-9 허용 목록). /about · /privacy 는 정적이라 제외 */
-export const REVALIDATABLE_PATHS = ["/", "/projects", "/studies", "/events", "/members"] as const;
+export const REVALIDATABLE_PATHS = [
+  "/",
+  "/about",
+  "/projects",
+  "/studies",
+  "/events",
+  "/members",
+] as const;
 export type RevalidatablePath = (typeof REVALIDATABLE_PATHS)[number];
 
 export interface RevalidateResponse {
   revalidated: true;
   paths: RevalidatablePath[];
   now: number;
+}
+
+// ============================================================
+// About (관리자가 수정하는 About 페이지 내용)
+// ============================================================
+
+/** What We Do 묶음 — activity: GDGoC PKNU 활동(홈에도 보임) · free-content: 무료 학습 콘텐츠 */
+export const ABOUT_ACTIVITY_GROUPS = ["activity", "free-content"] as const;
+export type AboutActivityGroup = (typeof ABOUT_ACTIVITY_GROUPS)[number];
+
+/** 카드 모양 (ActivityPoster) */
+export const ABOUT_ACTIVITY_LAYOUTS = [
+  "color",
+  "cover",
+  "square",
+  "top",
+  "artwork",
+  "logo",
+  "circles",
+] as const;
+export type AboutActivityLayout = (typeof ABOUT_ACTIVITY_LAYOUTS)[number];
+
+/** 카드 바탕색. auto 면 순서대로 돌아가는 기본 색 */
+export const ABOUT_ACTIVITY_TONES = [
+  "auto",
+  "blue",
+  "green",
+  "coral",
+  "orange",
+  "navy",
+  "gray",
+  "purple",
+  "forest",
+  "plum",
+] as const;
+export type AboutActivityTone = (typeof ABOUT_ACTIVITY_TONES)[number];
+
+export const RULE_ICONS = ["book", "person", "badge"] as const;
+export type RuleIconCode = (typeof RULE_ICONS)[number];
+
+export interface AboutActivityItem {
+  group: AboutActivityGroup;
+  title: string;
+  cadence: string;
+  description: string;
+  layout: AboutActivityLayout;
+  /** R2 업로드(about/) 또는 사이트 기본 그림(/images/…) */
+  imageUrl?: string;
+  /** circles 의 작은 원 */
+  secondImageUrl?: string;
+  /** cover · top 사진에서 보일 중심 (예: "35% 50%") */
+  imagePosition?: string;
+  tone: AboutActivityTone;
+}
+
+export interface AboutRuleItem {
+  slug: string;
+  title: string;
+  icon: RuleIconCode;
+  /** 마크다운 본문 (features/about/lib/rule-markdown.ts 가 해석하는 문법만) */
+  body: string;
+}
+
+export interface AboutFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface AboutContent {
+  /** Who We Are 문단. 문단 안의 
+ 은 줄바꿈 */
+  identity: string[];
+  activities: AboutActivityItem[];
+  rules: AboutRuleItem[];
+  faq: AboutFaqItem[];
+  /** 저장한 적이 없으면(코드 기본 내용) 없다 */
+  updatedAt?: IsoDateTime;
 }

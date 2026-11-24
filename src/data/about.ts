@@ -136,7 +136,7 @@ export const ACTIVITIES = {
 
 /**
  * About What We Do 카드 묶음 (ACTIVITIES 의 title, 이 순서대로). eyebrow 는 카드 제목 위 작은 글씨.
- * 홈의 4개(HOME_ACTIVITY_TITLES)에 무료 학습 콘텐츠 3개를 더한다. 제목을 바꾸면 함께 고칠 것.
+ * 관리자가 About 을 저장하기 전의 기본 내용(features/about/lib/about-content.ts DEFAULT_ABOUT)을 만들 때만 쓴다.
  */
 export const ABOUT_ACTIVITY_GROUPS = [
   {

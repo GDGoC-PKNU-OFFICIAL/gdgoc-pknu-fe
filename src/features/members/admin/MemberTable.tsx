@@ -25,41 +25,41 @@ interface MemberTableProps {
  */
 export default function MemberTable({ members, onDelete }: MemberTableProps) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
       <table className="w-full min-w-[48rem] text-left text-sm">
         <caption className="sr-only">멤버 목록</caption>
-        <thead className="border-b border-line bg-surface-muted text-xs text-ink-muted">
+        <thead className="sticky top-0 z-[1] border-b border-line bg-surface-muted text-xs font-semibold text-ink-muted">
           <tr>
-            <th scope="col" className="w-16 px-4 py-3 font-medium">
+            <th scope="col" className="w-16 px-3 py-2 font-medium">
               사진
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               이름
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               구분
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               역할
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               분야
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               수정일
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               수정
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               삭제
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-y divide-line [&>tr]:transition-colors [&>tr:hover]:bg-brand-blue/[0.04] [&>tr:nth-child(even)]:bg-surface-muted/40">
           {members.map((member) => (
             <tr key={member.id}>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <div className="relative size-10 overflow-hidden rounded-lg bg-surface-muted">
                   <SafeImage
                     src={member.photoUrl}
@@ -77,12 +77,12 @@ export default function MemberTable({ members, onDelete }: MemberTableProps) {
                   {member.department}
                 </span>
               </th>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <Badge tone={member.status === "core" ? "blue" : "neutral"}>
                   {MEMBER_STATUS_LABELS[member.status]}
                 </Badge>
               </td>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 {member.status === "core" ? (
                   <Badge tone={MEMBER_ROLE_TONES[member.role]}>
                     {MEMBER_ROLE_LABELS[member.role]}
@@ -91,11 +91,11 @@ export default function MemberTable({ members, onDelete }: MemberTableProps) {
                   <span className="text-ink-muted">—</span>
                 )}
               </td>
-              <td className="px-4 py-2 whitespace-nowrap">{MEMBER_PART_LABELS[member.part]}</td>
-              <td className="px-4 py-2 whitespace-nowrap text-ink-muted tabular-nums">
+              <td className="px-3 py-1.5 whitespace-nowrap">{MEMBER_PART_LABELS[member.part]}</td>
+              <td className="px-3 py-1.5 whitespace-nowrap text-ink-muted tabular-nums">
                 {formatKstDateTime(new Date(member.updatedAt))}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <Link
                   href={memberEditHref(member.id)}
                   aria-label={`${member.name} 수정`}
@@ -115,7 +115,7 @@ export default function MemberTable({ members, onDelete }: MemberTableProps) {
                   </svg>
                 </Link>
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <button
                   type="button"
                   aria-label={`${member.name} 삭제`}

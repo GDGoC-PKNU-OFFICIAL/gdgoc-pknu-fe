@@ -27,7 +27,7 @@ export default function AdminMembersPage() {
           </Link>
         }
       />
-      <Suspense fallback={<Skeleton className="h-96 w-full rounded-2xl" />}>
+      <Suspense fallback={<Skeleton className="h-96 w-full rounded-lg" />}>
         <MemberListScreen />
       </Suspense>
     </section>

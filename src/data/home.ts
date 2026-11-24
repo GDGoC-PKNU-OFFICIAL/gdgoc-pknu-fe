@@ -59,15 +59,4 @@ export const HOME_LIST_LIMIT = 3;
 export const HOME_EVENT_LIMIT = 6;
 
 /** 홈 진행 중 스터디는 4개까지 보여 준다 (태블릿 이상 2 × 2). 나머지는 Studies 페이지에서 본다 */
-/**
- * 홈 · About What We Do 에 보여 줄 활동 (ACTIVITIES 의 title, 이 순서대로). 나머지는 지금 어디에도 보이지 않는다.
- * 제목이 ACTIVITIES 와 다르면 그 카드는 빠진다 — 문구를 바꾸면 함께 고칠 것.
- */
-export const HOME_ACTIVITY_TITLES = [
-  "정기 세션",
-  "파트 스터디",
-  "학기 프로젝트",
-  "GDG 관련 대외활동",
-];
-
 export const HOME_STUDY_LIMIT = 4;

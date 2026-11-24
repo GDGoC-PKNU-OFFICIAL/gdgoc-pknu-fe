@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import { RULES } from "@/data/rules";
+import type { RuleDoc } from "@/data/rules";
 import { focusWithoutRing } from "@/lib/focus";
 import { isOpenedFromList, pushFromList, replaceUrl, urlWithQuery } from "@/lib/url-query";
 
@@ -19,9 +19,9 @@ import RuleDetailOverlay from "./RuleDetailOverlay";
  * 블록은 평범한 링크이고, 문서 클릭을 캡처 단계에서 가로채 페이지 이동 없이 연다 (새 탭 열기는 그대로).
  * useSearchParams 를 쓰므로 page.tsx 에서 Suspense 로 감싼다.
  */
-export default function RuleDetailController() {
+export default function RuleDetailController({ docs }: { docs: readonly RuleDoc[] }) {
   const slug = useSearchParams().get(RULE_QUERY);
-  const doc = slug === null ? null : (RULES.items.find((item) => item.slug === slug) ?? null);
+  const doc = slug === null ? null : (docs.find((item) => item.slug === slug) ?? null);
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closingRef = useRef(false);
