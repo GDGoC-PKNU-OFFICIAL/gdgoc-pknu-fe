@@ -18,10 +18,14 @@ export function errorJson(
 }
 
 /**
- * ApiError 를 그대로 응답으로 옮긴다. status 0(응답 없음)은 HTTP 로 표현할 수 없으므로
+ * ApiError 를 그대로 응답으로 옮긴다. Spring 이 준 Retry-After(429 LOGIN_LOCKED)도 함께 넘긴다. status 0(응답 없음)은 HTTP 로 표현할 수 없으므로
  * 게이트웨이 계열로 바꾼다 — 타임아웃은 504, 연결 실패는 502. code 는 TIMEOUT · NETWORK_ERROR 를 유지한다.
  */
 export function apiErrorJson(error: ApiError) {
   const status = error.status !== 0 ? error.status : error.code === "TIMEOUT" ? 504 : 502;
-  return errorJson(status, error.code, error.message, error.fieldErrors);
+  const res = errorJson(status, error.code, error.message, error.fieldErrors);
+  if (error.retryAfterSeconds !== undefined) {
+    res.headers.set("Retry-After", String(error.retryAfterSeconds));
+  }
+  return res;
 }
