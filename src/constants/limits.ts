@@ -44,6 +44,7 @@ export const PROJECT_LIMITS = {
   features: { max: 10, itemLength: 80 },
   outcomes: { max: 10, itemLength: 80 },
   url: URL_MAX, // links.github · links.demo
+  badgeLabel: 20, // badge.label
 } as const;
 
 // ============================================================

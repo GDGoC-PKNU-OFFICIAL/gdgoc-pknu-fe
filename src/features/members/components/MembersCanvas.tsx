@@ -36,7 +36,9 @@ export default function MembersCanvas({ title, description, children }: MembersC
 
       <div
         data-members-intro
-        className="relative drop-shadow-[0_-10px_28px_rgba(11,18,32,0.16)] motion-safe:animate-sheet-rise"
+        // after: 흰 영역 아래로 흰 바탕을 더 늘여 둔다 — sheet-rise 는 끝에서 살짝 위로 넘쳤다 돌아오는데,
+        // 그때 흰 영역 아래(푸터 바로 위)에 파란 배경이 띠처럼 비치지 않게. 자리 잡으면 바깥 틀(overflow-clip)에 잘려 안 보인다
+        className="relative drop-shadow-[0_-10px_28px_rgba(11,18,32,0.16)] after:absolute after:inset-x-0 after:top-full after:h-40 after:bg-surface motion-safe:animate-sheet-rise"
       >
         <div className="relative">
           <svg

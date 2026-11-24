@@ -5,14 +5,13 @@ import { type FocusEvent, type MouseEvent, useRef, useState } from "react";
 import Link from "next/link";
 
 import SafeImage from "@/components/common/SafeImage";
-import Badge from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
-import { MEMBER_PART_LABELS, MEMBER_ROLE_LABELS } from "@/constants/labels";
+import { MEMBER_PART_LABELS } from "@/constants/labels";
 import { type AnalyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import type { Member } from "@/types/api";
 
-import { DEFAULT_MEMBER_IMAGE, MEMBER_ROLE_TONES } from "../lib/member-labels";
+import { DEFAULT_MEMBER_IMAGE } from "../lib/member-labels";
 
 /** 카드를 뒤집는 조건: 마우스를 올림 · 키보드 포커스 · 터치로 뒤집어 둠 */
 const ROTATE = cn(
@@ -114,7 +113,10 @@ export default function MemberFlipCard({
   const faces = (
     <span
       className={cn(
-        "relative block h-full transition-transform duration-500 transform-3d",
+        // 천천히 출발해 천천히 멈추는 곡선(ease-in-out)으로 0.5초 동안 돈다. will-change 로 회전을 GPU 레이어에서 그려 끊김을 줄인다.
+        // 마우스를 올릴 때만 0.1초 늦게 출발한다 — 커서가 카드 위를 스쳐 지나갈 때 카드가 덜컥 뒤집혔다 돌아오지 않게 (내릴 때는 바로)
+        "relative block h-full transition-transform duration-500 ease-[cubic-bezier(0.45,0,0.2,1)] will-change-transform transform-3d",
+        "motion-safe:group-hover:delay-100",
         "motion-reduce:transition-none",
         preview ? PREVIEW_ROTATE : ROTATE,
       )}
@@ -142,11 +144,6 @@ export default function MemberFlipCard({
         <span className="flex w-full min-w-0 flex-col gap-2 text-center">
           <span className="flex min-w-0 items-center justify-center gap-2">
             <span className="truncate text-lg font-semibold">{name}</span>
-            {member.status === "core" && (
-              <Badge tone={MEMBER_ROLE_TONES[member.role]} className="shrink-0">
-                {MEMBER_ROLE_LABELS[member.role]}
-              </Badge>
-            )}
           </span>
           <span className="truncate text-sm text-ink-muted">{department}</span>
           {history.length > 0 && (

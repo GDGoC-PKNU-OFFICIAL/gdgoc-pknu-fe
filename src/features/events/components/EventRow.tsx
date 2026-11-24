@@ -48,7 +48,7 @@ export default function EventRow({ event, selected = false, onSelect }: EventRow
       onClick={() => onSelect(event)}
       className={cn(
         ROW,
-        "cursor-pointer transition-[border-color,box-shadow] hover:border-brand-blue/60",
+        "cursor-pointer transition-shadow hover:shadow-md",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue",
         selected && "border-brand-blue ring-2 ring-brand-blue/30",
       )}

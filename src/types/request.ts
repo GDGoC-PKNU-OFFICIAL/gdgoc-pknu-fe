@@ -13,6 +13,7 @@ import type {
   MemberPart,
   MemberRole,
   MemberStatus,
+  ProjectBadge,
   ProjectCategory,
   RevalidatablePath,
   UploadTarget,
@@ -56,6 +57,7 @@ export interface ProjectRequest {
   features: string[]; // 최대 10개, 각 80자 이하
   outcomes: string[]; // 최대 10개, 각 80자 이하
   links: { github: string | null; demo: string | null }; // http(s) URL, 500자 이하
+  badge: ProjectBadge | null; // label 20자 이하. null 이면 category 라벨 · 색
 }
 
 // ============================================================

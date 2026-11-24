@@ -3,11 +3,10 @@ import Link from "next/link";
 import SafeImage from "@/components/common/SafeImage";
 import Badge from "@/components/ui/Badge";
 import Tag from "@/components/ui/Tag";
-import { PROJECT_CATEGORY_LABELS } from "@/constants/labels";
 import { formatMonthPeriod } from "@/lib/date";
 import type { Project } from "@/types/api";
 
-import { DEFAULT_PROJECT_IMAGE, PROJECT_CATEGORY_TONES } from "../lib/project-labels";
+import { DEFAULT_PROJECT_IMAGE, projectBadge } from "../lib/project-labels";
 import { projectDetailHref } from "../lib/project-query";
 
 /** 카드에 보여 줄 기술 스택 수. 나머지는 "+n" (IA 5-2) */
@@ -26,12 +25,13 @@ interface ProjectCardProps {
  * 썸네일의 data-project-thumb 는 그 전환에서 시작 위치를 찾는 데 쓴다.
  */
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const { slug, title, summary, category, period, techStack, thumbnailUrl } = project;
+  const { slug, title, summary, period, techStack, thumbnailUrl } = project;
+  const badge = projectBadge(project);
   const visibleTech = techStack.slice(0, VISIBLE_TECH_COUNT);
   const hiddenTechCount = techStack.length - visibleTech.length;
 
   return (
-    <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-[border-color,box-shadow] hover:border-brand-blue hover:shadow-md has-[a:focus-visible]:border-brand-blue has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-blue/30">
+    <article className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-shadow hover:shadow-md has-[a:focus-visible]:border-brand-blue has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-blue/30">
       <div data-project-thumb={slug} className="relative aspect-video bg-surface-muted">
         {/* 제목이 바로 아래 있으므로 장식 이미지로 둔다 */}
         <SafeImage
@@ -52,8 +52,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       */}
       <div className="flex min-w-0 flex-1 flex-col p-5 md:p-6">
         <div className="flex min-w-0 items-center justify-between gap-3">
-          <Badge tone={PROJECT_CATEGORY_TONES[category]} className="min-w-0 truncate">
-            {PROJECT_CATEGORY_LABELS[category]}
+          <Badge tone={badge.tone} className="min-w-0 truncate">
+            {badge.label}
           </Badge>
           <span className="shrink-0 text-xs text-ink-muted tabular-nums">
             {formatMonthPeriod(period)}

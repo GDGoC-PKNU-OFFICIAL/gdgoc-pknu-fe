@@ -1,4 +1,4 @@
-import CardSlider from "@/components/common/CardSlider";
+import EmblaSlider from "@/components/common/EmblaSlider";
 import EmptyState from "@/components/common/EmptyState";
 import type { AnalyticsEvents } from "@/lib/analytics";
 import type { Member } from "@/types/api";
@@ -25,11 +25,12 @@ export default function MemberCarousel({
   if (members.length === 0) return <EmptyState message={emptyMessage} />;
 
   return (
+    // About What We Do 와 같은 Embla 슬라이드 (끌기 · 관성 · 끝 저항 · 트랙패드 스와이프).
     // 세로로 긴 4 : 5 카드라 데스크톱에서 한 줄에 4장씩 — 카드가 너무 커지지 않게 한다
-    <CardSlider label={label} density="dense">
+    <EmblaSlider label={label} density="dense" itemName="멤버">
       {members.map((member) => (
         <MemberFlipCard key={member.id} member={member} analyticsSection={analyticsSection} />
       ))}
-    </CardSlider>
+    </EmblaSlider>
   );
 }
