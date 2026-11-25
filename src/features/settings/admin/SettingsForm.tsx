@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type DeepPartial, useForm, useWatch } from "react-hook-form";
+import { Controller, type DeepPartial, useForm, useWatch } from "react-hook-form";
 
 import DraftRestoreDialog from "@/components/admin/DraftRestoreDialog";
 import FormField, { FormFieldset, FormSection } from "@/components/admin/FormField";
@@ -14,9 +14,12 @@ import { useLeaveWarning } from "@/components/admin/hooks/use-leave-warning";
 import { useSlowNotice } from "@/components/admin/hooks/use-slow-notice";
 import { applyFieldErrors } from "@/components/admin/lib/apply-field-errors";
 import { SETTINGS_DRAFT_KEY } from "@/components/admin/lib/draft-storage";
+import ImagePositionField from "@/components/admin/ImagePositionField";
+import ImageUploadField, { type UploadStatus } from "@/components/admin/ImageUploadField";
 import Input from "@/components/ui/Input";
 import { SETTING_LIMITS } from "@/constants/limits";
 import { ADMIN_ROUTES } from "@/constants/routes";
+import { HERO } from "@/data/home";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
@@ -40,6 +43,7 @@ const L = SETTING_LIMITS;
 const MESSAGES = {
   saved: "저장했습니다. 사이트에 곧 반영됩니다.",
   invalid: "입력값을 확인해 주세요.",
+  uploading: "이미지 업로드가 끝난 뒤 저장해 주세요.",
 } as const;
 
 /** 입력 중인 통계 → 미리보기. 숫자가 비었거나 음수면 0 으로 보여 준다 */
@@ -79,9 +83,14 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
   const { run, pending } = useAdminMutation();
   const slow = useSlowNotice(pending);
   useLeaveWarning(isDirty && !pending);
+  const [heroUpload, setHeroUpload] = useState<UploadStatus>("idle");
 
   const onSubmit = form.handleSubmit(
     async (output) => {
+      if (heroUpload !== "idle") {
+        toast.error(MESSAGES.uploading);
+        return;
+      }
       // 401 로 로그인에 가더라도 지금 내용이 남도록 먼저 임시 저장한다 (PRD 4-6)
       draft.saveNow();
       const result = await run(() => updateSettings(toSettingRequest(output)), {
@@ -143,6 +152,58 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
           </aside>
 
           <div className="flex min-w-0 flex-col gap-6">
+            <FormSection
+              title="히어로 사진"
+              description="홈 맨 위 배경 사진입니다. 비워 두면 기본 사진이 보입니다."
+            >
+              <div className="flex flex-wrap items-start gap-6">
+                <Controller
+                  control={control}
+                  name="heroImageUrl"
+                  render={({ field: image, fieldState }) => (
+                    <ImageUploadField
+                      id="settings-heroImageUrl"
+                      legend="사진"
+                      target="hero"
+                      value={image.value}
+                      onChange={(next) => {
+                        image.onChange(next);
+                        // 다른 사진이면 전 사진에 맞춘 위치는 뜻이 없다
+                        if (next !== image.value) {
+                          form.setValue("heroImagePosition", "", { shouldDirty: true });
+                        }
+                      }}
+                      onBlur={image.onBlur}
+                      ref={image.ref}
+                      fallbackSrc={HERO.photo.src}
+                      aspect="video"
+                      error={fieldState.error?.message}
+                      onStatusChange={setHeroUpload}
+                      onBeforeUpload={draft.saveNow}
+                    />
+                  )}
+                />
+                {values.heroImageUrl && (
+                  <Controller
+                    control={control}
+                    name="heroImagePosition"
+                    render={({ field: position, fieldState }) => (
+                      <ImagePositionField
+                        id="settings-heroImagePosition"
+                        legend="화면에 보일 부분"
+                        src={values.heroImageUrl as string}
+                        position={position.value}
+                        onPositionChange={position.onChange}
+                        aspect="16 / 9"
+                        defaultPosition="50% 45%"
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                )}
+              </div>
+            </FormSection>
+
             <FormSection title="모집 상태" description="홈 히어로의 모집 배지 · 기간에 반영됩니다.">
               <label className="flex min-h-11 cursor-pointer items-center justify-between gap-4">
                 <span className="flex flex-col">

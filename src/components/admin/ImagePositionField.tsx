@@ -16,10 +16,10 @@ interface ImagePositionFieldProps {
   /** "가로% 세로%" — 빈 값이면 defaultPosition 으로 보인다 */
   position: string;
   onPositionChange: (value: string) => void;
-  /** 확대 배율 % (min~max) */
-  zoom: number;
-  onZoomChange: (value: number) => void;
-  zoomRange: { min: number; max: number; step: number };
+  /** 확대 배율 % (min~max). 확대를 받지 않는 칸(히어로)은 빼면 100% 고정 — 휠은 그대로 페이지를 스크롤한다 */
+  zoom?: number;
+  onZoomChange?: (value: number) => void;
+  zoomRange?: { min: number; max: number; step: number };
   /** 공개 카드에서 사진이 보이는 칸의 비율 (CSS aspect-ratio, 예: "3 / 4") */
   aspect: string;
   /** 틀 모양 — 원형 사진은 동그랗게 보여 준다 */
@@ -30,6 +30,8 @@ interface ImagePositionFieldProps {
 }
 
 type Point = [number, number];
+
+const NO_ZOOM = { min: 100, max: 100, step: 0 } as const;
 
 const clamp = (n: number) => Math.min(100, Math.max(0, Math.round(n)));
 const format = ([x, y]: Point) => `${x}% ${y}%`;
@@ -55,9 +57,9 @@ export default function ImagePositionField({
   src,
   position: positionValue,
   onPositionChange,
-  zoom,
-  onZoomChange,
-  zoomRange,
+  zoom = 100,
+  onZoomChange = () => {},
+  zoomRange = NO_ZOOM,
   aspect,
   round = false,
   defaultPosition = "50% 50%",
@@ -107,9 +109,10 @@ export default function ImagePositionField({
   // - 마우스 휠: 한 칸(보통 deltaY 100)에 약 15%
   // - 노트북 터치패드 두 손가락 오므리기 · 벌리기: 브라우저가 ctrlKey 가 켜진 작은 휠로 보낸다 → 손가락 움직임만큼 부드럽게
   // - 터치패드 두 손가락 스크롤(ctrlKey 없음, 작은 값): 확대하지 않고 페이지를 그대로 스크롤한다
+  const canZoom = zoomRange.max > zoomRange.min;
   useEffect(() => {
     const frame = frameRef.current;
-    if (!frame) return;
+    if (!frame || !canZoom) return;
     const onWheel = (event: WheelEvent) => {
       const pinch = event.ctrlKey;
       const mouseWheel =
@@ -123,7 +126,7 @@ export default function ImagePositionField({
     };
     frame.addEventListener("wheel", onWheel, { passive: false });
     return () => frame.removeEventListener("wheel", onWheel);
-  }, []);
+  }, [canZoom]);
 
   // 터치 화면: 손가락 하나는 끌기, 둘은 오므리기 · 벌리기로 확대
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -220,13 +223,19 @@ export default function ImagePositionField({
     <FormFieldset
       id={id}
       legend={legend}
-      hint={`끌어서 위치를 맞추고, 사진 위에서 마우스 휠 · 두 손가락 벌리기로 확대합니다.${
-        axisHint === "상하좌우"
-          ? ""
+      hint={
+        canZoom
+          ? `끌어서 위치를 맞추고, 사진 위에서 마우스 휠 · 두 손가락 벌리기로 확대합니다.${
+              axisHint === "상하좌우"
+                ? ""
+                : axisHint
+                  ? ` 지금은 ${axisHint}로만 움직이고, 조금 키우면 ${lockedHint}로도 움직입니다.`
+                  : " 지금은 사진이 틀에 꼭 맞아, 키우면 움직일 수 있습니다."
+            }`
           : axisHint
-            ? ` 지금은 ${axisHint}로만 움직이고, 조금 키우면 ${lockedHint}로도 움직입니다.`
-            : " 지금은 사진이 틀에 꼭 맞아, 키우면 움직일 수 있습니다."
-      }`}
+            ? `사진을 끌어서 보일 곳을 맞춥니다 (${axisHint}).`
+            : "사진이 틀에 꼭 맞아 옮길 곳이 없습니다."
+      }
       error={error}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -234,8 +243,8 @@ export default function ImagePositionField({
           ref={frameRef}
           role="slider"
           tabIndex={0}
-          aria-label={`${legend} — 방향키로 옮기기, +/- 로 확대`}
-          aria-valuetext={`가로 ${position[0]}%, 세로 ${position[1]}%, 확대 ${zoom}%`}
+          aria-label={`${legend} — 방향키로 옮기기${canZoom ? ", +/- 로 확대" : ""}`}
+          aria-valuetext={`가로 ${position[0]}%, 세로 ${position[1]}%${canZoom ? `, 확대 ${zoom}%` : ""}`}
           aria-valuenow={position[0]}
           aria-valuemin={0}
           aria-valuemax={100}
@@ -284,9 +293,11 @@ export default function ImagePositionField({
           </span>
         </div>
         <div className="flex min-w-0 flex-col gap-1">
-          <span className="text-xs text-ink-muted">
-            확대 <span className="font-semibold text-ink tabular-nums">{zoom}%</span>
-          </span>
+          {canZoom && (
+            <span className="text-xs text-ink-muted">
+              확대 <span className="font-semibold text-ink tabular-nums">{zoom}%</span>
+            </span>
+          )}
           <span className="text-xs text-ink-muted tabular-nums">
             {positionValue ? `위치 ${format(position)}` : "위치 기본"}
           </span>

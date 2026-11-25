@@ -199,6 +199,10 @@ export interface SiteSetting {
   recruiting: boolean;
   recruitPeriod?: DatePeriod;
   stats: SiteStat[]; // 정확히 4개
+  /** 홈 히어로 배경 사진 (R2 hero/). 없으면 사이트 기본 사진 (data/home.ts HERO.photo) */
+  heroImageUrl?: string;
+  /** 히어로 사진에서 보일 곳 "가로% 세로%". 없으면 기본 위치 */
+  heroImagePosition?: string;
   updatedAt: IsoDateTime;
 }
 
@@ -245,7 +249,7 @@ export interface SlugCheckResponse {
 }
 
 /** 업로드 대상 → 파일 키 접두사 projects/ · members/ */
-export const UPLOAD_TARGETS = ["project", "member", "about"] as const;
+export const UPLOAD_TARGETS = ["project", "member", "about", "hero"] as const;
 export type UploadTarget = (typeof UPLOAD_TARGETS)[number];
 
 /** 허용 이미지 형식 (PresignRequest · ImageUploadField accept · config 공용) */

@@ -22,6 +22,7 @@ const MESSAGES = {
   periodOrder: "종료일은 시작일과 같거나 그 이후여야 합니다.",
   date: "날짜 형식이 올바르지 않습니다.",
   statsCount: `통계는 정확히 ${L.stats.count}개여야 합니다.`,
+  position: "예: 35% 50% (가로 % 세로 %)",
 } as const;
 
 const optionalDate = z.string().refine((value) => value === "" || isIsoDate(value), MESSAGES.date);
@@ -55,6 +56,15 @@ export const settingFormSchema = z.object({
       }
     }),
   stats: z.array(statSchema).length(L.stats.count, MESSAGES.statsCount),
+  /** 홈 히어로 사진 (업로드한 R2 주소). null = 사이트 기본 사진 */
+  heroImageUrl: z.string().nullable(),
+  /** 히어로 사진에서 보일 곳 "가로% 세로%". "" = 기본 위치 */
+  heroImagePosition: z
+    .string()
+    .refine(
+      (value) => value === "" || /^(100|\d{1,2})% (100|\d{1,2})%$/.test(value),
+      MESSAGES.position,
+    ),
 });
 
 /** 폼이 들고 있는 값 (입력 중 · 임시 저장본) */
@@ -69,6 +79,8 @@ export function emptySettingForm(): SettingFormValues {
     recruiting: false,
     recruitPeriod: { start: "", end: "" },
     stats: labels.map((label) => ({ label, value: 0 })),
+    heroImageUrl: null,
+    heroImagePosition: "",
   };
 }
 
@@ -86,6 +98,8 @@ export function settingToForm(setting: SiteSetting): SettingFormValues {
       end: setting.recruitPeriod?.end ?? "",
     },
     stats,
+    heroImageUrl: setting.heroImageUrl ?? null,
+    heroImagePosition: setting.heroImagePosition ?? "",
   };
 }
 
@@ -96,5 +110,9 @@ export function toSettingRequest(values: SettingFormOutput): SettingRequest {
     recruiting: values.recruiting,
     recruitPeriod: start && end ? { start, end } : null,
     stats: values.stats.map((stat) => ({ label: stat.label, value: stat.value })),
+    heroImageUrl: values.heroImageUrl,
+    // 사진이 없으면 위치는 뜻이 없다 — 기본 사진은 기본 위치로 보인다
+    heroImagePosition:
+      values.heroImageUrl && values.heroImagePosition ? values.heroImagePosition : null,
   };
 }
