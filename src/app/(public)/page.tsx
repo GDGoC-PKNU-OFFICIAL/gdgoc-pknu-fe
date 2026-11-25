@@ -70,13 +70,15 @@ export default async function HomePage() {
     <div data-scroll-snap className="overflow-x-clip">
       {/* 1. 히어로 — 단체 사진을 화면 가득 깔고, 선글라스 낀 듯 어둡게 톤을 눌러 그 위에 흰 글자를 올린다 */}
       <section className="relative isolate overflow-hidden bg-[#0b0f17] md:snap-start">
+        {/* 배경 사진은 사이트 설정에서 바꿀 수 있다 (없으면 기본 사진 · 기본 위치) */}
         <Image
-          src={HERO.photo.src}
+          src={settings.heroImageUrl ?? HERO.photo.src}
           alt=""
           fill
           priority
           sizes="100vw"
-          className="-z-20 object-cover object-[50%_45%] saturate-[0.85] motion-safe:animate-hero-zoom"
+          className="-z-20 object-cover saturate-[0.85] motion-safe:animate-hero-zoom"
+          style={{ objectPosition: settings.heroImagePosition ?? "50% 45%" }}
         />
         {/* 선글라스 렌즈: 푸른빛 도는 어두운 막 + 가장자리를 더 어둡게(비네팅) */}
         <div

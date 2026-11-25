@@ -142,6 +142,8 @@ export interface SettingRequest {
   recruiting: boolean;
   recruitPeriod: { start: IsoDate; end: IsoDate } | null; // 둘 다 입력하거나 null, start ≤ end
   stats: SiteStatRequest[]; // 정확히 4개
+  heroImageUrl: string | null; // null = 사이트 기본 사진. 새로 올린 사진은 Spring 이 R2 에서 다시 확인
+  heroImagePosition: string | null; // "가로% 세로%" (각 0~100), 사진이 없으면 무시된다
 }
 
 // ============================================================

@@ -43,7 +43,7 @@ function isFileRuleError(error: ApiError): boolean {
 interface ImageUploadFieldProps {
   id: string;
   legend: string;
-  /** 파일 키 접두사 결정 — 프로젝트 썸네일 project · 멤버 사진 member */
+  /** 파일 키 접두사 결정 — 프로젝트 썸네일 project · 멤버 사진 member · About 카드 about · 홈 히어로 hero */
   target: UploadTarget;
   /** 폼 값 = 업로드 완료된 publicUrl. 없으면 null (기본 이미지) */
   value: string | null;
