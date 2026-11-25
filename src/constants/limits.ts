@@ -81,6 +81,7 @@ export const EVENT_LIMITS = {
 export const MEMBER_LIMITS = {
   name: 20,
   department: 30,
+  part: 20, // 분야 — 직접 적는다 (예: 백엔드, DevOps)
   history: { max: 2, itemLength: 40 }, // 입력폼 자체가 3개째 추가를 막는다 (PRD 4-2-1)
   interests: { max: 3, itemLength: 15 }, // 중복 불가
   bio: 60,

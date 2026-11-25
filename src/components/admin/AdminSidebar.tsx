@@ -83,13 +83,7 @@ export default function AdminSidebar() {
           href={ADMIN_ROUTES.dashboard}
           className="flex items-center gap-2 text-sm font-bold tracking-tight text-white"
         >
-          <span
-            aria-hidden="true"
-            className="flex size-6 items-center justify-center rounded bg-brand-blue text-[11px] font-black"
-          >
-            G
-          </span>
-          GDGoC PKNU 관리자
+          GDGoC Admin
         </Link>
         <button
           type="button"
@@ -123,7 +117,7 @@ export default function AdminSidebar() {
         <nav aria-label="관리자 메뉴" className="flex flex-col gap-4">
           {ADMIN_NAV_GROUPS.map((group) => (
             <div key={group.label} className="flex flex-col gap-0.5">
-              <p className="px-4 pb-1 text-[11px] font-semibold tracking-wider text-[#7d8aa3]">
+              <p className="px-4 pb-1 text-xs font-semibold tracking-wider text-[#7d8aa3]">
                 {group.label}
               </p>
               <ul className="flex flex-col">

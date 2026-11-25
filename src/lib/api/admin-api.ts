@@ -25,6 +25,7 @@ import type {
   EventRequest,
   LoginRequest,
   MemberListQuery,
+  MemberOrderRequest,
   MemberRequest,
   PresignRequest,
   SettingRequest,
@@ -237,9 +238,14 @@ export function createMember(body: MemberRequest): Promise<AdminMember> {
   return sendJson<AdminMember>("POST", "/members", body);
 }
 
-/** A-43 수정 (전체 필드 교체). 시니어면 role 은 null 이어야 한다 */
+/** A-43 수정 (전체 필드 교체). 구분을 바꾸면 서버가 바뀐 구분의 맨 뒤로 보낸다 */
 export function updateMember(id: number, body: MemberRequest): Promise<AdminMember> {
   return sendJson<AdminMember>("PUT", `/members/${id}`, body);
+}
+
+/** 표시 순서 변경 → 204. ids 는 그 구분의 멤버 id 전체여야 한다 (누락 · 중복 · 다른 구분 id 는 400) */
+export function reorderMembers(body: MemberOrderRequest): Promise<void> {
+  return sendJson<void>("PUT", "/members/order", body);
 }
 
 /** 삭제 → 204. 프로젝트 · 스터디 기록에는 영향 없다 (참여자는 이름 문자열) */

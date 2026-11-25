@@ -21,8 +21,6 @@ export const IDENTITY = {
 
 export interface Activity {
   title: string;
-  /** 주기 · 시기 */
-  cadence: string;
   description: string;
   /** 홈 What We Do 카드 그림 (public/ 기준 경로, 800×520). 없으면 그림 없이 그린다 */
   image?: string;
@@ -34,8 +32,16 @@ export interface Activity {
    * top = 사진은 글자 위쪽 자리만 채우고 글자는 색 바탕 위에 (사진이 글자를 침범하지 않는다)
    */
   photoLayout?: "cover" | "square" | "top";
-  /** cover 사진에서 보일 중심 (CSS object-position, 예: "35% 50%"). 없으면 가운데 */
+  /**
+   * 사진(photo · artwork · circles 의 큰 원)에서 보일 곳 (CSS object-position, 예: "35% 50%").
+   * 없으면 가운데 (cover 는 조금 아래 "50% 55%")
+   */
   photoPosition?: string;
+  /** 사진 확대 배율 % (100~300). 없으면 100. 확대 기준점은 photoPosition (lib/image-frame) */
+  photoZoom?: number;
+  /** circles 의 작은 원 사진에서 보일 곳 · 확대 배율 */
+  secondPhotoPosition?: string;
+  secondPhotoZoom?: number;
   /**
    * About 포스터 카드 위쪽에 얹을 정사각형 그림 (public/ 기준, 정사각형으로 잘라 둔 파일). 화면 캡처 · 로고 등.
    * 색 카드 위에 둥근 모서리로 얹는다 (photo 가 있으면 photo 가 우선)
@@ -60,7 +66,6 @@ export const ACTIVITIES = {
   items: [
     {
       title: "정기 세션",
-      cadence: "격주",
       description:
         "현직자의 조언을 듣는 커리어 세션과, 그동안 공부한 기술을 나누는 기술 세미나 · 테크톡을 엽니다.",
       image: "/images/activities/session-color.webp",
@@ -69,7 +74,6 @@ export const ACTIVITIES = {
     },
     {
       title: "파트 스터디",
-      cadence: "학기 중 주 1회",
       description:
         "원하는 스터디를 직접 만들거나 참여하며 기본기를 다집니다. 미니 프로젝트 · 스터디로 부담 없이 경험을 쌓을 수 있어요.",
       image: "/images/activities/study-color.webp",
@@ -78,7 +82,6 @@ export const ACTIVITIES = {
     },
     {
       title: "학기 프로젝트",
-      cadence: "학기 단위",
       description:
         "학기 초 네트워킹 행사로 팀을 꾸리고, 진행 과정 관리와 현업자 멘토링을 받으며 서비스를 완성합니다.",
       image: "/images/activities/project-color.webp",
@@ -86,7 +89,6 @@ export const ACTIVITIES = {
     },
     {
       title: "개발 입문 교육",
-      cadence: "학기 초",
       description:
         "개발 경험이 없어도 괜찮아요! 프론트엔드 · 백엔드 · AI · 게임 등 여러 분야를 직접 체험해 본 뒤 진로를 고를 수 있는 입문 교육입니다.",
       image: "/images/activities/intro-illust.webp",
@@ -94,7 +96,6 @@ export const ACTIVITIES = {
     // Solution Challenge 는 아래 대외활동에 포함되어 하나로 합쳤다
     {
       title: "GDG 관련 대외활동",
-      cadence: "연중",
       description:
         "전 세계 규모 개발 대회 Solution Challenge 에 도전하고(부경대에서 한국 최초 최종 우승 팀 배출), 전국 35개 대학 GDG on Campus 와도 교류할 수 있습니다.",
       image: "/images/activities/gdg-events-illust.webp",
@@ -102,22 +103,19 @@ export const ACTIVITIES = {
     },
     {
       title: "Build with AI",
-      cadence: "행사",
       description:
         "GDG 의 지원을 받아 부경대에서 여는 AI 개발 행사입니다. 구글 Antigravity 로 AI 에이전트 기반 개발을 경험하고 최신 구글 기술을 실습합니다.",
       image: "/images/activities/build-ai-illust.webp",
     },
-    // 무료 학습 콘텐츠 (Guarantee) — About 에서만 보인다 (ABOUT_ACTIVITY_GROUPS)
+    // 무료 학습 콘텐츠 (Guarantee)
     {
       title: "Google Cloud Study Jam",
-      cadence: "매 분기",
       artwork: "/images/activities/study-jam-finder.webp",
       description:
         "매 분기 열리는 구글 클라우드 스터디 잼에서 그룹으로 새로운 구글 기술을 함께 학습합니다.",
     },
     {
       title: "Google Cloud Skills Boost",
-      cadence: "상시",
       photo: "/images/activities/skills-boost-photo.webp",
       photoLayout: "top",
       photoPosition: "33% 50%",
@@ -126,7 +124,6 @@ export const ACTIVITIES = {
     },
     {
       title: "Google Career Certificate",
-      cadence: "신규 멤버 모집 후",
       logo: true,
       background: "bg-gradient-to-b from-[#2d2738] via-[#41385a] to-[#63587e]",
       description: "신규 멤버 모집 후 그룹을 꾸려 구글 커리어 자격증 학습 참여를 도와드립니다.",
@@ -135,16 +132,15 @@ export const ACTIVITIES = {
 } as const;
 
 /**
- * About What We Do 카드 묶음 (ACTIVITIES 의 title, 이 순서대로). eyebrow 는 카드 제목 위 작은 글씨.
+ * About · 홈 What We Do 카드 순서 (ACTIVITIES 의 title).
  * 관리자가 About 을 저장하기 전의 기본 내용(features/about/lib/about-content.ts DEFAULT_ABOUT)을 만들 때만 쓴다.
  */
-export const ABOUT_ACTIVITY_GROUPS = [
-  {
-    eyebrow: "GDGoC PKNU 활동",
-    titles: ["정기 세션", "파트 스터디", "학기 프로젝트", "GDG 관련 대외활동"],
-  },
-  {
-    eyebrow: "무료 학습 콘텐츠",
-    titles: ["Google Cloud Study Jam", "Google Cloud Skills Boost", "Google Career Certificate"],
-  },
+export const ABOUT_ACTIVITY_ORDER = [
+  "정기 세션",
+  "파트 스터디",
+  "학기 프로젝트",
+  "GDG 관련 대외활동",
+  "Google Cloud Study Jam",
+  "Google Cloud Skills Boost",
+  "Google Career Certificate",
 ] as const;

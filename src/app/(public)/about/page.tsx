@@ -12,14 +12,9 @@ import { RULES } from "@/data/rules";
 import AboutCanvas from "@/features/about/components/AboutCanvas";
 import RuleDetailController from "@/features/about/components/RuleDetailController";
 import RuleDocBlock from "@/features/about/components/RuleDocBlock";
-import {
-  ACTIVITY_GROUP_LABELS,
-  DEFAULT_ABOUT,
-  toPosterActivity,
-  toRuleDoc,
-} from "@/features/about/lib/about-content";
+import { DEFAULT_ABOUT, toPosterActivity, toRuleDoc } from "@/features/about/lib/about-content";
 import { getAbout } from "@/lib/api/public-api";
-import { ABOUT_ACTIVITY_GROUPS, type AboutContent } from "@/types/api";
+import type { AboutContent } from "@/types/api";
 
 // ISR 30분 — 관리자가 About 을 저장하면 BFF 가 /about 을 바로 재검증한다.
 // 정적 분석 대상이라 constants/config 의 REVALIDATE_SECONDS 를 import 할 수 없다 (값을 바꾸면 함께 고친다)
@@ -35,15 +30,12 @@ const CONTAINER = "mx-auto flex max-w-site flex-col gap-8 px-4 py-16 md:px-8";
 
 // P-01 About (IA 4장). 전부 src/data 의 정적 콘텐츠라 API 호출이 없다.
 // "지원 모집 중" 항목은 두지 않는다 — 모집 여부는 홈 히어로 배너로만 안내한다.
-/** What We Do 포스터 카드 목록 (묶음 순서대로, 묶음 이름이 카드 위 작은 글씨) */
+/** What We Do 포스터 카드 목록 (관리자가 정한 순서 그대로) */
 function activityPosters(activities: AboutContent["activities"]) {
-  return ABOUT_ACTIVITY_GROUPS.flatMap((group) =>
-    activities.filter((item) => item.group === group),
-  ).map((item, index) => (
+  return activities.map((item, index) => (
     <ActivityPoster
       key={`${item.title}-${index}`}
       activity={toPosterActivity(item)}
-      eyebrow={ACTIVITY_GROUP_LABELS[item.group]}
       index={index}
     />
   ));

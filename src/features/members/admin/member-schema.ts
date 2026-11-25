@@ -1,22 +1,14 @@
 // src/features/members/admin/member-schema.ts
 // 멤버 등록 · 수정 폼 (A-42 · A-43) 의 값 모양 · 1차 검증 · 요청 변환 (API 명세서 4-6, FRONT_ARCHITECTURE § 5-4).
 //
-// 폼 값은 평평하게 둔다 — 구분을 바꿔도 역할 칸 값이 남아 있어야 다시 코어멤버로 돌렸을 때 복원된다.
-// "시니어면 role 은 null" 규칙은 toMemberRequest 의 반환 타입(MemberRequest 판별 유니온)이 강제한다.
+// 표시 순서는 이 폼에서 다루지 않는다 — 목록의 ↑↓ 로 바꾼다 (PUT /members/order).
 // 비운 칸은 폼에서 "", 요청에서 null 이다 (명세 1-4). 글자 수 · 개수 제한은 constants/limits.ts 에서만 가져온다.
 
 import { z } from "zod";
 
 import { HTTP_URL_PATTERN, MEMBER_LIMITS } from "@/constants/limits";
 import { publicEnv } from "@/lib/env/client";
-import {
-  type AdminMember,
-  MEMBER_PARTS,
-  MEMBER_ROLES,
-  MEMBER_STATUSES,
-  type MemberPart,
-  type MemberRole,
-} from "@/types/api";
+import { type AdminMember, MEMBER_STATUSES } from "@/types/api";
 import type { MemberRequest } from "@/types/request";
 
 const L = MEMBER_LIMITS;
@@ -27,8 +19,6 @@ const MESSAGES = {
   maxItems: (max: number) => `최대 ${max}개까지 입력할 수 있습니다.`,
   emptyItem: "내용을 입력하거나 항목을 삭제해 주세요.",
   duplicate: "중복된 항목이 있습니다.",
-  role: "역할을 선택해 주세요.",
-  part: "분야를 선택해 주세요.",
   url: "http:// 또는 https:// 로 시작하는 주소를 입력해 주세요.",
   email: "이메일 형식으로 입력해 주세요. (예: name@example.com)",
   photoUrl: "업로드한 프로필 사진 주소가 아닙니다.",
@@ -56,47 +46,29 @@ const optionalEmail = z
   .max(L.email, MESSAGES.maxLength(L.email))
   .refine((value) => value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value), MESSAGES.email);
 
-function oneOf<T extends string>(values: readonly T[]) {
-  return (value: string): value is T => (values as readonly string[]).includes(value);
-}
-
-const isMemberRole = oneOf(MEMBER_ROLES);
-const isMemberPart = oneOf(MEMBER_PARTS);
-
 /** 프로필 사진은 R2 공개 주소의 members/ 아래만 허용 (명세 4-6). 저장 시 Spring 이 실제 객체를 다시 확인한다 */
 const photoPrefix = `${publicEnv.NEXT_PUBLIC_R2_PUBLIC_BASE_URL}/members/`;
 
-export const memberFormSchema = z
-  .object({
-    status: z.enum(MEMBER_STATUSES),
-    /** 코어멤버일 때만 검사한다 (아래 superRefine) */
-    role: z.string(),
-    photoUrl: z
-      .string()
-      .nullable()
-      .refine((value) => value === null || value.startsWith(photoPrefix), MESSAGES.photoUrl),
-    name: requiredText(L.name),
-    department: requiredText(L.department),
-    history: z
-      .array(listItem(L.history.itemLength))
-      .max(L.history.max, MESSAGES.maxItems(L.history.max)),
-    interests: z
-      .array(listItem(L.interests.itemLength))
-      .max(L.interests.max, MESSAGES.maxItems(L.interests.max))
-      .refine((items) => new Set(items).size === items.length, MESSAGES.duplicate),
-    part: z
-      .string()
-      .refine(isMemberPart, MESSAGES.part)
-      .transform((value) => value as MemberPart),
-    bio: requiredText(L.bio),
-    links: z.object({ github: optionalUrl, email: optionalEmail }),
-    consentConfirmed: z.boolean().refine((value) => value, MESSAGES.consent),
-  })
-  .superRefine(({ status, role }, ctx) => {
-    if (status === "core" && !isMemberRole(role)) {
-      ctx.addIssue({ code: "custom", path: ["role"], message: MESSAGES.role });
-    }
-  });
+export const memberFormSchema = z.object({
+  status: z.enum(MEMBER_STATUSES),
+  photoUrl: z
+    .string()
+    .nullable()
+    .refine((value) => value === null || value.startsWith(photoPrefix), MESSAGES.photoUrl),
+  name: requiredText(L.name),
+  department: requiredText(L.department),
+  history: z
+    .array(listItem(L.history.itemLength))
+    .max(L.history.max, MESSAGES.maxItems(L.history.max)),
+  interests: z
+    .array(listItem(L.interests.itemLength))
+    .max(L.interests.max, MESSAGES.maxItems(L.interests.max))
+    .refine((items) => new Set(items).size === items.length, MESSAGES.duplicate),
+  part: requiredText(L.part),
+  bio: requiredText(L.bio),
+  links: z.object({ github: optionalUrl, email: optionalEmail }),
+  consentConfirmed: z.boolean().refine((value) => value, MESSAGES.consent),
+});
 
 /** 폼이 들고 있는 값 (입력 중 · 임시 저장본) */
 export type MemberFormValues = z.input<typeof memberFormSchema>;
@@ -107,7 +79,6 @@ export type MemberFormOutput = z.output<typeof memberFormSchema>;
 export function emptyMemberForm(): MemberFormValues {
   return {
     status: "core",
-    role: "",
     photoUrl: null,
     name: "",
     department: "",
@@ -127,7 +98,6 @@ export function emptyMemberForm(): MemberFormValues {
 export function memberToForm(member: AdminMember): MemberFormValues {
   return {
     status: member.status,
-    role: member.status === "core" ? member.role : "",
     photoUrl: member.photoUrl ?? null,
     name: member.name,
     department: member.department,
@@ -140,9 +110,10 @@ export function memberToForm(member: AdminMember): MemberFormValues {
   };
 }
 
-/** 요청 본문. 모든 필드를 보내고, 비운 값은 null · [] (명세 1-4). 시니어면 role 은 null */
+/** 요청 본문. 모든 필드를 보내고, 비운 값은 null · [] (명세 1-4) */
 export function toMemberRequest(values: MemberFormOutput): MemberRequest {
-  const base = {
+  return {
+    status: values.status,
     photoUrl: values.photoUrl,
     name: values.name,
     department: values.department,
@@ -153,7 +124,4 @@ export function toMemberRequest(values: MemberFormOutput): MemberRequest {
     links: { github: values.links.github || null, email: values.links.email || null },
     consentConfirmed: values.consentConfirmed,
   };
-  return values.status === "core"
-    ? { ...base, status: "core", role: values.role as MemberRole }
-    : { ...base, status: "senior", role: null };
 }

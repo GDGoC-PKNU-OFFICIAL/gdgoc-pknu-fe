@@ -6,7 +6,6 @@ import { z } from "zod";
 
 import { SLUG_PATTERN } from "@/constants/limits";
 import {
-  ABOUT_ACTIVITY_GROUPS,
   ABOUT_ACTIVITY_LAYOUTS,
   ABOUT_ACTIVITY_TONES,
   type AboutContent,
@@ -16,7 +15,7 @@ import type { AboutRequest } from "@/types/request";
 
 export const ABOUT_LIMITS = {
   identity: { min: 1, max: 5, itemLength: 1000 },
-  activities: { min: 1, max: 12, titleLength: 30, cadenceLength: 20, descriptionLength: 200 },
+  activities: { min: 1, max: 12, titleLength: 30, descriptionLength: 200 },
   rules: { max: 6, slugLength: 60, titleLength: 30, bodyLength: 5000 },
   faq: { max: 20, questionLength: 100, answerLength: 1000 },
 } as const;
@@ -41,22 +40,31 @@ const requiredText = (max: number) =>
 
 /** 사진이 필요한 모양 */
 export const LAYOUTS_WITH_IMAGE = ["cover", "square", "top", "artwork", "circles"] as const;
-/** 보일 중심을 정할 수 있는 모양 */
-export const LAYOUTS_WITH_POSITION = ["cover", "top"] as const;
+
+/** 사진 확대 배율 % (서버 AboutRequest 와 같은 범위). 100 이면 확대하지 않는다 */
+export const ZOOM = { min: 100, max: 300, step: 5 } as const;
+
+/** 사진에서 보일 곳 "가로% 세로%" (각 0~100) — 빈 값이면 모양마다 정한 기본 위치 */
+const positionField = z
+  .string()
+  .trim()
+  .refine(
+    (value) => value === "" || /^(100|\d{1,2})% (100|\d{1,2})%$/.test(value),
+    MESSAGES.position,
+  );
+const zoomField = z.number().int().min(ZOOM.min).max(ZOOM.max);
 
 const activitySchema = z
   .object({
-    group: z.enum(ABOUT_ACTIVITY_GROUPS),
     title: requiredText(L.activities.titleLength),
-    cadence: requiredText(L.activities.cadenceLength),
     description: requiredText(L.activities.descriptionLength),
     layout: z.enum(ABOUT_ACTIVITY_LAYOUTS),
     imageUrl: z.string().nullable(),
     secondImageUrl: z.string().nullable(),
-    imagePosition: z
-      .string()
-      .trim()
-      .refine((value) => value === "" || /^\d{1,3}% \d{1,3}%$/.test(value), MESSAGES.position),
+    imagePosition: positionField,
+    imageZoom: zoomField,
+    secondImagePosition: positionField,
+    secondImageZoom: zoomField,
     tone: z.enum(ABOUT_ACTIVITY_TONES),
   })
   .superRefine((value, ctx) => {
@@ -127,14 +135,15 @@ export type ActivityFormValues = AboutFormValues["activities"][number];
 
 export function emptyActivity(): ActivityFormValues {
   return {
-    group: "activity",
     title: "",
-    cadence: "",
     description: "",
     layout: "color",
     imageUrl: null,
     secondImageUrl: null,
     imagePosition: "",
+    imageZoom: ZOOM.min,
+    secondImagePosition: "",
+    secondImageZoom: ZOOM.min,
     tone: "auto",
   };
 }
@@ -143,14 +152,15 @@ export function aboutToForm(about: AboutContent): AboutFormValues {
   return {
     identity: [...about.identity],
     activities: about.activities.map((item) => ({
-      group: item.group,
       title: item.title,
-      cadence: item.cadence,
       description: item.description,
       layout: item.layout,
       imageUrl: item.imageUrl ?? null,
       secondImageUrl: item.secondImageUrl ?? null,
       imagePosition: item.imagePosition ?? "",
+      imageZoom: item.imageZoom ?? ZOOM.min,
+      secondImagePosition: item.secondImagePosition ?? "",
+      secondImageZoom: item.secondImageZoom ?? ZOOM.min,
       tone: item.tone,
     })),
     rules: about.rules.map((rule) => ({ ...rule })),
@@ -164,16 +174,19 @@ export function toAboutRequest(values: AboutFormOutput): AboutRequest {
     identity: values.identity,
     activities: values.activities.map((item) => {
       const usesImage = (LAYOUTS_WITH_IMAGE as readonly string[]).includes(item.layout);
-      const usesPosition = (LAYOUTS_WITH_POSITION as readonly string[]).includes(item.layout);
+      const circles = item.layout === "circles";
+      // 100% 는 확대하지 않은 것과 같아 보내지 않는다
+      const zoomOrNull = (zoom: number) => (zoom > ZOOM.min ? zoom : null);
       return {
-        group: item.group,
         title: item.title,
-        cadence: item.cadence,
         description: item.description,
         layout: item.layout,
         imageUrl: usesImage ? item.imageUrl : null,
-        secondImageUrl: item.layout === "circles" ? item.secondImageUrl : null,
-        imagePosition: usesPosition && item.imagePosition ? item.imagePosition : null,
+        secondImageUrl: circles ? item.secondImageUrl : null,
+        imagePosition: usesImage && item.imagePosition ? item.imagePosition : null,
+        imageZoom: usesImage ? zoomOrNull(item.imageZoom) : null,
+        secondImagePosition: circles && item.secondImagePosition ? item.secondImagePosition : null,
+        secondImageZoom: circles ? zoomOrNull(item.secondImageZoom) : null,
         tone: item.tone,
       };
     }),

@@ -243,7 +243,9 @@ export default function ImageUploadField({
               </button>
               {value !== null && !uploading && (
                 <Button
+                  // 바꾸기(테두리 버튼)와 한눈에 구분되게 검정 버튼으로 — 사진이 지워지는 쪽이다
                   variant="ghost"
+                  className="bg-[#1f1f1f] text-white hover:bg-[#3c4043]"
                   onClick={() => {
                     setLocalError(null);
                     onChange(null);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { cn } from "@/lib/cn";
-import { type Member, MEMBER_ROLES, type MemberPart, type MemberRole } from "@/types/api";
+import type { Member } from "@/types/api";
 
 import MemberFlipCard from "../components/MemberFlipCard";
 
@@ -24,10 +24,6 @@ const FACES: { value: FaceOption; label: string }[] = [
   { value: "back", label: "후면" },
 ];
 
-function isMemberRole(value: string | undefined): value is MemberRole {
-  return (MEMBER_ROLES as readonly (string | undefined)[]).includes(value);
-}
-
 /** 입력 중인 폼 값 → 카드가 받는 Member. 입력 중 값이라 비거나 형식이 덜 맞을 수 있다 */
 function toPreviewMember(values: DeepPartial<MemberFormValues>): Member {
   const trim = (value: string | undefined) => value?.trim() ?? "";
@@ -35,6 +31,7 @@ function toPreviewMember(values: DeepPartial<MemberFormValues>): Member {
     (list ?? []).map(trim).filter((item) => item !== "");
   const base = {
     id: 0,
+    sortOrder: 0,
     createdAt: "",
     updatedAt: "",
     name: trim(values.name) || PLACEHOLDERS.name,
@@ -43,14 +40,11 @@ function toPreviewMember(values: DeepPartial<MemberFormValues>): Member {
     history: items(values.history),
     interests: items(values.interests),
     // 분야를 아직 고르지 않았으면 빈 값 — 카드가 "—" 로 보여 준다
-    part: (values.part ?? "") as MemberPart,
+    part: values.part?.trim() ?? "",
     bio: trim(values.bio) || PLACEHOLDERS.bio,
     links: {},
   };
-  // 코어멤버인데 역할을 아직 안 골랐으면 배지 없이 보여 준다 (시니어 카드와 같은 모양)
-  return values.status === "core" && isMemberRole(values.role)
-    ? { ...base, status: "core", role: values.role }
-    : { ...base, status: "senior" };
+  return values.status === "senior" ? { ...base, status: "senior" } : { ...base, status: "core" };
 }
 
 /**
@@ -88,7 +82,10 @@ export default function MemberCardPreview({ values }: { values: DeepPartial<Memb
           ))}
         </div>
       </div>
-      <MemberFlipCard member={toPreviewMember(values)} previewFace={face} />
+      {/* 공개 화면과 같은 글자 크기 (관리자 화면은 글자를 키워 두었다 — globals.css admin-text) */}
+      <div className="public-text">
+        <MemberFlipCard member={toPreviewMember(values)} previewFace={face} />
+      </div>
       <p className="text-xs text-ink-muted">
         공개 Members 페이지에 보이는 카드입니다. 입력하면 바로 반영됩니다.
       </p>

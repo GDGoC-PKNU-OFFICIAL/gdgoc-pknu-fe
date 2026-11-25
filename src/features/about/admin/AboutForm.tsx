@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,6 +19,7 @@ import { useAdminMutation } from "@/components/admin/hooks/use-admin-mutation";
 import { useDraft } from "@/components/admin/hooks/use-draft";
 import { useLeaveWarning } from "@/components/admin/hooks/use-leave-warning";
 import { useSlowNotice } from "@/components/admin/hooks/use-slow-notice";
+import ImagePositionField from "@/components/admin/ImagePositionField";
 import ImageUploadField, { type UploadStatus } from "@/components/admin/ImageUploadField";
 import { applyFieldErrors } from "@/components/admin/lib/apply-field-errors";
 import { ABOUT_DRAFT_KEY } from "@/components/admin/lib/draft-storage";
@@ -31,9 +32,9 @@ import Textarea from "@/components/ui/Textarea";
 import { ADMIN_ROUTES } from "@/constants/routes";
 import { useToast } from "@/hooks/use-toast";
 import { updateAbout } from "@/lib/api/admin-api";
+import { cn } from "@/lib/cn";
 import { formatKstDateTime } from "@/lib/date";
 import {
-  ABOUT_ACTIVITY_GROUPS,
   ABOUT_ACTIVITY_LAYOUTS,
   ABOUT_ACTIVITY_TONES,
   type AboutActivityLayout,
@@ -41,7 +42,7 @@ import {
   RULE_ICONS,
 } from "@/types/api";
 
-import { ACTIVITY_GROUP_LABELS, TONE_LABELS, toPosterActivity } from "../lib/about-content";
+import { TONE_LABELS, toPosterActivity } from "../lib/about-content";
 
 import {
   ABOUT_LIMITS,
@@ -51,8 +52,8 @@ import {
   aboutToForm,
   emptyActivity,
   LAYOUTS_WITH_IMAGE,
-  LAYOUTS_WITH_POSITION,
   toAboutRequest,
+  ZOOM,
 } from "./about-schema";
 
 const L = ABOUT_LIMITS;
@@ -75,10 +76,6 @@ const LAYOUT_LABELS = {
 
 const RULE_ICON_LABELS = { book: "책", person: "사람", badge: "배지" } as const;
 
-const GROUP_OPTIONS = ABOUT_ACTIVITY_GROUPS.map((value) => ({
-  value,
-  label: ACTIVITY_GROUP_LABELS[value],
-}));
 const LAYOUT_OPTIONS = ABOUT_ACTIVITY_LAYOUTS.map((value) => ({
   value,
   label: LAYOUT_LABELS[value],
@@ -195,154 +192,164 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
           title={`What We Do 활동 카드 (${activities.fields.length}/${L.activities.max})`}
           description="'GDGoC PKNU 활동' 묶음은 홈 What We Do 에도 같은 순서로 보입니다. 위 · 아래 버튼으로 순서를 바꿉니다."
         >
-          <ol className="flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line">
+          {/* 카드마다 따로 떨어진 패널 — 머리 띠(번호 · 제목 · 순서 · 삭제)와 본문을 나눠 어디서 어디까지가 한 카드인지 바로 보이게 한다 */}
+          <ol className="flex flex-col gap-5">
             {activities.fields.map((field, index) => {
               const item = values.activities?.[index];
               const layout = (item?.layout ?? "color") as AboutActivityLayout;
               const itemErrors = errors.activities?.[index];
               return (
-                <li key={field.id} className="flex flex-col gap-4 bg-surface p-4">
-                  <RowHeader
-                    index={index}
-                    total={activities.fields.length}
-                    title={item?.title || "(제목 없음)"}
-                    meta={`${ACTIVITY_GROUP_LABELS[item?.group ?? "activity"]} · ${LAYOUT_LABELS[layout]}`}
-                    onMove={(to) => activities.move(index, to)}
-                    onRemove={() => activities.remove(index)}
-                    removeDisabled={activities.fields.length <= L.activities.min}
-                  />
-                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_12rem]">
-                    {/* 이 카드가 About · 홈에 보일 모습 (입력하는 대로 바뀐다) */}
-                    <div className="lg:order-last">
-                      <p className="mb-1.5 text-xs font-medium text-ink-muted">미리보기</p>
-                      <div inert className="pointer-events-none w-48 select-none lg:w-full">
-                        <ActivityPoster
-                          activity={toPosterActivity(previewActivity(item))}
-                          eyebrow={ACTIVITY_GROUP_LABELS[item?.group ?? "activity"]}
-                          index={index}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex min-w-0 flex-col gap-4">
-                      <div className="grid gap-3 md:grid-cols-[repeat(4,minmax(0,1fr))]">
-                        <SelectField
-                          id={`about-activities-${index}-group`}
-                          label="묶음"
-                          options={GROUP_OPTIONS}
-                          register={register}
-                          name={`activities.${index}.group`}
-                        />
-                        <SelectField
-                          id={`about-activities-${index}-layout`}
-                          label="카드 모양"
-                          options={LAYOUT_OPTIONS}
-                          register={register}
-                          name={`activities.${index}.layout`}
-                        />
-                        <SelectField
-                          id={`about-activities-${index}-tone`}
-                          label="바탕색"
-                          options={TONE_OPTIONS}
-                          register={register}
-                          name={`activities.${index}.tone`}
-                        />
-                        <TextField
-                          id={`about-activities-${index}-cadence`}
-                          label="주기"
-                          max={L.activities.cadenceLength}
-                          register={register}
-                          name={`activities.${index}.cadence`}
-                          error={itemErrors?.cadence?.message}
-                        />
-                      </div>
-                      <TextField
-                        id={`about-activities-${index}-title`}
-                        label="제목"
-                        max={L.activities.titleLength}
-                        register={register}
-                        name={`activities.${index}.title`}
-                        error={itemErrors?.title?.message}
+                <RowPanel
+                  key={field.id}
+                  index={index}
+                  total={activities.fields.length}
+                  title={item?.title || "(제목 없음)"}
+                  meta={LAYOUT_LABELS[layout]}
+                  onMove={(to) => activities.move(index, to)}
+                  onRemove={() => activities.remove(index)}
+                  removeDisabled={activities.fields.length <= L.activities.min}
+                  bodyClassName="grid gap-4 lg:grid-cols-[minmax(0,1fr)_17rem] xl:grid-cols-[minmax(0,1fr)_20rem]"
+                >
+                  {/* 이 카드가 About · 홈에 보일 모습 (입력하는 대로 바뀐다).
+                        폭은 공개 화면 데스크톱 카드(약 270~324px)에 맞춘다 — 더 좁으면 여백 · 글자 크기는 그대로라 설명이 일찍 잘리고
+                        '위쪽 정사각형 사진' 카드는 글자가 사진 위로 올라가 공개 화면과 다르게 보인다 */}
+                  <div className="lg:order-last">
+                    <p className="mb-1.5 text-xs font-medium text-ink-muted">미리보기</p>
+                    <div inert className="public-text pointer-events-none w-68 select-none lg:w-full">
+                      <ActivityPoster
+                        activity={toPosterActivity(previewActivity(item))}
+                        index={index}
                       />
-                      <FormField
-                        id={`about-activities-${index}-description`}
-                        label="설명"
-                        required
-                        error={itemErrors?.description?.message}
-                        counter={{
-                          length: item?.description?.length ?? 0,
-                          max: L.activities.descriptionLength,
-                        }}
-                      >
-                        {(control) => (
-                          <Textarea
-                            {...control}
-                            rows={2}
-                            maxLength={L.activities.descriptionLength}
-                            {...register(`activities.${index}.description`)}
-                          />
-                        )}
-                      </FormField>
-                      {(LAYOUTS_WITH_IMAGE as readonly string[]).includes(layout) && (
-                        <div className="flex flex-wrap gap-6">
-                          <Controller
-                            control={control}
-                            name={`activities.${index}.imageUrl`}
-                            render={({ field: image, fieldState }) => (
-                              <ImageUploadField
-                                id={`about-activities-${index}-imageUrl`}
-                                legend={layout === "circles" ? "큰 원 사진" : "사진 · 그림"}
-                                target="about"
-                                value={image.value}
-                                onChange={image.onChange}
-                                onBlur={image.onBlur}
-                                ref={image.ref}
-                                fallbackSrc="/images/default-project.png"
-                                aspect="square"
-                                error={fieldState.error?.message}
-                                onStatusChange={onUploadStatus(`${field.id}-1`)}
-                                onBeforeUpload={draft.saveNow}
-                              />
-                            )}
-                          />
-                          {layout === "circles" && (
-                            <Controller
-                              control={control}
-                              name={`activities.${index}.secondImageUrl`}
-                              render={({ field: image, fieldState }) => (
-                                <ImageUploadField
-                                  id={`about-activities-${index}-secondImageUrl`}
-                                  legend="작은 원 사진"
-                                  target="about"
-                                  value={image.value}
-                                  onChange={image.onChange}
-                                  onBlur={image.onBlur}
-                                  ref={image.ref}
-                                  fallbackSrc="/images/default-project.png"
-                                  aspect="square"
-                                  error={fieldState.error?.message}
-                                  onStatusChange={onUploadStatus(`${field.id}-2`)}
-                                  onBeforeUpload={draft.saveNow}
-                                />
-                              )}
-                            />
-                          )}
-                          {(LAYOUTS_WITH_POSITION as readonly string[]).includes(layout) && (
-                            <TextField
-                              id={`about-activities-${index}-imagePosition`}
-                              label="사진에서 보일 중심"
-                              optional
-                              hint="비우면 가운데. 예: 35% 50%"
-                              max={9}
-                              register={register}
-                              name={`activities.${index}.imagePosition`}
-                              error={itemErrors?.imagePosition?.message}
-                            />
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
-                </li>
+                  <div className="flex min-w-0 flex-col gap-4">
+                    <div className="grid gap-3 md:grid-cols-[repeat(2,minmax(0,1fr))]">
+                      <SelectField
+                        id={`about-activities-${index}-layout`}
+                        label="카드 모양"
+                        options={LAYOUT_OPTIONS}
+                        register={register}
+                        name={`activities.${index}.layout`}
+                      />
+                      <SelectField
+                        id={`about-activities-${index}-tone`}
+                        label="바탕색"
+                        options={TONE_OPTIONS}
+                        register={register}
+                        name={`activities.${index}.tone`}
+                      />
+                    </div>
+                    <TextField
+                      id={`about-activities-${index}-title`}
+                      label="제목"
+                      max={L.activities.titleLength}
+                      register={register}
+                      name={`activities.${index}.title`}
+                      error={itemErrors?.title?.message}
+                    />
+                    <FormField
+                      id={`about-activities-${index}-description`}
+                      label="설명"
+                      required
+                      error={itemErrors?.description?.message}
+                      counter={{
+                        length: item?.description?.length ?? 0,
+                        max: L.activities.descriptionLength,
+                      }}
+                    >
+                      {(control) => (
+                        <Textarea
+                          {...control}
+                          rows={2}
+                          maxLength={L.activities.descriptionLength}
+                          {...register(`activities.${index}.description`)}
+                        />
+                      )}
+                    </FormField>
+                    {(LAYOUTS_WITH_IMAGE as readonly string[]).includes(layout) && (
+                      <div className="flex flex-col gap-5">
+                        {(layout === "circles" ? PHOTO_SLOTS : PHOTO_SLOTS.slice(0, 1)).map(
+                          (slot) => {
+                            const names = {
+                              url: `activities.${index}.${slot.url}`,
+                              position: `activities.${index}.${slot.position}`,
+                              zoom: `activities.${index}.${slot.zoom}`,
+                            } as const;
+                            const src = item?.[slot.url];
+                            const frame =
+                              slot.key === "second"
+                                ? CIRCLE_FRAME
+                                : PHOTO_FRAMES[layout as PhotoLayout];
+                            return (
+                              // 사진 한 장 = 올리기 + 카드에 보일 부분 고르기 (나란히)
+                              <div key={slot.key} className="flex flex-wrap items-start gap-6">
+                                <Controller
+                                  control={control}
+                                  name={names.url}
+                                  render={({ field: image, fieldState }) => (
+                                    <ImageUploadField
+                                      id={`about-activities-${index}-${slot.url}`}
+                                      legend={
+                                        layout === "circles" ? slot.circleLegend : "사진 · 그림"
+                                      }
+                                      target="about"
+                                      value={image.value}
+                                      onChange={(next) => {
+                                        image.onChange(next);
+                                        // 다른 사진이면 전 사진에 맞춘 위치 · 배율은 뜻이 없다 → 기본부터 다시 맞춘다
+                                        if (next !== image.value) {
+                                          form.setValue(names.position, "", { shouldDirty: true });
+                                          form.setValue(names.zoom, ZOOM.min, {
+                                            shouldDirty: true,
+                                          });
+                                        }
+                                      }}
+                                      onBlur={image.onBlur}
+                                      ref={image.ref}
+                                      fallbackSrc="/images/default-project.png"
+                                      aspect="square"
+                                      error={fieldState.error?.message}
+                                      onStatusChange={onUploadStatus(`${field.id}-${slot.key}`)}
+                                      onBeforeUpload={draft.saveNow}
+                                    />
+                                  )}
+                                />
+                                {src && (
+                                  <Controller
+                                    control={control}
+                                    name={names.position}
+                                    render={({ field: position, fieldState }) => (
+                                      <ImagePositionField
+                                        id={`about-activities-${index}-${slot.position}`}
+                                        legend={
+                                          layout === "circles"
+                                            ? `${slot.circleLegend}에 보일 부분`
+                                            : "카드에 보일 부분"
+                                        }
+                                        src={src}
+                                        position={position.value}
+                                        onPositionChange={position.onChange}
+                                        zoom={item?.[slot.zoom] ?? ZOOM.min}
+                                        onZoomChange={(next) =>
+                                          form.setValue(names.zoom, next, { shouldDirty: true })
+                                        }
+                                        zoomRange={ZOOM}
+                                        aspect={frame.aspect}
+                                        round={frame.round}
+                                        defaultPosition={frame.defaultPosition}
+                                        error={fieldState.error?.message}
+                                      />
+                                    )}
+                                  />
+                                )}
+                              </div>
+                            );
+                          },
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </RowPanel>
               );
             })}
           </ol>
@@ -361,20 +368,21 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
           title={`활동 규칙 문서 (${rules.fields.length}/${L.rules.max})`}
           description="블록을 누르면 열리는 규칙 문서입니다. 주소(slug)는 공유 링크(?rule=)에 쓰여 겹칠 수 없습니다."
         >
-          <ol className="flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line">
+          <ol className="flex flex-col gap-5">
             {rules.fields.map((field, index) => {
               const item = values.rules?.[index];
               const itemErrors = errors.rules?.[index];
               return (
-                <li key={field.id} className="flex flex-col gap-4 bg-surface p-4">
-                  <RowHeader
-                    index={index}
-                    total={rules.fields.length}
-                    title={item?.title || "(제목 없음)"}
-                    meta={`?rule=${item?.slug ?? ""}`}
-                    onMove={(to) => rules.move(index, to)}
-                    onRemove={() => rules.remove(index)}
-                  />
+                <RowPanel
+                  key={field.id}
+                  index={index}
+                  total={rules.fields.length}
+                  title={item?.title || "(제목 없음)"}
+                  meta={`?rule=${item?.slug ?? ""}`}
+                  onMove={(to) => rules.move(index, to)}
+                  onRemove={() => rules.remove(index)}
+                  bodyClassName="flex flex-col gap-4"
+                >
                   <div className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)]">
                     <TextField
                       id={`about-rules-${index}-title`}
@@ -418,7 +426,7 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
                       />
                     )}
                   </FormField>
-                </li>
+                </RowPanel>
               );
             })}
           </ol>
@@ -434,19 +442,20 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
           title={`FAQ (${faq.fields.length}/${L.faq.max})`}
           description="About 맨 아래 질문 · 답변입니다."
         >
-          <ol className="flex flex-col divide-y divide-line overflow-hidden rounded-xl border border-line">
+          <ol className="flex flex-col gap-5">
             {faq.fields.map((field, index) => {
               const item = values.faq?.[index];
               const itemErrors = errors.faq?.[index];
               return (
-                <li key={field.id} className="flex flex-col gap-3 bg-surface p-4">
-                  <RowHeader
-                    index={index}
-                    total={faq.fields.length}
-                    title={item?.question || "(질문 없음)"}
-                    onMove={(to) => faq.move(index, to)}
-                    onRemove={() => faq.remove(index)}
-                  />
+                <RowPanel
+                  key={field.id}
+                  index={index}
+                  total={faq.fields.length}
+                  title={item?.question || "(질문 없음)"}
+                  onMove={(to) => faq.move(index, to)}
+                  onRemove={() => faq.remove(index)}
+                  bodyClassName="flex flex-col gap-3"
+                >
                   <TextField
                     id={`about-faq-${index}-question`}
                     label="질문"
@@ -471,7 +480,7 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
                       />
                     )}
                   </FormField>
-                </li>
+                </RowPanel>
               );
             })}
           </ol>
@@ -502,17 +511,60 @@ export default function AboutForm({ about, saved }: AboutFormProps) {
 
 // ───────────────────────────── 작은 부품 ─────────────────────────────
 
+/** 사진 칸 — 보통은 한 장, circles 는 큰 원 · 작은 원 두 장 (폼 값 이름이 칸마다 다르다) */
+const PHOTO_SLOTS = [
+  {
+    key: "first",
+    url: "imageUrl",
+    position: "imagePosition",
+    zoom: "imageZoom",
+    circleLegend: "큰 원 사진",
+  },
+  {
+    key: "second",
+    url: "secondImageUrl",
+    position: "secondImagePosition",
+    zoom: "secondImageZoom",
+    circleLegend: "작은 원 사진",
+  },
+] as const;
+
+type PhotoLayout = (typeof LAYOUTS_WITH_IMAGE)[number];
+
+interface PhotoFrame {
+  /** 공개 카드(ActivityPoster)에서 이 사진이 보이는 칸의 비율 — 위치 고르기 틀을 같은 비율로 그린다 */
+  aspect: string;
+  round?: boolean;
+  /** 위치를 비워 두면 공개 카드가 쓰는 값 (ActivityPoster 와 같게) */
+  defaultPosition?: string;
+}
+
+const CIRCLE_FRAME: PhotoFrame = { aspect: "1 / 1", round: true };
+
+/**
+ * 모양별 사진 칸. cover: 카드 전체(3:4, 기본 위치가 조금 아래). top: 카드 위쪽에서 글자 칸을 뺀 자리
+ * (폭 320px · 설명 3줄에서 잰 320×262). square · artwork: 정사각형. circles: 큰 원.
+ */
+const PHOTO_FRAMES: Record<PhotoLayout, PhotoFrame> = {
+  cover: { aspect: "3 / 4", defaultPosition: "50% 55%" },
+  top: { aspect: "11 / 9" },
+  square: { aspect: "1 / 1" },
+  artwork: { aspect: "1 / 1" },
+  circles: CIRCLE_FRAME,
+};
+
 /** 입력 중인 카드 → 포스터 미리보기 (빈 칸은 자리 표시 글자, 사진이 아직 없으면 색 카드) */
 function previewActivity(item: Partial<AboutFormValues["activities"][number]> | undefined) {
   return {
-    group: item?.group ?? "activity",
     title: item?.title?.trim() || "카드 제목",
-    cadence: item?.cadence?.trim() || "주기",
     description: item?.description?.trim() || "설명이 여기에 보입니다.",
     layout: item?.layout ?? "color",
     imageUrl: item?.imageUrl ?? undefined,
     secondImageUrl: item?.secondImageUrl ?? undefined,
     imagePosition: item?.imagePosition?.trim() || undefined,
+    imageZoom: item?.imageZoom,
+    secondImagePosition: item?.secondImagePosition?.trim() || undefined,
+    secondImageZoom: item?.secondImageZoom,
     tone: item?.tone ?? "auto",
   } as const;
 }
@@ -520,8 +572,11 @@ function previewActivity(item: Partial<AboutFormValues["activities"][number]> | 
 type Register = UseFormRegister<AboutFormValues>;
 type FieldName = Parameters<Register>[0];
 
-/** 줄 머리 — 번호 · 제목 · 보조 정보 · 위/아래/삭제 */
-function RowHeader({
+/**
+ * 목록 한 칸 (활동 카드 · 규칙 문서 · FAQ) — 카드마다 따로 떨어진 패널.
+ * 회색 머리 띠(번호 · 제목 · 보조 정보 · 위/아래/삭제)와 본문을 나눠, 어디서 어디까지가 한 칸인지 바로 보이게 한다.
+ */
+function RowPanel({
   index,
   total,
   title,
@@ -529,6 +584,8 @@ function RowHeader({
   onMove,
   onRemove,
   removeDisabled,
+  bodyClassName,
+  children,
 }: {
   index: number;
   total: number;
@@ -537,48 +594,55 @@ function RowHeader({
   onMove: (to: number) => void;
   onRemove: () => void;
   removeDisabled?: boolean;
+  /** 본문 배치 (여백 p-4 는 공통) */
+  bodyClassName?: string;
+  children: ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-surface-muted text-xs font-semibold tabular-nums">
-        {index + 1}
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm font-semibold">{title}</span>
-        {meta && <span className="truncate text-xs text-ink-muted">{meta}</span>}
-      </span>
-      <span className="flex shrink-0 gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          className="min-h-9 px-2.5"
-          aria-label={`${index + 1}번 위로`}
-          disabled={index === 0}
-          onClick={() => onMove(index - 1)}
-        >
-          ↑
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className="min-h-9 px-2.5"
-          aria-label={`${index + 1}번 아래로`}
-          disabled={index === total - 1}
-          onClick={() => onMove(index + 1)}
-        >
-          ↓
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className="min-h-9 px-2.5 text-brand-red"
-          disabled={removeDisabled}
-          onClick={onRemove}
-        >
-          삭제
-        </Button>
-      </span>
-    </div>
+    <li className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+      <div className="flex items-center gap-3 border-b border-line bg-surface-muted px-4 py-2.5">
+        {/* 회색 띠 위라 번호는 파란 칸으로 (회색 위 회색이면 묻힌다) */}
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-blue text-xs font-semibold text-white tabular-nums">
+          {index + 1}
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-sm font-semibold">{title}</span>
+          {meta && <span className="truncate text-xs text-ink-muted">{meta}</span>}
+        </span>
+        <span className="flex shrink-0 gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            className="min-h-9 px-2.5"
+            aria-label={`${index + 1}번 위로`}
+            disabled={index === 0}
+            onClick={() => onMove(index - 1)}
+          >
+            ↑
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="min-h-9 px-2.5"
+            aria-label={`${index + 1}번 아래로`}
+            disabled={index === total - 1}
+            onClick={() => onMove(index + 1)}
+          >
+            ↓
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="min-h-9 px-2.5 text-brand-red"
+            disabled={removeDisabled}
+            onClick={onRemove}
+          >
+            삭제
+          </Button>
+        </span>
+      </div>
+      <div className={cn("p-4", bodyClassName)}>{children}</div>
+    </li>
   );
 }
 

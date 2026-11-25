@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import SafeImage from "@/components/common/SafeImage";
 import Tag from "@/components/ui/Tag";
-import { MEMBER_PART_LABELS } from "@/constants/labels";
 import { type AnalyticsEvents, trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import type { Member } from "@/types/api";
@@ -181,8 +180,8 @@ export default function MemberFlipCard({
       >
         <span className="flex flex-col gap-1">
           <span className="text-xs text-ink-muted">분야</span>
-          {/* 관리자 미리보기에서는 분야를 아직 고르지 않았을 수 있다 */}
-          <span className="text-lg font-semibold">{MEMBER_PART_LABELS[part] ?? "—"}</span>
+          {/* 관리자 미리보기에서는 분야를 아직 적지 않았을 수 있다 */}
+          <span className="text-lg font-semibold break-keep">{part || "—"}</span>
         </span>
         <span className="flex max-w-full min-w-0 flex-col gap-1">
           <span className="text-xs text-ink-muted">한 줄 소개</span>

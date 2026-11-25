@@ -289,7 +289,7 @@ export default function DashboardView({ data, today, now }: DashboardViewProps) 
                     >
                       {/* 날짜 칸 — 월 · 일을 달력처럼 */}
                       <span className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl bg-surface-muted leading-none">
-                        <span className="text-[11px] text-ink-muted">{Number(month)}월</span>
+                        <span className="text-xs text-ink-muted">{Number(month)}월</span>
                         <span className="text-lg font-bold tabular-nums">{Number(day)}</span>
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">

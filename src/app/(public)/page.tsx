@@ -25,11 +25,7 @@ import {
 import { CURRENT_PROJECTS } from "@/data/projects";
 import { SITE } from "@/data/site";
 import { CURRENT_STUDIES } from "@/data/studies";
-import {
-  ACTIVITY_GROUP_LABELS,
-  DEFAULT_ABOUT,
-  toPosterActivity,
-} from "@/features/about/lib/about-content";
+import { DEFAULT_ABOUT, toPosterActivity } from "@/features/about/lib/about-content";
 import EventTimeline from "@/features/events/components/EventTimeline";
 import { upcomingEvents } from "@/features/events/lib/filter-upcoming";
 import ProjectShowcaseGrid from "@/features/projects/components/ProjectShowcaseGrid";
@@ -57,8 +53,8 @@ export default async function HomePage() {
     getEvents(),
     getAbout().then((content) => content ?? DEFAULT_ABOUT),
   ]);
-  // What We Do: About 의 "GDGoC PKNU 활동" 묶음 카드 (관리자가 About 에서 고친다)
-  const homeActivities = about.activities.filter((item) => item.group === "activity");
+  // What We Do: About 과 같은 카드 전부, 같은 순서 (관리자가 About 에서 고친다)
+  const homeActivities = about.activities;
 
   const currentProjects = splitByStatus(projects).current.slice(0, HOME_LIST_LIMIT);
   const currentStudies = splitByStatus(studies).current.slice(0, HOME_STUDY_LIMIT);
@@ -183,14 +179,13 @@ export default async function HomePage() {
         link={HOME_SECTIONS.about.link}
         decoration={<SectionDoodles preset="about" />}
       >
-        {/* About What We Do 와 같은 포스터 카드 (About 의 "GDGoC PKNU 활동" 묶음, 같은 순서 · 같은 색).
-            데스크톱(xl)은 4장이 한 줄에 다 들어와 넘길 게 없고, 그보다 좁으면 About 처럼 옆으로 끌어 넘긴다 */}
+        {/* About What We Do 와 같은 포스터 카드 (같은 순서 · 같은 색).
+            데스크톱(xl)은 4장씩 보이고, 넘치는 카드는 About 처럼 옆으로 끌어 넘긴다 */}
         <EmblaSlider label="What We Do 활동 목록">
           {homeActivities.map((item, index) => (
             <ActivityPoster
               key={`${item.title}-${index}`}
               activity={toPosterActivity(item)}
-              eyebrow={ACTIVITY_GROUP_LABELS[item.group]}
               index={index}
             />
           ))}

@@ -1,7 +1,10 @@
+import type { CSSProperties } from "react";
+
 import Image from "next/image";
 
 import type { Activity } from "@/data/about";
 import { cn } from "@/lib/cn";
+import { framedImageStyle } from "@/lib/image-frame";
 
 /** 카드 바탕 — 앨범 커버처럼 한 장씩 다른 색 그라데이션 + 장식 도형 */
 interface PosterTheme {
@@ -23,8 +26,6 @@ const THEMES: PosterTheme[] = [
 
 interface ActivityPosterProps {
   activity: Activity;
-  /** 제목 위 작은 글씨 (예: "GDGoC PKNU 활동") */
-  eyebrow: string;
   /** 색 · 도형을 고르는 순번 */
   index: number;
 }
@@ -33,7 +34,6 @@ interface ActivityPosterProps {
  * 활동 포스터 카드 (About What We Do) — 음악 앱의 앨범 카드처럼 세로로 긴 색 카드.
  *   ┌──────────────┐
  *   │   ◢◤ 도형     │  ← 반투명 장식
- *   │ 무료 학습 콘텐츠 │  ← eyebrow
  *   │ 제목           │
  *   │ 설명 두 줄      │
  *   └──────────────┘
@@ -44,7 +44,7 @@ interface ActivityPosterProps {
  * activity.artwork 가 있으면 색 카드 위쪽에 그 그림을 통째로 얹고,
  * activity.logo 면 색 카드 가운데에 GNB 와 같은 로고를 크게 얹는다.
  */
-export default function ActivityPoster({ activity, eyebrow, index }: ActivityPosterProps) {
+export default function ActivityPoster({ activity, index }: ActivityPosterProps) {
   const theme = THEMES[index % THEMES.length];
 
   return (
@@ -57,14 +57,14 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
     >
       {activity.photo && activity.photoLayout === "top" ? (
         // 사진 카드(top): 사진은 글자 위쪽에 남는 자리를 카드 가장자리까지 꽉 채우고, 글자는 그 아래 색 바탕에 둔다
-        <div className="relative -mx-5 -mt-5 mb-4 min-h-0 flex-1 md:-mx-6 md:-mt-6">
+        <div className="relative -mx-5 -mt-5 mb-4 min-h-0 flex-1 overflow-hidden md:-mx-6 md:-mt-6">
           <Image
             src={activity.photo}
             alt=""
             fill
             sizes="(min-width: 1280px) 50vw, (min-width: 768px) 75vw, 130vw"
             className="object-cover"
-            style={{ objectPosition: activity.photoPosition ?? "50% 50%" }}
+            style={framedImageStyle(activity.photoPosition, activity.photoZoom)}
             draggable={false}
           />
         </div>
@@ -78,7 +78,7 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
             // 가로 사진(3:2)을 세로 카드(3:4)에 꽉 채우면 사진은 카드 폭의 2배로 그려진다 → 그만큼 큰 파일을 받게 한다
             sizes="(min-width: 1280px) 66vw, (min-width: 768px) 100vw, 170vw"
             className="-z-20 object-cover"
-            style={{ objectPosition: activity.photoPosition ?? "50% 55%" }}
+            style={framedImageStyle(activity.photoPosition, activity.photoZoom, "50% 55%")}
             draggable={false}
           />
           <div
@@ -100,7 +100,7 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
             draggable={false}
           />
           <div
-            className="absolute inset-x-0 top-0 -z-20 aspect-square"
+            className="absolute inset-x-0 top-0 -z-20 aspect-square overflow-hidden"
             style={{
               maskImage: "linear-gradient(to bottom, black 78%, transparent)",
               WebkitMaskImage: "linear-gradient(to bottom, black 78%, transparent)",
@@ -113,6 +113,7 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
               // 가로 사진(3:2)을 정사각형에 꽉 채우면 사진은 카드 폭의 1.5배로 그려진다 → 그만큼 큰 파일을 받게 한다
               sizes="(min-width: 1280px) 50vw, (min-width: 768px) 75vw, 130vw"
               className="object-cover"
+              style={framedImageStyle(activity.photoPosition, activity.photoZoom)}
               draggable={false}
             />
           </div>
@@ -127,11 +128,13 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
         <>
           <CirclePhoto
             src={activity.circles[0]}
+            style={framedImageStyle(activity.photoPosition, activity.photoZoom)}
             className="top-[5%] left-[7%] w-[62%]"
             sizes="(min-width: 1280px) 21vw, (min-width: 768px) 31vw, 53vw"
           />
           <CirclePhoto
             src={activity.circles[1]}
+            style={framedImageStyle(activity.secondPhotoPosition, activity.secondPhotoZoom)}
             className="top-[37%] left-[63%] w-[30%]"
             sizes="(min-width: 1280px) 10vw, (min-width: 768px) 15vw, 26vw"
           />
@@ -162,6 +165,7 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
             height={786}
             sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 85vw"
             className="aspect-square h-auto w-full object-cover"
+            style={framedImageStyle(activity.photoPosition, activity.photoZoom)}
             draggable={false}
           />
         </div>
@@ -177,7 +181,6 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
       )}
 
       <div className="flex min-w-0 flex-col gap-1">
-        <p className="text-sm text-white/75">{eyebrow}</p>
         <h3 className="text-lg font-bold tracking-tight break-keep md:text-xl">{activity.title}</h3>
         <p className="line-clamp-3 text-sm leading-relaxed break-keep text-white/85">
           {activity.description}
@@ -188,10 +191,28 @@ export default function ActivityPoster({ activity, eyebrow, index }: ActivityPos
 }
 
 /** 원형으로 자른 사진 (원형 액자 카드). 그림자 없이 색 바탕 위에 바로 얹는다 */
-function CirclePhoto({ src, className, sizes }: { src: string; className: string; sizes: string }) {
+function CirclePhoto({
+  src,
+  className,
+  sizes,
+  style,
+}: {
+  src: string;
+  className: string;
+  sizes: string;
+  style: CSSProperties;
+}) {
   return (
     <div className={cn("absolute -z-10 aspect-square overflow-hidden rounded-full", className)}>
-      <Image src={src} alt="" fill sizes={sizes} className="object-cover" draggable={false} />
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes={sizes}
+        className="object-cover"
+        style={style}
+        draggable={false}
+      />
     </div>
   );
 }

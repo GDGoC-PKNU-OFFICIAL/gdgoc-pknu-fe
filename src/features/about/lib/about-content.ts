@@ -5,28 +5,12 @@
 //   코드에 들어 있던 data/about · rules · faq 를 그대로 옮긴 것이라 첫 저장 전후로 화면이 같다.
 // - toPosterActivity · toRuleDoc: API 모양 → ActivityPoster · 규칙 상세가 그리는 모양.
 
-import {
-  ABOUT_ACTIVITY_GROUPS as DATA_GROUPS,
-  ACTIVITIES,
-  type Activity,
-  IDENTITY,
-} from "@/data/about";
+import { ABOUT_ACTIVITY_ORDER, ACTIVITIES, type Activity, IDENTITY } from "@/data/about";
 import { FAQ } from "@/data/faq";
 import { RULES, type RuleDoc } from "@/data/rules";
-import type {
-  AboutActivityGroup,
-  AboutActivityItem,
-  AboutActivityTone,
-  AboutContent,
-} from "@/types/api";
+import type { AboutActivityItem, AboutActivityTone, AboutContent } from "@/types/api";
 
 import { parseRuleMarkdown, ruleToMarkdown } from "./rule-markdown";
-
-/** 카드 제목 위 작은 글씨 */
-export const ACTIVITY_GROUP_LABELS = {
-  activity: "GDGoC PKNU 활동",
-  "free-content": "무료 학습 콘텐츠",
-} satisfies Record<AboutActivityGroup, string>;
 
 /**
  * 카드 바탕 (Tailwind 가 찾을 수 있게 클래스를 통째로). auto 는 ActivityPoster 의 순서대로 돌아가는 기본 색.
@@ -67,27 +51,32 @@ export function toneBackground(tone: AboutActivityTone): string | undefined {
 export function toPosterActivity(item: AboutActivityItem): Activity {
   const base: Activity = {
     title: item.title,
-    cadence: item.cadence,
     description: item.description,
     background: TONE_BACKGROUNDS[item.tone],
   };
   const image = item.imageUrl;
+  // 사진에서 보일 곳 · 확대 배율 (모든 사진 모양 공통, circles 는 큰 원 · 작은 원 따로)
+  const frame = { photoPosition: item.imagePosition, photoZoom: item.imageZoom };
   switch (item.layout) {
     case "cover":
     case "square":
     case "top":
-      return image
-        ? { ...base, photo: image, photoLayout: item.layout, photoPosition: item.imagePosition }
-        : base;
+      return image ? { ...base, ...frame, photo: image, photoLayout: item.layout } : base;
     case "artwork":
-      return image ? { ...base, artwork: image } : base;
+      return image ? { ...base, ...frame, artwork: image } : base;
     case "logo":
       return { ...base, logo: true };
     case "circles":
       return image && item.secondImageUrl
-        ? { ...base, circles: [image, item.secondImageUrl] as const }
+        ? {
+            ...base,
+            ...frame,
+            circles: [image, item.secondImageUrl] as const,
+            secondPhotoPosition: item.secondImagePosition,
+            secondPhotoZoom: item.secondImageZoom,
+          }
         : image
-          ? { ...base, photo: image, photoLayout: "square" }
+          ? { ...base, ...frame, photo: image, photoLayout: "square" }
           : base;
     default:
       return base;
@@ -106,11 +95,9 @@ function toneOf(activity: Activity): AboutActivityTone {
   return (entry?.[0] as AboutActivityTone | undefined) ?? "auto";
 }
 
-function fromStaticActivity(activity: Activity, group: AboutActivityGroup): AboutActivityItem {
+function fromStaticActivity(activity: Activity): AboutActivityItem {
   const common = {
-    group,
     title: activity.title,
-    cadence: activity.cadence,
     description: activity.description,
     tone: toneOf(activity),
   };
@@ -135,16 +122,10 @@ function fromStaticActivity(activity: Activity, group: AboutActivityGroup): Abou
   return { ...common, layout: "color" };
 }
 
-const GROUP_CODES = ["activity", "free-content"] as const satisfies readonly AboutActivityGroup[];
-
 export const DEFAULT_ABOUT: AboutContent = {
   identity: [...IDENTITY.paragraphs],
-  activities: DATA_GROUPS.flatMap(({ titles }, groupIndex) =>
-    titles.flatMap((title) =>
-      ACTIVITIES.items
-        .filter((item) => item.title === title)
-        .map((item) => fromStaticActivity(item, GROUP_CODES[groupIndex])),
-    ),
+  activities: ABOUT_ACTIVITY_ORDER.flatMap((title) =>
+    ACTIVITIES.items.filter((item) => item.title === title).map(fromStaticActivity),
   ),
   rules: RULES.items.map((doc) => ({
     slug: doc.slug,

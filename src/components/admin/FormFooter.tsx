@@ -29,27 +29,35 @@ export default function FormFooter({ cancelHref, pending, slow, draftSavedAt }: 
       : "";
 
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-6 md:px-6">
-      <p aria-live="polite" className="min-h-5 text-xs text-ink-muted">
-        {status}
-      </p>
-      <div className="flex gap-2 sm:justify-end">
-        <Link
-          href={cancelHref}
-          aria-disabled={pending || undefined}
-          className={buttonStyles({
-            variant: "secondary",
-            className: pending
-              ? "pointer-events-none flex-1 opacity-50 sm:flex-none"
-              : "flex-1 sm:flex-none",
-          })}
-        >
-          취소
-        </Link>
-        <Button type="submit" disabled={pending} className="flex-1 sm:flex-none">
-          {pending ? "저장 중…" : "저장"}
-        </Button>
+    <>
+      {/* 아래 고정 바가 폼 끝을 가리지 않도록 바 높이만큼 자리를 비워 둔다 */}
+      <div aria-hidden="true" className="h-28 sm:h-20" />
+      {/*
+        화면 맨 아래에 늘 붙인다 (sticky 는 내용이 화면보다 짧으면 내용 바로 아래에 떠 버린다 — 사이트 설정처럼 짧은 폼).
+        데스크톱은 사이드바(md:w-56) 오른쪽부터, 모바일은 사이드바가 위쪽 띠라 화면 전체 폭이다.
+      */}
+      <div className="fixed inset-x-0 bottom-0 z-10 flex flex-col gap-2 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:left-56 md:px-6">
+        <p aria-live="polite" className="min-h-5 text-xs text-ink-muted">
+          {status}
+        </p>
+        <div className="flex gap-2 sm:justify-end">
+          <Link
+            href={cancelHref}
+            aria-disabled={pending || undefined}
+            className={buttonStyles({
+              variant: "secondary",
+              className: pending
+                ? "pointer-events-none flex-1 opacity-50 sm:flex-none"
+                : "flex-1 sm:flex-none",
+            })}
+          >
+            취소
+          </Link>
+          <Button type="submit" disabled={pending} className="flex-1 sm:flex-none">
+            {pending ? "저장 중…" : "저장"}
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
