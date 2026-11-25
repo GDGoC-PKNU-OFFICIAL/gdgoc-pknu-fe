@@ -157,32 +157,35 @@ export default function SettingsForm({ setting }: SettingsFormProps) {
               description="홈 맨 위 배경 사진입니다. 비워 두면 기본 사진이 보입니다."
             >
               <div className="flex flex-wrap items-start gap-6">
-                <Controller
-                  control={control}
-                  name="heroImageUrl"
-                  render={({ field: image, fieldState }) => (
-                    <ImageUploadField
-                      id="settings-heroImageUrl"
-                      legend="사진"
-                      target="hero"
-                      value={image.value}
-                      onChange={(next) => {
-                        image.onChange(next);
-                        // 다른 사진이면 전 사진에 맞춘 위치는 뜻이 없다
-                        if (next !== image.value) {
-                          form.setValue("heroImagePosition", "", { shouldDirty: true });
-                        }
-                      }}
-                      onBlur={image.onBlur}
-                      ref={image.ref}
-                      fallbackSrc={HERO.photo.src}
-                      aspect="video"
-                      error={fieldState.error?.message}
-                      onStatusChange={setHeroUpload}
-                      onBeforeUpload={draft.saveNow}
-                    />
-                  )}
-                />
+                {/* 16:9 미리보기(w-full)가 0 폭으로 줄지 않도록 칸 폭을 정해 둔다 */}
+                <div className="w-full max-w-64">
+                  <Controller
+                    control={control}
+                    name="heroImageUrl"
+                    render={({ field: image, fieldState }) => (
+                      <ImageUploadField
+                        id="settings-heroImageUrl"
+                        legend="사진"
+                        target="hero"
+                        value={image.value}
+                        onChange={(next) => {
+                          image.onChange(next);
+                          // 다른 사진이면 전 사진에 맞춘 위치는 뜻이 없다
+                          if (next !== image.value) {
+                            form.setValue("heroImagePosition", "", { shouldDirty: true });
+                          }
+                        }}
+                        onBlur={image.onBlur}
+                        ref={image.ref}
+                        fallbackSrc={HERO.photo.src}
+                        aspect="video"
+                        error={fieldState.error?.message}
+                        onStatusChange={setHeroUpload}
+                        onBeforeUpload={draft.saveNow}
+                      />
+                    )}
+                  />
+                </div>
                 {values.heroImageUrl && (
                   <Controller
                     control={control}
