@@ -25,7 +25,7 @@ export default async function AdminProjectEditPage({
   if (!isValidId(id)) notFound();
 
   return (
-    <section className="flex flex-col gap-6 px-4 pt-8 md:px-8">
+    <section className="flex flex-col gap-6 px-4 pt-5 md:px-6">
       <AdminPageHeader title="프로젝트 수정" />
       <ProjectEditScreen id={Number(id)} />
     </section>

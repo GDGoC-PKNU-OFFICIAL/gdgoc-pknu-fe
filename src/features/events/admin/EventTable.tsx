@@ -56,35 +56,35 @@ export default function EventTable({
   const positions = dayPositions(events);
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
       <table className="w-full min-w-[52rem] text-left text-sm">
         <caption className="sr-only">일정 목록</caption>
-        <thead className="border-b border-line bg-surface-muted text-xs text-ink-muted">
+        <thead className="sticky top-0 z-[1] border-b border-line bg-surface-muted text-xs font-semibold text-ink-muted">
           <tr>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               날짜
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               순서
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               제목
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               카테고리
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               장소
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               수정
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               삭제
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-y divide-line [&>tr]:transition-colors [&>tr:hover]:bg-brand-blue/[0.04] [&>tr:nth-child(even)]:bg-surface-muted/40">
           {events.map((event) => {
             const position = positions.get(event.id) ?? { index: 0, count: 1 };
             const sameDayContinued = position.index > 0;
@@ -100,7 +100,7 @@ export default function EventTable({
                 >
                   {formatEventDate(event)}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-3 py-1.5">
                   {showOrder ? (
                     <div className="flex items-center gap-1">
                       <span className="w-5 text-center text-xs text-ink-muted tabular-nums">
@@ -137,7 +137,7 @@ export default function EventTable({
                     </span>
                   )}
                 </th>
-                <td className="px-4 py-2 whitespace-nowrap">
+                <td className="px-3 py-1.5 whitespace-nowrap">
                   <span className="inline-flex items-center gap-2">
                     <span
                       aria-hidden="true"
@@ -150,7 +150,7 @@ export default function EventTable({
                   </span>
                 </td>
                 <td className="max-w-48 truncate px-4 py-2 text-ink-muted">{event.place ?? "—"}</td>
-                <td className="px-2 py-2 text-center">
+                <td className="px-2 py-1.5 text-center">
                   <Link
                     href={eventEditHref(event.id)}
                     aria-label={`${event.title} 수정`}
@@ -170,7 +170,7 @@ export default function EventTable({
                     </svg>
                   </Link>
                 </td>
-                <td className="px-2 py-2 text-center">
+                <td className="px-2 py-1.5 text-center">
                   <button
                     type="button"
                     aria-label={`${event.title} 삭제`}

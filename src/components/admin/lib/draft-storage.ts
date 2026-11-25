@@ -17,7 +17,7 @@ export const DRAFT_KEY_PREFIX = "gdg-admin-draft:";
 const DRAFT_VERSION = 1;
 
 /** 임시 저장 대상 (IA 8-6): 4개 리소스의 등록 · 수정 폼 + 사이트 설정 */
-export type DraftResource = AdminResource | "settings";
+export type DraftResource = AdminResource | "settings" | "about";
 
 export interface Draft<T> {
   version: typeof DRAFT_VERSION;
@@ -31,6 +31,9 @@ export interface Draft<T> {
 
 /** 사이트 설정(A-50)은 단일 레코드라 id 가 없다 — "gdg-admin-draft:settings" */
 export const SETTINGS_DRAFT_KEY = `${DRAFT_KEY_PREFIX}settings`;
+
+/** About 도 단일 레코드 — "gdg-admin-draft:about" */
+export const ABOUT_DRAFT_KEY = `${DRAFT_KEY_PREFIX}about`;
 
 /** @example draftKey("projects", "new") // "gdg-admin-draft:projects:new" */
 export function draftKey(resource: DraftResource, id: number | "new"): string {

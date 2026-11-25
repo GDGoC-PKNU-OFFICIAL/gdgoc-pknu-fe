@@ -27,7 +27,7 @@ export default function AdminStudiesPage() {
           </Link>
         }
       />
-      <Suspense fallback={<Skeleton className="h-96 w-full rounded-2xl" />}>
+      <Suspense fallback={<Skeleton className="h-96 w-full rounded-lg" />}>
         <StudyListScreen />
       </Suspense>
     </section>

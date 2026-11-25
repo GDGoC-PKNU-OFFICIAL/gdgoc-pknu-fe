@@ -182,7 +182,7 @@ export default function EventListScreen() {
         ) : !current.ok ? (
           <div
             role="alert"
-            className="flex flex-col items-center gap-4 rounded-2xl border border-line bg-surface px-6 py-12 text-center"
+            className="flex flex-col items-center gap-4 rounded-lg border border-line bg-surface px-6 py-12 text-center"
           >
             <p className="text-sm text-ink-muted">{current.message}</p>
             <Button variant="secondary" onClick={() => setReloadCount((count) => count + 1)}>
@@ -284,7 +284,7 @@ function ListSkeleton({ notice }: { notice: string | null }) {
       <p className="min-h-5 text-sm text-ink-muted">
         {notice ?? <span className="sr-only">불러오는 중</span>}
       </p>
-      <div className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-4">
+      <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-12 w-full" />
         ))}

@@ -23,7 +23,7 @@ export default async function AdminEventEditPage({ params }: PageProps<"/admin/e
   if (!isValidId(id)) notFound();
 
   return (
-    <section className="flex flex-col gap-6 px-4 pt-8 md:px-8">
+    <section className="flex flex-col gap-6 px-4 pt-5 md:px-6">
       <AdminPageHeader title="일정 수정" />
       <EventEditScreen id={Number(id)} />
     </section>

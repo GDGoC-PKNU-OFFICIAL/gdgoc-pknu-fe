@@ -94,6 +94,8 @@ export interface Study extends ResourceMeta {
   slug: string;
   title: string;
   summary: string;
+  /** 스터디 소개 문단. 나중에 생긴 필드라 없을 수 있다 → 빈 배열과 같다 (상세에서 소개 칸을 숨김) */
+  description?: string[];
   topic: string;
   status: ContentStatus;
   period: MonthPeriod;
@@ -156,40 +158,29 @@ export interface EventItem extends ResourceMeta {
 export const MEMBER_STATUSES = ["core", "senior"] as const;
 export type MemberStatus = (typeof MEMBER_STATUSES)[number];
 
-/** 배열 순서 = 코어멤버 카드 정렬 순서 (3-10) */
-export const MEMBER_ROLES = ["lead", "part-lead", "core"] as const;
-export type MemberRole = (typeof MEMBER_ROLES)[number];
-
-export const MEMBER_PARTS = ["frontend", "backend", "mobile", "ai-ml", "design"] as const;
-export type MemberPart = (typeof MEMBER_PARTS)[number];
-
 interface MemberBase extends ResourceMeta {
   name: string;
   photoUrl?: string; // 없으면 기본 이미지
   department: string;
   history: string[]; // 최대 2개
   interests: string[]; // 최대 3개
-  part: MemberPart;
+  /** 분야 — 관리자가 직접 적은 글자 그대로 카드에 보인다 (예: "백엔드", "DevOps") */
+  part: string;
   bio: string; // 최대 60자
-  links: { github?: string; homepage?: string };
+  links: { github?: string; email?: string };
+  /** 같은 구분 안에서의 표시 순서 (작을수록 앞). 관리자 목록의 ↑↓ 로 바꾼다 (PUT /members/order) */
+  sortOrder: number;
 }
 
-/** 코어멤버 — role 이 반드시 있다 */
 export interface CoreMember extends MemberBase {
   status: "core";
-  role: MemberRole;
 }
 
-/** 시니어 — role 이 없다 (응답에서 생략) */
 export interface SeniorMember extends MemberBase {
   status: "senior";
-  role?: never;
 }
 
-/**
- * 공개 응답용 멤버. `status` 로 좁히면 `role` 도 함께 좁혀진다.
- * @example if (m.status === "core") m.role // MemberRole (undefined 아님)
- */
+/** 공개 응답용 멤버. 응답은 이미 구분 → 표시 순서로 정렬되어 온다 */
 export type Member = CoreMember | SeniorMember;
 
 /** 관리자 응답용 멤버. 공개 응답에는 consentConfirmedAt 이 없다 */
@@ -202,13 +193,10 @@ export type AdminMember = Member & { consentConfirmedAt: IsoDateTime };
 export interface SiteStat {
   label: string;
   value: number;
-  unit?: string;
-  suffix?: string;
 }
 
 export interface SiteSetting {
   recruiting: boolean;
-  bannerText: string;
   recruitPeriod?: DatePeriod;
   stats: SiteStat[]; // 정확히 4개
   updatedAt: IsoDateTime;
@@ -257,7 +245,7 @@ export interface SlugCheckResponse {
 }
 
 /** 업로드 대상 → 파일 키 접두사 projects/ · members/ */
-export const UPLOAD_TARGETS = ["project", "member"] as const;
+export const UPLOAD_TARGETS = ["project", "member", "about"] as const;
 export type UploadTarget = (typeof UPLOAD_TARGETS)[number];
 
 /** 허용 이미지 형식 (PresignRequest · ImageUploadField accept · config 공용) */
@@ -279,11 +267,95 @@ export interface HealthResponse {
 }
 
 /** 재검증 가능한 공개 경로 (4-9 허용 목록). /about · /privacy 는 정적이라 제외 */
-export const REVALIDATABLE_PATHS = ["/", "/projects", "/studies", "/events", "/members"] as const;
+export const REVALIDATABLE_PATHS = [
+  "/",
+  "/about",
+  "/projects",
+  "/studies",
+  "/events",
+  "/members",
+] as const;
 export type RevalidatablePath = (typeof REVALIDATABLE_PATHS)[number];
 
 export interface RevalidateResponse {
   revalidated: true;
   paths: RevalidatablePath[];
   now: number;
+}
+
+// ============================================================
+// About (관리자가 수정하는 About 페이지 내용)
+// ============================================================
+
+/** 카드 모양 (ActivityPoster) */
+export const ABOUT_ACTIVITY_LAYOUTS = [
+  "color",
+  "cover",
+  "square",
+  "top",
+  "artwork",
+  "logo",
+  "circles",
+] as const;
+export type AboutActivityLayout = (typeof ABOUT_ACTIVITY_LAYOUTS)[number];
+
+/** 카드 바탕색. auto 면 순서대로 돌아가는 기본 색 */
+export const ABOUT_ACTIVITY_TONES = [
+  "auto",
+  "blue",
+  "green",
+  "coral",
+  "orange",
+  "navy",
+  "gray",
+  "purple",
+  "forest",
+  "plum",
+] as const;
+export type AboutActivityTone = (typeof ABOUT_ACTIVITY_TONES)[number];
+
+export const RULE_ICONS = ["book", "person", "badge"] as const;
+export type RuleIconCode = (typeof RULE_ICONS)[number];
+
+/** What We Do 카드 한 장. 목록 순서가 곧 About · 홈 화면 순서다 */
+export interface AboutActivityItem {
+  title: string;
+  description: string;
+  layout: AboutActivityLayout;
+  /** R2 업로드(about/) 또는 사이트 기본 그림(/images/…) */
+  imageUrl?: string;
+  /** circles 의 작은 원 */
+  secondImageUrl?: string;
+  /** 사진에서 카드에 보일 곳 (예: "35% 50%" = object-position). 없으면 모양마다 정한 기본 위치 */
+  imagePosition?: string;
+  /** 사진 확대 배율 % (100~300). 없으면 100 */
+  imageZoom?: number;
+  /** circles 의 작은 원 사진에서 보일 곳 · 확대 배율 */
+  secondImagePosition?: string;
+  secondImageZoom?: number;
+  tone: AboutActivityTone;
+}
+
+export interface AboutRuleItem {
+  slug: string;
+  title: string;
+  icon: RuleIconCode;
+  /** 마크다운 본문 (features/about/lib/rule-markdown.ts 가 해석하는 문법만) */
+  body: string;
+}
+
+export interface AboutFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface AboutContent {
+  /** Who We Are 문단. 문단 안의 
+ 은 줄바꿈 */
+  identity: string[];
+  activities: AboutActivityItem[];
+  rules: AboutRuleItem[];
+  faq: AboutFaqItem[];
+  /** 저장한 적이 없으면(코드 기본 내용) 없다 */
+  updatedAt?: IsoDateTime;
 }

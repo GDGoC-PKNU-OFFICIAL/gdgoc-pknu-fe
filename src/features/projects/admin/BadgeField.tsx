@@ -28,6 +28,16 @@ interface BadgeFieldProps {
   error?: string;
 }
 
+/** 색 고르기 버튼의 진한 색 점 (배지 글자 색과 같은 계열, 관리자는 라이트 테마라 한 벌만) */
+const SWATCH_COLORS = {
+  blue: "#1a73e8",
+  green: "#1e8e3e",
+  red: "#d93025",
+  yellow: "#f9ab00",
+  purple: "#8430ce",
+  gray: "#80868b",
+} satisfies Record<BadgeColor, string>;
+
 function isProjectCategory(value: string): value is ProjectCategory {
   return (PROJECT_CATEGORIES as readonly string[]).includes(value);
 }
@@ -71,28 +81,50 @@ export default function BadgeField({ register, label, color, category, error }: 
           />
         </div>
 
-        <div
-          role="radiogroup"
-          aria-label="배지 색"
-          className={cn("flex flex-wrap gap-2", !trimmed && "opacity-50")}
-        >
-          {BADGE_COLORS.map((value) => (
-            <label key={value} className="cursor-pointer">
-              <input
-                type="radio"
-                value={value}
-                className="peer sr-only"
-                {...register("badge.color")}
-              />
-              <Badge
-                tone={BADGE_COLOR_TONES[value]}
-                className="min-h-9 px-3.5 ring-offset-2 ring-offset-surface peer-checked:ring-2 peer-checked:ring-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-brand-blue"
-              >
-                {BADGE_COLOR_LABELS[value]}
-              </Badge>
-            </label>
-          ))}
+        {/*
+          색 고르기 — 연한 배지 모양 그대로 두면 글자 · 바탕이 모두 흐려 잘 안 보인다.
+          진한 색 점 + 진한 글자로 그리고, 고른 색은 진한 테두리 + ✓ 로 표시한다. 실제 모양은 아래 미리보기에서 본다.
+        */}
+        <div role="radiogroup" aria-label="배지 색" className="flex flex-wrap gap-2">
+          {BADGE_COLORS.map((value) => {
+            const selected = value === color;
+            return (
+              <label key={value} className="cursor-pointer">
+                <input
+                  type="radio"
+                  value={value}
+                  className="peer sr-only"
+                  {...register("badge.color")}
+                />
+                <span
+                  className={cn(
+                    "flex min-h-10 items-center gap-2 rounded-full border bg-surface px-3.5 text-sm font-medium text-ink transition-colors",
+                    "hover:bg-surface-muted",
+                    "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-blue",
+                    selected ? "border-2 border-ink bg-surface-muted" : "border-line",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="size-3.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: SWATCH_COLORS[value] }}
+                  />
+                  {BADGE_COLOR_LABELS[value]}
+                  {selected && (
+                    <span aria-hidden="true" className="text-xs">
+                      ✓
+                    </span>
+                  )}
+                </span>
+              </label>
+            );
+          })}
         </div>
+        {!trimmed && (
+          <p className="text-xs text-ink-muted">
+            배지 글자를 적으면 고른 색으로 보입니다. 지금은 유형 기본 색으로 보입니다.
+          </p>
+        )}
 
         {preview && (
           <p className="flex items-center gap-2 text-xs text-ink-muted">

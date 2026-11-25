@@ -76,6 +76,11 @@ export const studyFormSchema = z.object({
       }),
     )
     .max(L.outputs.max, MESSAGES.maxItems(L.outputs.max)),
+  // 스터디 소개 (선택). 소개가 생기기 전에 저장된 임시 저장본에는 없으므로 빈 배열로 채운다
+  description: z
+    .array(listItem(L.description.itemLength))
+    .max(L.description.max, MESSAGES.maxItems(L.description.max))
+    .default([]),
 });
 
 /** 폼이 들고 있는 값 (입력 중 · 임시 저장본) */
@@ -94,6 +99,7 @@ export function emptyStudyForm(): StudyFormValues {
     participants: [],
     format: "",
     outputs: [],
+    description: [],
   };
 }
 
@@ -109,6 +115,7 @@ export function studyToForm(study: Study): StudyFormValues {
     participants: [...study.participants],
     format: study.format ?? "",
     outputs: study.outputs.map(({ label, url }) => ({ label, url })),
+    description: [...(study.description ?? [])],
   };
 }
 
@@ -124,5 +131,6 @@ export function toStudyRequest(values: StudyFormOutput): StudyRequest {
     participants: values.participants,
     format: values.format || null,
     outputs: values.outputs,
+    description: values.description,
   };
 }

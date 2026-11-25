@@ -17,14 +17,15 @@ import Button, { buttonStyles } from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
 import Skeleton from "@/components/ui/Skeleton";
 import { ADMIN_LIST_PAGE_SIZE } from "@/constants/config";
-import { MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from "@/constants/labels";
+import { MEMBER_STATUS_LABELS } from "@/constants/labels";
 import { ADMIN_ROUTES } from "@/constants/routes";
-import { deleteMember, getAdminMembers } from "@/lib/api/admin-api";
+import { deleteMember, getAdminMembers, reorderMembers } from "@/lib/api/admin-api";
 import { ApiError } from "@/lib/api/api-error";
-import { type AdminMember, MEMBER_ROLES, MEMBER_STATUSES } from "@/types/api";
+import { type AdminMember, MEMBER_STATUSES } from "@/types/api";
 import type { Page } from "@/types/common";
 
 import {
+  canReorder,
   hasActiveFilters,
   MEMBER_SORTS,
   type MemberListState,
@@ -32,13 +33,18 @@ import {
   toMemberListQuery,
   toMemberListSearch,
 } from "./member-list-query";
+import { loadStatusIds, moveId } from "./member-order";
 import MemberTable from "./MemberTable";
 
 const STATUS_OPTIONS = MEMBER_STATUSES.map((value) => ({
   value,
   label: MEMBER_STATUS_LABELS[value],
 }));
-const ROLE_OPTIONS = MEMBER_ROLES.map((value) => ({ value, label: MEMBER_ROLE_LABELS[value] }));
+
+const MESSAGES = {
+  reordered: "순서를 바꿨습니다. Members 화면에 곧 반영됩니다.",
+  reorderStale: "멤버 목록이 바뀌어 순서를 저장하지 못했습니다. 목록을 새로 불러왔습니다.",
+} as const;
 
 type LoadResult =
   { key: string; ok: true; page: Page<AdminMember> } | { key: string; ok: false; message: string };
@@ -46,6 +52,7 @@ type LoadResult =
 /**
  * A-41 멤버 목록 (IA 8-3). 검색 · 필터 · 정렬 · 페이지는 URL 쿼리에 두고, 데이터는 BFF 로 가져온다.
  * 결과를 요청 키(쿼리 + 새로고침 횟수)와 함께 저장해, 키가 바뀌면 이전 결과 대신 로딩을 보여 준다.
+ * 공개 Members 화면 순서는 ↑↓ 로 바꾸고 바로 저장한다 (PUT /members/order, 구분마다 따로).
  */
 export default function MemberListScreen() {
   const router = useRouter();
@@ -56,7 +63,9 @@ export default function MemberListScreen() {
   const [reloadCount, setReloadCount] = useState(0);
   const [result, setResult] = useState<LoadResult | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminMember | null>(null);
+  const [movingId, setMovingId] = useState<number | null>(null);
   const { run, pending: deleting } = useAdminMutation();
+  const reorder = useAdminMutation();
 
   const search = toMemberListSearch(state);
   const requestKey = `${search}#${reloadCount}`;
@@ -105,6 +114,25 @@ export default function MemberListScreen() {
     else setReloadCount((count) => count + 1);
   }
 
+  /** 순서 변경 — 그 구분의 id 전체를 서버에서 다시 읽어 옮긴 뒤 저장한다 (member-order.ts) */
+  async function moveMember(member: AdminMember, delta: -1 | 1) {
+    setMovingId(member.id);
+    await reorder.run(
+      async () => {
+        const ids = await loadStatusIds(member.status);
+        const next = moveId(ids, member.id, delta);
+        if (next) await reorderMembers({ status: member.status, ids: next });
+      },
+      {
+        successMessage: MESSAGES.reordered,
+        onError: (error) => (error.status === 400 ? MESSAGES.reorderStale : undefined),
+      },
+    );
+    setMovingId(null);
+    // 실패해도 다시 불러온다 — 화면 순서를 서버와 맞춘다
+    setReloadCount((count) => count + 1);
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <ListToolbar
@@ -122,14 +150,6 @@ export default function MemberListScreen() {
           className="w-auto"
         />
         <Select
-          aria-label="역할"
-          placeholder="역할 전체"
-          options={ROLE_OPTIONS}
-          value={state.role}
-          onChange={(e) => update({ role: e.target.value as MemberListState["role"] })}
-          className="w-auto"
-        />
-        <Select
           aria-label="정렬"
           options={MEMBER_SORTS}
           value={state.sort}
@@ -144,7 +164,7 @@ export default function MemberListScreen() {
         ) : !current.ok ? (
           <div
             role="alert"
-            className="flex flex-col items-center gap-4 rounded-2xl border border-line bg-surface px-6 py-12 text-center"
+            className="flex flex-col items-center gap-4 rounded-lg border border-line bg-surface px-6 py-12 text-center"
           >
             <p className="text-sm text-ink-muted">{current.message}</p>
             <Button variant="secondary" onClick={() => setReloadCount((count) => count + 1)}>
@@ -161,8 +181,19 @@ export default function MemberListScreen() {
           <>
             <p className="text-sm text-ink-muted">
               총 <strong className="font-semibold text-ink">{current.page.totalItems}</strong>명
+              {!canReorder(state) && (
+                <span className="ml-2 text-xs">
+                  · 순서는 검색 없이 &lsquo;공개 화면 순서&rsquo;로 볼 때 바꿀 수 있습니다.
+                </span>
+              )}
             </p>
-            <MemberTable members={current.page.items} onDelete={setDeleteTarget} />
+            <MemberTable
+              members={current.page.items}
+              reorderable={canReorder(state)}
+              movingId={movingId}
+              onMove={moveMember}
+              onDelete={setDeleteTarget}
+            />
             <Pagination
               page={current.page.page}
               totalPages={current.page.totalPages}
@@ -235,7 +266,7 @@ function ListSkeleton({ notice }: { notice: string | null }) {
       <p className="min-h-5 text-sm text-ink-muted">
         {notice ?? <span className="sr-only">불러오는 중</span>}
       </p>
-      <div className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-4">
+      <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-4">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-12 w-full" />
         ))}

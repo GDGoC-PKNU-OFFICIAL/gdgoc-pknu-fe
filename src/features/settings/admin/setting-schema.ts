@@ -26,8 +26,6 @@ const MESSAGES = {
 
 const optionalDate = z.string().refine((value) => value === "" || isIsoDate(value), MESSAGES.date);
 
-const optionalText = (max: number) => z.string().trim().max(max, MESSAGES.maxLength(max));
-
 const statSchema = z.object({
   label: z
     .string()
@@ -39,17 +37,10 @@ const statSchema = z.object({
     .number({ error: MESSAGES.value })
     .int(MESSAGES.value)
     .min(L.stats.minValue, MESSAGES.value),
-  unit: optionalText(L.stats.unitLength),
-  suffix: optionalText(L.stats.suffixLength),
 });
 
 export const settingFormSchema = z.object({
   recruiting: z.boolean(),
-  bannerText: z
-    .string()
-    .trim()
-    .min(1, MESSAGES.required)
-    .max(L.bannerText, MESSAGES.maxLength(L.bannerText)),
   recruitPeriod: z
     .object({ start: optionalDate, end: optionalDate })
     .superRefine(({ start, end }, ctx) => {
@@ -76,9 +67,8 @@ export function emptySettingForm(): SettingFormValues {
   const labels = ["운영 기수", "누적 멤버", "완료 프로젝트", "세션 · 이벤트"];
   return {
     recruiting: false,
-    bannerText: "",
     recruitPeriod: { start: "", end: "" },
-    stats: labels.map((label) => ({ label, value: 0, unit: "", suffix: "" })),
+    stats: labels.map((label) => ({ label, value: 0 })),
   };
 }
 
@@ -87,13 +77,10 @@ export function settingToForm(setting: SiteSetting): SettingFormValues {
   const stats = setting.stats.slice(0, L.stats.count).map((stat) => ({
     label: stat.label,
     value: stat.value,
-    unit: stat.unit ?? "",
-    suffix: stat.suffix ?? "",
   }));
-  while (stats.length < L.stats.count) stats.push({ label: "", value: 0, unit: "", suffix: "" });
+  while (stats.length < L.stats.count) stats.push({ label: "", value: 0 });
   return {
     recruiting: setting.recruiting,
-    bannerText: setting.bannerText,
     recruitPeriod: {
       start: setting.recruitPeriod?.start ?? "",
       end: setting.recruitPeriod?.end ?? "",
@@ -107,13 +94,7 @@ export function toSettingRequest(values: SettingFormOutput): SettingRequest {
   const { start, end } = values.recruitPeriod;
   return {
     recruiting: values.recruiting,
-    bannerText: values.bannerText,
     recruitPeriod: start && end ? { start, end } : null,
-    stats: values.stats.map((stat) => ({
-      label: stat.label,
-      value: stat.value,
-      unit: stat.unit || null,
-      suffix: stat.suffix || null,
-    })),
+    stats: values.stats.map((stat) => ({ label: stat.label, value: stat.value })),
   };
 }

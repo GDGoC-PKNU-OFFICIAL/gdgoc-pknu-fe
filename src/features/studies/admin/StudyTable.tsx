@@ -22,38 +22,38 @@ interface StudyTableProps {
  */
 export default function StudyTable({ studies, onDelete }: StudyTableProps) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
       <table className="w-full min-w-[52rem] text-left text-sm">
         <caption className="sr-only">스터디 목록</caption>
-        <thead className="border-b border-line bg-surface-muted text-xs text-ink-muted">
+        <thead className="sticky top-0 z-[1] border-b border-line bg-surface-muted text-xs font-semibold text-ink-muted">
           <tr>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               제목
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               주제
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               상태
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               기간
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               리더
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               수정일
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               수정
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               삭제
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-y divide-line [&>tr]:transition-colors [&>tr:hover]:bg-brand-blue/[0.04] [&>tr:nth-child(even)]:bg-surface-muted/40">
           {studies.map((study) => (
             <tr key={study.id}>
               <th scope="row" className="max-w-64 px-4 py-2 font-medium">
@@ -62,18 +62,18 @@ export default function StudyTable({ studies, onDelete }: StudyTableProps) {
                   {study.slug}
                 </span>
               </th>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <Badge tone="blue">{study.topic}</Badge>
               </td>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <Badge tone={study.status === "current" ? "green" : "neutral"}>
                   {CONTENT_STATUS_LABELS[study.status]}
                 </Badge>
               </td>
-              <td className="px-4 py-2 whitespace-nowrap tabular-nums">
+              <td className="px-3 py-1.5 whitespace-nowrap tabular-nums">
                 {formatMonthPeriod(study.period)}
               </td>
-              <td className="px-4 py-2 whitespace-nowrap">
+              <td className="px-3 py-1.5 whitespace-nowrap">
                 {study.leader}
                 {study.participants.length > 0 && (
                   <span className="ml-1 text-xs text-ink-muted">
@@ -81,10 +81,10 @@ export default function StudyTable({ studies, onDelete }: StudyTableProps) {
                   </span>
                 )}
               </td>
-              <td className="px-4 py-2 whitespace-nowrap text-ink-muted tabular-nums">
+              <td className="px-3 py-1.5 whitespace-nowrap text-ink-muted tabular-nums">
                 {formatKstDateTime(new Date(study.updatedAt))}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <Link
                   href={studyEditHref(study.id)}
                   aria-label={`${study.title} 수정`}
@@ -104,7 +104,7 @@ export default function StudyTable({ studies, onDelete }: StudyTableProps) {
                   </svg>
                 </Link>
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <button
                   type="button"
                   aria-label={`${study.title} 삭제`}

@@ -15,12 +15,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** 관리자 화면은 항상 라이트 테마다 (공개 사이트에서 다크를 골랐어도) */
+/**
+ * 관리자 화면은 항상 라이트 테마다 (공개 사이트에서 다크를 골랐어도).
+ * 글자는 공개 사이트보다 한 단계 크게 쓴다 (globals.css admin-text) — 로그인 화면 포함.
+ */
 export default function AdminRootLayout({ children }: LayoutProps<"/">) {
   return (
-    <>
+    <div className="admin-text">
       <ThemeSync area="admin" />
       {children}
-    </>
+    </div>
   );
 }

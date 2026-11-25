@@ -6,12 +6,13 @@
 // - 서버 계산값(status) · 서버 관리 값(id, sortOrder, consentConfirmedAt, createdAt, updatedAt)은 넣지 않는다.
 
 import type {
+  AboutActivityItem,
+  AboutFaqItem,
+  AboutRuleItem,
   ContentStatus,
   EventCategory,
   ImageContentType,
   IsoDate,
-  MemberPart,
-  MemberRole,
   MemberStatus,
   ProjectBadge,
   ProjectCategory,
@@ -74,6 +75,7 @@ export interface StudyRequest {
   participants: string[]; // 최대 30개, 각 20자 이하 (리더 제외)
   format: string | null; // 30자 이하
   outputs: { label: string; url: string }[]; // 최대 5개, label 30자 이하, url 필수
+  description: string[]; // 0~10문단, 문단당 1,000자 이하
 }
 
 // ============================================================
@@ -110,38 +112,34 @@ interface MemberRequestBase {
   department: string; // 30자 이하
   history: string[]; // 최대 2개, 각 40자 이하
   interests: string[]; // 최대 3개, 각 15자 이하, 중복 불가
-  part: MemberPart;
+  part: string; // 20자 이하, 직접 적는다
   bio: string; // 60자 이하
-  links: { github: string | null; homepage: string | null };
+  links: { github: string | null; email: string | null };
   consentConfirmed: boolean; // false 면 서버가 fieldErrors 로 거부 (zod 에서는 true 강제)
 }
 
-/**
- * 코어멤버면 role 필수, 시니어면 role 은 반드시 null.
- * 폼 상태는 평평하게 두고, toRequest() 의 반환 타입으로 이 규칙을 강제한다.
- */
-export type MemberRequest =
-  | (MemberRequestBase & { status: "core"; role: MemberRole })
-  | (MemberRequestBase & { status: "senior"; role: null });
+/** 표시 순서는 여기서 바꾸지 않는다 — 등록 · 구분 변경 때 서버가 맨 뒤로 두고, 순서 변경은 MemberOrderRequest 로만 */
+export interface MemberRequest extends MemberRequestBase {
+  status: MemberStatus;
+}
+
+/** PUT /members/order — 한 구분의 멤버 id 전부를 보일 순서대로 (누락 · 중복 · 다른 구분 id 는 400) */
+export interface MemberOrderRequest {
+  status: MemberStatus;
+  ids: number[];
+}
 
 // ============================================================
 // 4-7 SettingRequest
 // ============================================================
 
-/**
- * 응답의 SiteStat 은 unit? · suffix? 이지만, 요청은 1-4 규칙에 따라 null 로 보낸다.
- * ⚠️ 명세서 4-7 표가 `unit?` · `suffix?` 로 적혀 있어 1-4 와 충돌 — 백엔드와 null 전송으로 확정 후 명세 수정 필요.
- */
 export interface SiteStatRequest {
   label: string; // 20자 이하
   value: number; // 0 이상 정수
-  unit: string | null; // 10자 이하
-  suffix: string | null; // 5자 이하
 }
 
 export interface SettingRequest {
   recruiting: boolean;
-  bannerText: string; // 60자 이하
   recruitPeriod: { start: IsoDate; end: IsoDate } | null; // 둘 다 입력하거나 null, start ≤ end
   stats: SiteStatRequest[]; // 정확히 4개
 }
@@ -190,11 +188,39 @@ export interface EventListQuery extends ListQueryBase<"date" | "title" | "update
 /** GET /api/admin/members — year 필터 없음. 기본 정렬: 구분 → 역할 순 → 이름 */
 export interface MemberListQuery extends ListQueryBase<"name" | "updatedAt"> {
   status?: MemberStatus;
-  role?: MemberRole;
 }
 
 /** GET /api/admin/{projects|studies}/slug-check */
 export interface SlugCheckQuery {
   slug: string;
   excludeId?: number; // 수정 화면에서 자기 자신 제외
+}
+
+// ============================================================
+// AboutRequest (PUT /api/admin/about — 전체 교체)
+// ============================================================
+
+export interface AboutActivityRequest extends Omit<
+  AboutActivityItem,
+  | "imageUrl"
+  | "secondImageUrl"
+  | "imagePosition"
+  | "imageZoom"
+  | "secondImagePosition"
+  | "secondImageZoom"
+> {
+  imageUrl: string | null;
+  secondImageUrl: string | null;
+  imagePosition: string | null;
+  /** 100~300. null(또는 100)이면 확대하지 않는다 */
+  imageZoom: number | null;
+  secondImagePosition: string | null;
+  secondImageZoom: number | null;
+}
+
+export interface AboutRequest {
+  identity: string[]; // 1~5문단, 문단당 1,000자
+  activities: AboutActivityRequest[]; // 1~12장
+  rules: AboutRuleItem[]; // 최대 6개, slug 중복 불가, body 5,000자
+  faq: AboutFaqItem[]; // 최대 20개
 }

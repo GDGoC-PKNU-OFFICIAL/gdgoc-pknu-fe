@@ -14,26 +14,25 @@ import PageSection, {
 import SectionDivider from "@/components/common/SectionDivider";
 import SectionDoodles from "@/components/common/SectionDoodles";
 import SectionHeader from "@/components/common/SectionHeader";
-import { ABOUT_ACTIVITY_GROUPS, ACTIVITIES } from "@/data/about";
 import { SCHEDULE_SECTION } from "@/data/events";
 import {
   HERO,
   HOME_EVENT_LIMIT,
   HOME_LIST_LIMIT,
   HOME_SECTIONS,
-  HOME_ACTIVITY_TITLES,
   HOME_STUDY_LIMIT,
 } from "@/data/home";
 import { CURRENT_PROJECTS } from "@/data/projects";
 import { SITE } from "@/data/site";
 import { CURRENT_STUDIES } from "@/data/studies";
+import { DEFAULT_ABOUT, toPosterActivity } from "@/features/about/lib/about-content";
 import EventTimeline from "@/features/events/components/EventTimeline";
 import { upcomingEvents } from "@/features/events/lib/filter-upcoming";
 import ProjectShowcaseGrid from "@/features/projects/components/ProjectShowcaseGrid";
 import RecruitBanner from "@/features/settings/components/RecruitBanner";
 import StatsGrid from "@/features/settings/components/StatsGrid";
 import StudyShowcase from "@/features/studies/components/StudyShowcase";
-import { getEvents, getProjects, getSettings, getStudies } from "@/lib/api/public-api";
+import { getAbout, getEvents, getProjects, getSettings, getStudies } from "@/lib/api/public-api";
 import { cn } from "@/lib/cn";
 import { splitByStatus } from "@/lib/split-by-status";
 
@@ -47,12 +46,15 @@ export const metadata: Metadata = {
 // P-00 홈 (IA 4장). 섹션 헤더에 배지를 두지 않는다 (영문 타이틀만). 여러 도메인이 섞이는 화면이라 app 에서 조합한다 (FRONT_ARCHITECTURE § 2 원칙 2).
 // 공개 API 는 정렬된 순서로 주므로 앞에서 잘라 쓴다. 다가오는 일정의 "오늘"은 ISR 시점 값이다 (lib/date.ts 주의문).
 export default async function HomePage() {
-  const [settings, projects, studies, events] = await Promise.all([
+  const [settings, projects, studies, events, about] = await Promise.all([
     getSettings(),
     getProjects(),
     getStudies(),
     getEvents(),
+    getAbout().then((content) => content ?? DEFAULT_ABOUT),
   ]);
+  // What We Do: About 과 같은 카드 전부, 같은 순서 (관리자가 About 에서 고친다)
+  const homeActivities = about.activities;
 
   const currentProjects = splitByStatus(projects).current.slice(0, HOME_LIST_LIMIT);
   const currentStudies = splitByStatus(studies).current.slice(0, HOME_STUDY_LIMIT);
@@ -177,16 +179,13 @@ export default async function HomePage() {
         link={HOME_SECTIONS.about.link}
         decoration={<SectionDoodles preset="about" />}
       >
-        {/* About What We Do 와 같은 포스터 카드 (HOME_ACTIVITY_TITLES 의 4개, About 첫 묶음과 같은 순서 · 같은 색).
-            데스크톱(xl)은 4장이 한 줄에 다 들어와 넘길 게 없고, 그보다 좁으면 About 처럼 옆으로 끌어 넘긴다 */}
+        {/* About What We Do 와 같은 포스터 카드 (같은 순서 · 같은 색).
+            데스크톱(xl)은 4장씩 보이고, 넘치는 카드는 About 처럼 옆으로 끌어 넘긴다 */}
         <EmblaSlider label="What We Do 활동 목록">
-          {HOME_ACTIVITY_TITLES.flatMap((name) =>
-            ACTIVITIES.items.filter((item) => item.title === name),
-          ).map((activity, index) => (
+          {homeActivities.map((item, index) => (
             <ActivityPoster
-              key={activity.title}
-              activity={activity}
-              eyebrow={ABOUT_ACTIVITY_GROUPS[0].eyebrow}
+              key={`${item.title}-${index}`}
+              activity={toPosterActivity(item)}
               index={index}
             />
           ))}

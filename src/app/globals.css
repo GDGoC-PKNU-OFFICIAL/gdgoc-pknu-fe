@@ -611,3 +611,30 @@
     animation: none !important;
   }
 }
+
+/*
+ * 관리자 화면 글자 크기 — 표 · 폼을 오래 읽는 업무 화면이라 공개 사이트보다 한 단계씩 크게 쓴다.
+ * Tailwind 의 text-xs · text-sm … 는 이 변수를 읽으므로(@theme, inline 아님) 관리자 레이아웃 안에서만 바뀐다.
+ * 여백 · 크기(rem)는 그대로 두고 글자만 키운다. 줄 높이는 Tailwind 기본 비율(--text-*--line-height)을 그대로 쓴다.
+ */
+.admin-text {
+  --text-xs: 0.875rem; /* 12 → 14px */
+  --text-sm: 1rem; /* 14 → 16px */
+  --text-base: 1.0625rem; /* 16 → 17px */
+  --text-lg: 1.25rem; /* 18 → 20px */
+  --text-xl: 1.375rem; /* 20 → 22px */
+  --text-2xl: 1.625rem; /* 24 → 26px */
+}
+
+/*
+ * 관리자 화면 안의 공개 화면 미리보기(카드 · 포스터)는 실제 공개 화면과 같은 글자 크기여야 한다
+ * — 미리보기 폭도 공개 화면에 맞춰 두었기 때문에, 글자만 커지면 잘림 · 줄바꿈이 공개 화면과 달라진다.
+ */
+.public-text {
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+}

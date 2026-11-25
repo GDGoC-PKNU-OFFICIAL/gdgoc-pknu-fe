@@ -21,15 +21,14 @@ import { listErrors } from "@/components/admin/lib/list-errors";
 import StringListField from "@/components/admin/StringListField";
 import TagInput from "@/components/admin/TagInput";
 import Input from "@/components/ui/Input";
-import Select from "@/components/ui/Select";
-import { MEMBER_PART_LABELS, MEMBER_ROLE_LABELS, MEMBER_STATUS_LABELS } from "@/constants/labels";
+import { MEMBER_STATUS_LABELS } from "@/constants/labels";
 import { MEMBER_LIMITS } from "@/constants/limits";
 import { ADMIN_ROUTES } from "@/constants/routes";
 import { useToast } from "@/hooks/use-toast";
 import { createMember, updateMember } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
 import { formatKstDateTime } from "@/lib/date";
-import { type AdminMember, MEMBER_PARTS, MEMBER_ROLES, MEMBER_STATUSES } from "@/types/api";
+import { type AdminMember, MEMBER_STATUSES } from "@/types/api";
 
 import { DEFAULT_MEMBER_IMAGE } from "../lib/member-labels";
 
@@ -44,9 +43,6 @@ import {
 import MemberCardPreview from "./MemberCardPreview";
 
 const L = MEMBER_LIMITS;
-
-const ROLE_OPTIONS = MEMBER_ROLES.map((value) => ({ value, label: MEMBER_ROLE_LABELS[value] }));
-const PART_OPTIONS = MEMBER_PARTS.map((value) => ({ value, label: MEMBER_PART_LABELS[value] }));
 
 const MESSAGES = {
   saved: "저장했습니다. 사이트에 곧 반영됩니다.",
@@ -64,7 +60,7 @@ interface MemberFormProps {
  * A-42 · A-43 멤버 등록 · 수정 폼 (IA 8-4 · FRONT_ARCHITECTURE § 5-4).
  * 프로젝트 · 스터디 폼과 같은 엔진(react-hook-form + zod + useDraft + useAdminMutation)에
  * 프로필 사진 업로드(ImageUploadField) · 플립 카드 미리보기 · 공개 동의 확인이 붙는다.
- * 시니어를 고르면 역할 칸을 숨기고 role: null 로 보낸다 (명세 2-7).
+ * 공개 화면 순서는 이 폼이 아니라 멤버 목록의 ↑↓ 로 정한다.
  */
 export default function MemberForm({ member }: MemberFormProps) {
   const router = useRouter();
@@ -80,7 +76,6 @@ export default function MemberForm({ member }: MemberFormProps) {
     formState: { errors, isDirty },
   } = form;
   const values = useWatch({ control });
-  const isCore = values.status === "core";
 
   const draft = useDraft({
     form,
@@ -139,7 +134,7 @@ export default function MemberForm({ member }: MemberFormProps) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           {/* 미리보기: 넓은 화면은 오른쪽에 고정, 좁은 화면은 폼 위에 둔다 */}
           <aside className="lg:sticky lg:top-6 lg:order-last lg:self-start">
-            <div className="rounded-2xl border border-line bg-surface p-5">
+            <div className="rounded-lg border border-line bg-surface p-5">
               <MemberCardPreview values={values} />
             </div>
           </aside>
@@ -170,29 +165,6 @@ export default function MemberForm({ member }: MemberFormProps) {
                   ))}
                 </div>
               </FormFieldset>
-
-              {isCore ? (
-                <FormField
-                  id="member-role"
-                  label="역할"
-                  required
-                  hint="카드 전면 배지로 표시됩니다."
-                  error={errors.role?.message}
-                >
-                  {(control) => (
-                    <Select
-                      {...control}
-                      options={ROLE_OPTIONS}
-                      placeholder="선택해 주세요"
-                      {...register("role")}
-                    />
-                  )}
-                </FormField>
-              ) : (
-                <p className="text-sm text-ink-muted">
-                  시니어는 역할이 없습니다. 저장하면 역할 정보는 지워집니다.
-                </p>
-              )}
             </FormSection>
 
             <FormSection title="카드 전면">
@@ -285,12 +257,19 @@ export default function MemberForm({ member }: MemberFormProps) {
             </FormSection>
 
             <FormSection title="카드 후면">
-              <FormField id="member-part" label="분야" required error={errors.part?.message}>
+              <FormField
+                id="member-part"
+                label="분야"
+                required
+                hint="카드 후면에 그대로 보입니다."
+                error={errors.part?.message}
+                counter={{ length: values.part?.length ?? 0, max: L.part }}
+              >
                 {(control) => (
-                  <Select
+                  <Input
                     {...control}
-                    options={PART_OPTIONS}
-                    placeholder="선택해 주세요"
+                    maxLength={L.part}
+                    placeholder="예: 백엔드, 프론트엔드, DevOps"
                     {...register("part")}
                   />
                 )}
@@ -323,19 +302,20 @@ export default function MemberForm({ member }: MemberFormProps) {
                   )}
                 </FormField>
                 <FormField
-                  id="member-links-homepage"
-                  label="소개 페이지"
-                  error={errors.links?.homepage?.message}
-                  counter={{ length: values.links?.homepage?.length ?? 0, max: L.url }}
+                  id="member-links-email"
+                  label="이메일"
+                  hint="멤버 카드의 메일 아이콘으로 공개됩니다."
+                  error={errors.links?.email?.message}
                 >
                   {(control) => (
                     <Input
                       {...control}
-                      type="url"
-                      inputMode="url"
-                      maxLength={L.url}
-                      placeholder="https://…"
-                      {...register("links.homepage")}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="off"
+                      maxLength={L.email}
+                      placeholder="name@example.com"
+                      {...register("links.email")}
                     />
                   )}
                 </FormField>

@@ -3,7 +3,7 @@
 // 모든 매핑에 `satisfies Record<…, string>` 을 붙여, types/api.ts 의 코드값 배열과 짝이 맞는지
 // 컴파일 타임에 검사한다 (코드값을 추가하고 라벨을 빠뜨리거나, 없는 키를 넣으면 타입 에러).
 //
-// - 정렬 순서의 출처는 이 파일이 아니라 types/api.ts 의 배열(MEMBER_ROLES 등)이다.
+// - 정렬 순서의 출처는 이 파일이 아니라 types/api.ts 의 배열이다.
 //   객체 키 순서에 정렬을 의존하지 않는다.
 // - components/ui 는 이 파일을 import 할 수 없다 (FRONT_ARCHITECTURE § 4). 라벨은 호출하는 쪽에서 문자열로 넘긴다.
 
@@ -11,8 +11,6 @@ import type {
   AdminResource,
   ContentStatus,
   EventCategory,
-  MemberPart,
-  MemberRole,
   MemberStatus,
   ProjectCategory,
 } from "@/types/api";
@@ -37,21 +35,6 @@ export const EVENT_CATEGORY_LABELS = {
   presentation: "프로젝트",
   milestone: "동아리 일정",
 } satisfies Record<EventCategory, string>;
-
-export const MEMBER_PART_LABELS = {
-  frontend: "프론트엔드",
-  backend: "백엔드",
-  mobile: "모바일",
-  "ai-ml": "AI·ML",
-  design: "디자인",
-} satisfies Record<MemberPart, string>;
-
-/** 코어멤버 역할 배지. 정렬 순서는 types/api.ts 의 MEMBER_ROLES 를 따른다 */
-export const MEMBER_ROLE_LABELS = {
-  lead: "리드",
-  "part-lead": "파트 리드",
-  core: "코어멤버",
-} satisfies Record<MemberRole, string>;
 
 /** 공개 Members 섹션 제목 · 관리자 구분 필터 공용 — 문구 출처를 하나로 둔다 */
 export const MEMBER_STATUS_LABELS = {

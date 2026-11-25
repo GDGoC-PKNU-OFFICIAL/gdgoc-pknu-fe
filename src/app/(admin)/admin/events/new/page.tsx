@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 // A-32 일정 등록 (IA 8-4). 수정(A-33)과 같은 폼을 쓴다.
 export default function AdminEventNewPage() {
   return (
-    <section className="flex flex-col gap-6 px-4 pt-8 md:px-8">
+    <section className="flex flex-col gap-6 px-4 pt-5 md:px-6">
       <AdminPageHeader title="일정 등록" />
       <EventForm />
     </section>

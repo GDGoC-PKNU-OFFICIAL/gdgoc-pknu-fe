@@ -10,6 +10,7 @@ import { useForm, useWatch } from "react-hook-form";
 import DraftRestoreDialog from "@/components/admin/DraftRestoreDialog";
 import FormField, { FormSection } from "@/components/admin/FormField";
 import FormFooter from "@/components/admin/FormFooter";
+import FormWithPreview from "@/components/admin/FormWithPreview";
 import { useAdminMutation } from "@/components/admin/hooks/use-admin-mutation";
 import { useDraft } from "@/components/admin/hooks/use-draft";
 import { useLeaveWarning } from "@/components/admin/hooks/use-leave-warning";
@@ -25,6 +26,8 @@ import { useToast } from "@/hooks/use-toast";
 import { createEvent, updateEvent } from "@/lib/api/admin-api";
 import { cn } from "@/lib/cn";
 import { formatKstDateTime, isIsoDate } from "@/lib/date";
+import { previewEvent } from "@/components/admin/lib/preview-values";
+import EventRow from "@/features/events/components/EventRow";
 import {
   EVENT_CATEGORIES,
   EVENT_CATEGORY_CHOICES,
@@ -128,128 +131,136 @@ export default function EventForm({ event }: EventFormProps) {
           </p>
         )}
 
-        <FormSection title="기본 정보">
-          <FormField
-            id="event-title"
-            label="제목"
-            required
-            error={errors.title?.message}
-            counter={{ length: values.title?.length ?? 0, max: L.title }}
-          >
-            {(control) => <Input {...control} maxLength={L.title} {...register("title")} />}
-          </FormField>
-
-          <FormField
-            id="event-category"
-            label="카테고리"
-            required
-            hint={
-              <span className="inline-flex items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "size-2.5 rounded-full",
-                    category ? EVENT_CATEGORY_STYLES[category].dot : "bg-line",
-                  )}
-                />
-                {category ? `캘린더에 이 색으로 표시됩니다.` : "카테고리마다 캘린더 색이 다릅니다."}
-              </span>
-            }
-            error={errors.category?.message}
-          >
-            {(control) => (
-              <Select
-                {...control}
-                options={CATEGORY_OPTIONS}
-                placeholder="선택해 주세요"
-                {...register("category")}
-              />
-            )}
-          </FormField>
-        </FormSection>
-
-        <FormSection
-          title="날짜 · 시간"
-          description="하루짜리 일정은 종료일을 비워 두세요. 같은 날 순서는 목록에서 바꿉니다."
+        <FormWithPreview
+          title="일정 미리보기"
+          note="Events 페이지 일정 목록에 이렇게 보입니다."
+          preview={<EventRow event={previewEvent(values)} />}
         >
-          <div className="grid gap-5 md:grid-cols-2">
-            <FormField id="event-date" label="시작일" required error={errors.date?.message}>
-              {(control) => <Input {...control} type="date" {...register("date")} />}
-            </FormField>
+          <FormSection title="기본 정보">
             <FormField
-              id="event-endDate"
-              label="종료일"
-              hint="여러 날 이어지는 일정만 입력합니다."
-              error={errors.endDate?.message}
+              id="event-title"
+              label="제목"
+              required
+              error={errors.title?.message}
+              counter={{ length: values.title?.length ?? 0, max: L.title }}
+            >
+              {(control) => <Input {...control} maxLength={L.title} {...register("title")} />}
+            </FormField>
+
+            <FormField
+              id="event-category"
+              label="카테고리"
+              required
+              hint={
+                <span className="inline-flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "size-2.5 rounded-full",
+                      category ? EVENT_CATEGORY_STYLES[category].dot : "bg-line",
+                    )}
+                  />
+                  {category
+                    ? `캘린더에 이 색으로 표시됩니다.`
+                    : "카테고리마다 캘린더 색이 다릅니다."}
+                </span>
+              }
+              error={errors.category?.message}
+            >
+              {(control) => (
+                <Select
+                  {...control}
+                  options={CATEGORY_OPTIONS}
+                  placeholder="선택해 주세요"
+                  {...register("category")}
+                />
+              )}
+            </FormField>
+          </FormSection>
+
+          <FormSection
+            title="날짜 · 시간"
+            description="하루짜리 일정은 종료일을 비워 두세요. 같은 날 순서는 목록에서 바꿉니다."
+          >
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField id="event-date" label="시작일" required error={errors.date?.message}>
+                {(control) => <Input {...control} type="date" {...register("date")} />}
+              </FormField>
+              <FormField
+                id="event-endDate"
+                label="종료일"
+                hint="여러 날 이어지는 일정만 입력합니다."
+                error={errors.endDate?.message}
+              >
+                {(control) => (
+                  <Input
+                    {...control}
+                    type="date"
+                    min={isIsoDate(date) ? date : undefined}
+                    {...register("endDate")}
+                  />
+                )}
+              </FormField>
+            </div>
+            {isIsoDate(date) && (
+              <p className="text-sm">
+                표시:{" "}
+                <strong className="font-semibold">
+                  {formatEventDate({
+                    date,
+                    endDate: isIsoDate(endDate) ? endDate : undefined,
+                  })}
+                </strong>
+                {dateMoved && (
+                  <span className="ml-2 text-xs text-ink-muted">
+                    날짜를 바꾸면 새 날짜의 맨 뒤 순서로 갑니다.
+                  </span>
+                )}
+              </p>
+            )}
+            <FormField
+              id="event-time"
+              label="시간"
+              error={errors.time?.message}
+              counter={{ length: values.time?.length ?? 0, max: L.time }}
             >
               {(control) => (
                 <Input
                   {...control}
-                  type="date"
-                  min={isIsoDate(date) ? date : undefined}
-                  {...register("endDate")}
+                  maxLength={L.time}
+                  placeholder="19:00–21:00"
+                  {...register("time")}
                 />
               )}
             </FormField>
-          </div>
-          {isIsoDate(date) && (
-            <p className="text-sm">
-              표시:{" "}
-              <strong className="font-semibold">
-                {formatEventDate({
-                  date,
-                  endDate: isIsoDate(endDate) ? endDate : undefined,
-                })}
-              </strong>
-              {dateMoved && (
-                <span className="ml-2 text-xs text-ink-muted">
-                  날짜를 바꾸면 새 날짜의 맨 뒤 순서로 갑니다.
-                </span>
-              )}
-            </p>
-          )}
-          <FormField
-            id="event-time"
-            label="시간"
-            error={errors.time?.message}
-            counter={{ length: values.time?.length ?? 0, max: L.time }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.time}
-                placeholder="19:00–21:00"
-                {...register("time")}
-              />
-            )}
-          </FormField>
-        </FormSection>
+          </FormSection>
 
-        <FormSection title="상세">
-          <FormField
-            id="event-place"
-            label="장소"
-            error={errors.place?.message}
-            counter={{ length: values.place?.length ?? 0, max: L.place }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.place}
-                placeholder="부경대 대연캠퍼스 ○○관"
-                {...register("place")}
-              />
-            )}
-          </FormField>
-          <FormField
-            id="event-summary"
-            label="한 줄 요약"
-            error={errors.summary?.message}
-            counter={{ length: values.summary?.length ?? 0, max: L.summary }}
-          >
-            {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
-          </FormField>
-        </FormSection>
+          <FormSection title="상세">
+            <FormField
+              id="event-place"
+              label="장소"
+              error={errors.place?.message}
+              counter={{ length: values.place?.length ?? 0, max: L.place }}
+            >
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.place}
+                  placeholder="부경대 대연캠퍼스 ○○관"
+                  {...register("place")}
+                />
+              )}
+            </FormField>
+            <FormField
+              id="event-summary"
+              label="한 줄 요약"
+              error={errors.summary?.message}
+              counter={{ length: values.summary?.length ?? 0, max: L.summary }}
+            >
+              {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
+            </FormField>
+          </FormSection>
+        </FormWithPreview>
 
         <FormFooter
           cancelHref={ADMIN_ROUTES.events}

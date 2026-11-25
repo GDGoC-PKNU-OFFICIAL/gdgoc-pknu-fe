@@ -10,6 +10,7 @@ import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import DraftRestoreDialog from "@/components/admin/DraftRestoreDialog";
 import FormField, { FormFieldset, FormSection } from "@/components/admin/FormField";
 import FormFooter from "@/components/admin/FormFooter";
+import FormWithPreview from "@/components/admin/FormWithPreview";
 import { useAdminMutation } from "@/components/admin/hooks/use-admin-mutation";
 import { useCurrentYearMonth } from "@/components/admin/hooks/use-current-year-month";
 import { useDraft } from "@/components/admin/hooks/use-draft";
@@ -36,6 +37,8 @@ import { checkProjectSlug, createProject, updateProject } from "@/lib/api/admin-
 import { cn } from "@/lib/cn";
 import { formatKstDateTime, isYearMonth, parseYearMonth } from "@/lib/date";
 import { type ContentStatus, PROJECT_CATEGORIES, type Project } from "@/types/api";
+import { previewProject } from "@/components/admin/lib/preview-values";
+import ProjectCard from "@/features/projects/components/ProjectCard";
 
 import { DEFAULT_PROJECT_IMAGE, PROJECT_STATUS_LABELS } from "../lib/project-labels";
 
@@ -195,386 +198,394 @@ export default function ProjectForm({ project }: ProjectFormProps) {
           </p>
         )}
 
-        <FormSection title="기본 정보">
-          <FormField
-            id="project-title"
-            label="제목"
-            required
-            error={errors.title?.message}
-            counter={{ length: values.title?.length ?? 0, max: L.title }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.title}
-                {...register("title", {
-                  onChange: (event: { target: { value: string } }) => {
-                    if (!slugEdited) {
-                      setValue("slug", suggestSlug(event.target.value, L.slug), {
-                        shouldDirty: true,
-                      });
-                    }
-                  },
-                })}
-              />
-            )}
-          </FormField>
-
-          <FormField
-            id="project-slug"
-            label="슬러그"
-            required
-            hint={
-              <span className={cn(slugStatus === "available" && "text-[#1e7e34]")}>{slugHint}</span>
-            }
-            error={
-              errors.slug?.message ?? (slugStatus === "taken" ? MESSAGES.slugTaken : undefined)
-            }
-            counter={{ length: values.slug?.length ?? 0, max: L.slug }}
-          >
-            {(control) => (
-              <Input
-                {...control}
-                maxLength={L.slug}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                placeholder="campus-map"
-                {...register("slug", { onChange: () => setSlugEdited(true) })}
-              />
-            )}
-          </FormField>
-
-          <FormField
-            id="project-summary"
-            label="한 줄 요약"
-            required
-            error={errors.summary?.message}
-            counter={{ length: values.summary?.length ?? 0, max: L.summary }}
-          >
-            {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
-          </FormField>
-
-          <FormField id="project-category" label="유형" required error={errors.category?.message}>
-            {(control) => (
-              <Select
-                {...control}
-                options={CATEGORY_OPTIONS}
-                placeholder="선택해 주세요"
-                {...register("category")}
-              />
-            )}
-          </FormField>
-
-          <BadgeField
-            register={register}
-            label={values.badge?.label ?? ""}
-            color={values.badge?.color ?? "blue"}
-            category={values.category ?? ""}
-            error={errors.badge?.label?.message ?? errors.badge?.color?.message}
-          />
-        </FormSection>
-
-        <FormSection
-          title="기간"
-          description="진행 상태는 입력하지 않습니다. 종료월로 자동 계산됩니다."
+        <FormWithPreview
+          title="프로젝트 카드 미리보기"
+          note="Projects 페이지 · 과거 프로젝트 목록에 이렇게 보입니다."
+          preview={<ProjectCard project={previewProject(values)} />}
         >
-          <div className="grid gap-5 md:grid-cols-2">
+          <FormSection title="기본 정보">
             <FormField
-              id="project-period-start"
-              label="시작"
+              id="project-title"
+              label="제목"
               required
-              error={errors.period?.start?.message}
+              error={errors.title?.message}
+              counter={{ length: values.title?.length ?? 0, max: L.title }}
             >
-              {(controlProps) => (
-                <Controller
-                  control={control}
-                  name="period.start"
-                  render={({ field }) => (
-                    <YearMonthSelect
-                      {...controlProps}
-                      ref={field.ref}
-                      value={field.value}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      years={years}
-                      emptyYearLabel="연도"
-                      monthLabel="시작 월"
-                    />
-                  )}
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.title}
+                  {...register("title", {
+                    onChange: (event: { target: { value: string } }) => {
+                      if (!slugEdited) {
+                        setValue("slug", suggestSlug(event.target.value, L.slug), {
+                          shouldDirty: true,
+                        });
+                      }
+                    },
+                  })}
                 />
               )}
             </FormField>
+
             <FormField
-              id="project-period-end"
-              label="종료"
-              hint="진행 중이면 비워 두세요. 종료 예정월을 넣어도 됩니다."
-              error={errors.period?.end?.message}
+              id="project-slug"
+              label="슬러그"
+              required
+              hint={
+                <span className={cn(slugStatus === "available" && "text-[#1e7e34]")}>
+                  {slugHint}
+                </span>
+              }
+              error={
+                errors.slug?.message ?? (slugStatus === "taken" ? MESSAGES.slugTaken : undefined)
+              }
+              counter={{ length: values.slug?.length ?? 0, max: L.slug }}
             >
-              {(controlProps) => (
-                <Controller
-                  control={control}
-                  name="period.end"
-                  render={({ field }) => (
-                    <YearMonthSelect
-                      {...controlProps}
-                      ref={field.ref}
-                      value={field.value}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      years={years}
-                      emptyYearLabel="진행 중"
-                      monthLabel="종료 월"
-                    />
-                  )}
+              {(control) => (
+                <Input
+                  {...control}
+                  maxLength={L.slug}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder="campus-map"
+                  {...register("slug", { onChange: () => setSlugEdited(true) })}
                 />
               )}
             </FormField>
-          </div>
-          <p className="text-sm">
-            진행 상태:{" "}
-            <strong className="font-semibold">
-              {status === null ? "—" : PROJECT_STATUS_LABELS[status]}
-            </strong>
-            <span className="ml-2 text-xs text-ink-muted">
-              {status === "past"
-                ? "과거 프로젝트에 표시됩니다."
-                : status === "current"
-                  ? "현재 프로젝트에 표시됩니다."
-                  : ""}
-            </span>
-          </p>
-        </FormSection>
 
-        <FormSection title="썸네일" description="비워 두면 기본 이미지가 표시됩니다.">
-          <Controller
-            control={control}
-            name="thumbnailUrl"
-            render={({ field, fieldState }) => (
-              <ImageUploadField
-                id="project-thumbnailUrl"
-                legend="썸네일 이미지 (16:9)"
-                target="project"
-                hint="jpg · png · webp, 5MB 이하. 16:9 로 잘린 모습이 공개 카드에 표시됩니다."
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                ref={field.ref}
-                fallbackSrc={DEFAULT_PROJECT_IMAGE}
-                aspect="video"
-                error={fieldState.error?.message}
-                onStatusChange={setUploadStatus}
-                onBeforeUpload={draft.saveNow}
-              />
-            )}
-          />
-        </FormSection>
+            <FormField
+              id="project-summary"
+              label="한 줄 요약"
+              required
+              error={errors.summary?.message}
+              counter={{ length: values.summary?.length ?? 0, max: L.summary }}
+            >
+              {(control) => <Input {...control} maxLength={L.summary} {...register("summary")} />}
+            </FormField>
 
-        <FormSection title="소개">
-          <Controller
-            control={control}
-            name="description"
-            render={({ field, fieldState }) => (
-              <StringListField
-                id="project-description"
-                legend="프로젝트 소개"
-                required
-                hint={`문단 ${L.description.min}~${L.description.max}개, 문단당 ${L.description.itemLength.toLocaleString()}자`}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.description}
-                errors={listErrors(fieldState.error)}
-                itemLabel={(i) => `소개 ${i + 1}문단`}
-                addLabel="문단 추가"
-                multiline
-              />
-            )}
-          />
-        </FormSection>
+            <FormField id="project-category" label="유형" required error={errors.category?.message}>
+              {(control) => (
+                <Select
+                  {...control}
+                  options={CATEGORY_OPTIONS}
+                  placeholder="선택해 주세요"
+                  {...register("category")}
+                />
+              )}
+            </FormField>
 
-        <FormSection
-          title="팀"
-          description="팀원 이름은 멤버 목록과 연결되지 않는 문자열입니다. 입력 순서대로 표시됩니다."
-        >
-          <FormFieldset
-            id="project-team"
-            legend="팀원"
-            hint={`최대 ${L.team.max}명, 이름 · 역할 각 ${L.team.itemLength}자`}
-            error={listErrors(errors.team).message}
+            <BadgeField
+              register={register}
+              label={values.badge?.label ?? ""}
+              color={values.badge?.color ?? "blue"}
+              category={values.category ?? ""}
+              error={errors.badge?.label?.message ?? errors.badge?.color?.message}
+            />
+          </FormSection>
+
+          <FormSection
+            title="기간"
+            description="진행 상태는 입력하지 않습니다. 종료월로 자동 계산됩니다."
           >
-            {team.fields.length > 0 && (
-              <ol className="flex flex-col gap-3">
-                {team.fields.map((member, index) => {
-                  const memberErrors = errors.team?.[index];
-                  return (
-                    <li key={member.id} className="flex items-start gap-2">
-                      <div className="grid flex-1 gap-2 sm:grid-cols-2">
-                        <FormField
-                          id={`project-team-${index}-name`}
-                          label={`팀원 ${index + 1} 이름`}
-                          error={memberErrors?.name?.message}
-                          counter={{
-                            length: values.team?.[index]?.name?.length ?? 0,
-                            max: L.team.itemLength,
-                          }}
-                        >
-                          {(controlProps) => (
-                            <Input
-                              {...controlProps}
-                              maxLength={L.team.itemLength}
-                              placeholder="홍길동"
-                              {...register(`team.${index}.name`)}
-                            />
-                          )}
-                        </FormField>
-                        <FormField
-                          id={`project-team-${index}-role`}
-                          label={`팀원 ${index + 1} 역할`}
-                          error={memberErrors?.role?.message}
-                          counter={{
-                            length: values.team?.[index]?.role?.length ?? 0,
-                            max: L.team.itemLength,
-                          }}
-                        >
-                          {(controlProps) => (
-                            <Input
-                              {...controlProps}
-                              maxLength={L.team.itemLength}
-                              placeholder="프론트엔드"
-                              {...register(`team.${index}.role`)}
-                            />
-                          )}
-                        </FormField>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`팀원 ${index + 1} 삭제`}
-                        onClick={() => team.remove(index)}
-                        className="mt-7 shrink-0 text-ink-muted"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 24 24"
-                          className="size-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                        >
-                          <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
-                      </Button>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-            <div>
-              <Button
-                variant="secondary"
-                disabled={team.fields.length >= L.team.max}
-                onClick={() => team.append({ name: "", role: "" })}
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField
+                id="project-period-start"
+                label="시작"
+                required
+                error={errors.period?.start?.message}
               >
-                + 팀원 추가
-              </Button>
+                {(controlProps) => (
+                  <Controller
+                    control={control}
+                    name="period.start"
+                    render={({ field }) => (
+                      <YearMonthSelect
+                        {...controlProps}
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        years={years}
+                        emptyYearLabel="연도"
+                        monthLabel="시작 월"
+                      />
+                    )}
+                  />
+                )}
+              </FormField>
+              <FormField
+                id="project-period-end"
+                label="종료"
+                hint="진행 중이면 비워 두세요. 종료 예정월을 넣어도 됩니다."
+                error={errors.period?.end?.message}
+              >
+                {(controlProps) => (
+                  <Controller
+                    control={control}
+                    name="period.end"
+                    render={({ field }) => (
+                      <YearMonthSelect
+                        {...controlProps}
+                        ref={field.ref}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        years={years}
+                        emptyYearLabel="진행 중"
+                        monthLabel="종료 월"
+                      />
+                    )}
+                  />
+                )}
+              </FormField>
             </div>
-          </FormFieldset>
-        </FormSection>
+            <p className="text-sm">
+              진행 상태:{" "}
+              <strong className="font-semibold">
+                {status === null ? "—" : PROJECT_STATUS_LABELS[status]}
+              </strong>
+              <span className="ml-2 text-xs text-ink-muted">
+                {status === "past"
+                  ? "과거 프로젝트에 표시됩니다."
+                  : status === "current"
+                    ? "현재 프로젝트에 표시됩니다."
+                    : ""}
+              </span>
+            </p>
+          </FormSection>
 
-        <FormSection title="내용">
-          <Controller
-            control={control}
-            name="techStack"
-            render={({ field, fieldState }) => (
-              <TagInput
-                id="project-techStack"
-                legend="기술 스택"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.techStack}
-                errors={listErrors(fieldState.error)}
-                placeholder="Next.js"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="features"
-            render={({ field, fieldState }) => (
-              <StringListField
-                id="project-features"
-                legend="주요 기능"
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.features}
-                errors={listErrors(fieldState.error)}
-                itemLabel={(i) => `주요 기능 ${i + 1}`}
-                addLabel="기능 추가"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="outcomes"
-            render={({ field, fieldState }) => (
-              <StringListField
-                id="project-outcomes"
-                legend={status === "past" ? "결과" : "결과 / 목표"}
-                hint={`진행 중인 프로젝트는 공개 화면에서 "목표"로 표시됩니다. 최대 ${L.outcomes.max}개, 항목당 ${L.outcomes.itemLength}자`}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                limits={L.outcomes}
-                errors={listErrors(fieldState.error)}
-                itemLabel={(i) => `결과 ${i + 1}`}
-                addLabel="결과 추가"
-              />
-            )}
-          />
-        </FormSection>
-
-        <FormSection title="링크" description="없는 링크는 공개 화면에서 버튼이 숨겨집니다.">
-          <div className="grid gap-5 md:grid-cols-2">
-            <FormField
-              id="project-links-github"
-              label="GitHub"
-              error={errors.links?.github?.message}
-              counter={{ length: values.links?.github?.length ?? 0, max: L.url }}
-            >
-              {(controlProps) => (
-                <Input
-                  {...controlProps}
-                  type="url"
-                  inputMode="url"
-                  maxLength={L.url}
-                  placeholder="https://github.com/…"
-                  {...register("links.github")}
+          <FormSection title="썸네일" description="비워 두면 기본 이미지가 표시됩니다.">
+            <Controller
+              control={control}
+              name="thumbnailUrl"
+              render={({ field, fieldState }) => (
+                <ImageUploadField
+                  id="project-thumbnailUrl"
+                  legend="썸네일 이미지 (16:9)"
+                  target="project"
+                  hint="jpg · png · webp, 5MB 이하. 16:9 로 잘린 모습이 공개 카드에 표시됩니다."
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                  fallbackSrc={DEFAULT_PROJECT_IMAGE}
+                  aspect="video"
+                  error={fieldState.error?.message}
+                  onStatusChange={setUploadStatus}
+                  onBeforeUpload={draft.saveNow}
                 />
               )}
-            </FormField>
-            <FormField
-              id="project-links-demo"
-              label="데모"
-              error={errors.links?.demo?.message}
-              counter={{ length: values.links?.demo?.length ?? 0, max: L.url }}
-            >
-              {(controlProps) => (
-                <Input
-                  {...controlProps}
-                  type="url"
-                  inputMode="url"
-                  maxLength={L.url}
-                  placeholder="https://…"
-                  {...register("links.demo")}
+            />
+          </FormSection>
+
+          <FormSection title="소개">
+            <Controller
+              control={control}
+              name="description"
+              render={({ field, fieldState }) => (
+                <StringListField
+                  id="project-description"
+                  legend="프로젝트 소개"
+                  required
+                  hint={`문단 ${L.description.min}~${L.description.max}개, 문단당 ${L.description.itemLength.toLocaleString()}자`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.description}
+                  errors={listErrors(fieldState.error)}
+                  itemLabel={(i) => `소개 ${i + 1}문단`}
+                  addLabel="문단 추가"
+                  multiline
                 />
               )}
-            </FormField>
-          </div>
-        </FormSection>
+            />
+          </FormSection>
+
+          <FormSection
+            title="팀"
+            description="팀원 이름은 멤버 목록과 연결되지 않는 문자열입니다. 입력 순서대로 표시됩니다."
+          >
+            <FormFieldset
+              id="project-team"
+              legend="팀원"
+              hint={`최대 ${L.team.max}명, 이름 · 역할 각 ${L.team.itemLength}자`}
+              error={listErrors(errors.team).message}
+            >
+              {team.fields.length > 0 && (
+                <ol className="flex flex-col gap-3">
+                  {team.fields.map((member, index) => {
+                    const memberErrors = errors.team?.[index];
+                    return (
+                      <li key={member.id} className="flex items-start gap-2">
+                        <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                          <FormField
+                            id={`project-team-${index}-name`}
+                            label={`팀원 ${index + 1} 이름`}
+                            error={memberErrors?.name?.message}
+                            counter={{
+                              length: values.team?.[index]?.name?.length ?? 0,
+                              max: L.team.itemLength,
+                            }}
+                          >
+                            {(controlProps) => (
+                              <Input
+                                {...controlProps}
+                                maxLength={L.team.itemLength}
+                                placeholder="홍길동"
+                                {...register(`team.${index}.name`)}
+                              />
+                            )}
+                          </FormField>
+                          <FormField
+                            id={`project-team-${index}-role`}
+                            label={`팀원 ${index + 1} 역할`}
+                            error={memberErrors?.role?.message}
+                            counter={{
+                              length: values.team?.[index]?.role?.length ?? 0,
+                              max: L.team.itemLength,
+                            }}
+                          >
+                            {(controlProps) => (
+                              <Input
+                                {...controlProps}
+                                maxLength={L.team.itemLength}
+                                placeholder="프론트엔드"
+                                {...register(`team.${index}.role`)}
+                              />
+                            )}
+                          </FormField>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={`팀원 ${index + 1} 삭제`}
+                          onClick={() => team.remove(index)}
+                          className="mt-7 shrink-0 text-ink-muted"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            className="size-4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                          >
+                            <path d="M6 6l12 12M18 6L6 18" />
+                          </svg>
+                        </Button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+              <div>
+                <Button
+                  variant="secondary"
+                  disabled={team.fields.length >= L.team.max}
+                  onClick={() => team.append({ name: "", role: "" })}
+                >
+                  + 팀원 추가
+                </Button>
+              </div>
+            </FormFieldset>
+          </FormSection>
+
+          <FormSection title="내용">
+            <Controller
+              control={control}
+              name="techStack"
+              render={({ field, fieldState }) => (
+                <TagInput
+                  id="project-techStack"
+                  legend="기술 스택"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.techStack}
+                  errors={listErrors(fieldState.error)}
+                  placeholder="Next.js"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="features"
+              render={({ field, fieldState }) => (
+                <StringListField
+                  id="project-features"
+                  legend="주요 기능"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.features}
+                  errors={listErrors(fieldState.error)}
+                  itemLabel={(i) => `주요 기능 ${i + 1}`}
+                  addLabel="기능 추가"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="outcomes"
+              render={({ field, fieldState }) => (
+                <StringListField
+                  id="project-outcomes"
+                  legend={status === "past" ? "결과" : "결과 / 목표"}
+                  hint={`진행 중인 프로젝트는 공개 화면에서 "목표"로 표시됩니다. 최대 ${L.outcomes.max}개, 항목당 ${L.outcomes.itemLength}자`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  limits={L.outcomes}
+                  errors={listErrors(fieldState.error)}
+                  itemLabel={(i) => `결과 ${i + 1}`}
+                  addLabel="결과 추가"
+                />
+              )}
+            />
+          </FormSection>
+
+          <FormSection title="링크" description="없는 링크는 공개 화면에서 버튼이 숨겨집니다.">
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField
+                id="project-links-github"
+                label="GitHub"
+                error={errors.links?.github?.message}
+                counter={{ length: values.links?.github?.length ?? 0, max: L.url }}
+              >
+                {(controlProps) => (
+                  <Input
+                    {...controlProps}
+                    type="url"
+                    inputMode="url"
+                    maxLength={L.url}
+                    placeholder="https://github.com/…"
+                    {...register("links.github")}
+                  />
+                )}
+              </FormField>
+              <FormField
+                id="project-links-demo"
+                label="데모"
+                error={errors.links?.demo?.message}
+                counter={{ length: values.links?.demo?.length ?? 0, max: L.url }}
+              >
+                {(controlProps) => (
+                  <Input
+                    {...controlProps}
+                    type="url"
+                    inputMode="url"
+                    maxLength={L.url}
+                    placeholder="https://…"
+                    {...register("links.demo")}
+                  />
+                )}
+              </FormField>
+            </div>
+          </FormSection>
+        </FormWithPreview>
 
         <FormFooter
           cancelHref={ADMIN_ROUTES.projects}

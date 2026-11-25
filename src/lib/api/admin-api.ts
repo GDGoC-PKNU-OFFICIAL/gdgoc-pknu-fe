@@ -5,6 +5,7 @@
 
 import { ADMIN_API_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from "@/constants/config";
 import type {
+  AboutContent,
   AdminMember,
   Dashboard,
   EventItem,
@@ -18,11 +19,13 @@ import type {
 } from "@/types/api";
 import type { Page } from "@/types/common";
 import type {
+  AboutRequest,
   EventListQuery,
   EventOrderRequest,
   EventRequest,
   LoginRequest,
   MemberListQuery,
+  MemberOrderRequest,
   MemberRequest,
   PresignRequest,
   SettingRequest,
@@ -235,9 +238,14 @@ export function createMember(body: MemberRequest): Promise<AdminMember> {
   return sendJson<AdminMember>("POST", "/members", body);
 }
 
-/** A-43 수정 (전체 필드 교체). 시니어면 role 은 null 이어야 한다 */
+/** A-43 수정 (전체 필드 교체). 구분을 바꾸면 서버가 바뀐 구분의 맨 뒤로 보낸다 */
 export function updateMember(id: number, body: MemberRequest): Promise<AdminMember> {
   return sendJson<AdminMember>("PUT", `/members/${id}`, body);
+}
+
+/** 표시 순서 변경 → 204. ids 는 그 구분의 멤버 id 전체여야 한다 (누락 · 중복 · 다른 구분 id 는 400) */
+export function reorderMembers(body: MemberOrderRequest): Promise<void> {
+  return sendJson<void>("PUT", "/members/order", body);
 }
 
 /** 삭제 → 204. 프로젝트 · 스터디 기록에는 영향 없다 (참여자는 이름 문자열) */
@@ -257,6 +265,16 @@ export function getAdminSettings(signal?: AbortSignal): Promise<SiteSetting> {
 /** A-50 저장 — 단일 레코드를 통째로 교체 (없으면 만든다). 통계는 정확히 4개 */
 export function updateSettings(body: SettingRequest): Promise<SiteSetting> {
   return sendJson<SiteSetting>("PUT", "/settings", body);
+}
+
+/** About 수정 폼 초기값. 아직 한 번도 저장하지 않았으면 404 NOT_FOUND — 코드 기본 내용으로 시작한다 */
+export function getAdminAbout(signal?: AbortSignal): Promise<AboutContent> {
+  return getJson<AboutContent>("/about", signal);
+}
+
+/** About 저장 — 단일 레코드를 통째로 교체 (없으면 만든다). 성공하면 BFF 가 / · /about 을 재검증한다 */
+export function updateAbout(body: AboutRequest): Promise<AboutContent> {
+  return sendJson<AboutContent>("PUT", "/about", body);
 }
 
 /** A-00 요약 — 모집 상태 · 콘텐츠별 건수 · 다가오는 일정 3건 · 최근 수정 5건 */

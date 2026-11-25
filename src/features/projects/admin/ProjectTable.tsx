@@ -25,41 +25,41 @@ interface ProjectTableProps {
  */
 export default function ProjectTable({ projects, onDelete }: ProjectTableProps) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
+    <div className="overflow-x-auto rounded-lg border border-line bg-surface">
       <table className="w-full min-w-[52rem] text-left text-sm">
         <caption className="sr-only">프로젝트 목록</caption>
-        <thead className="border-b border-line bg-surface-muted text-xs text-ink-muted">
+        <thead className="sticky top-0 z-[1] border-b border-line bg-surface-muted text-xs font-semibold text-ink-muted">
           <tr>
-            <th scope="col" className="w-24 px-4 py-3 font-medium">
+            <th scope="col" className="w-24 px-3 py-2 font-medium">
               썸네일
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               제목
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               유형
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               상태
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               기간
             </th>
-            <th scope="col" className="px-4 py-3 font-medium">
+            <th scope="col" className="px-3 py-2 font-medium">
               수정일
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               수정
             </th>
-            <th scope="col" className="px-2 py-3 text-center font-medium">
+            <th scope="col" className="px-2 py-1.5 text-center font-medium">
               삭제
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-y divide-line [&>tr]:transition-colors [&>tr:hover]:bg-brand-blue/[0.04] [&>tr:nth-child(even)]:bg-surface-muted/40">
           {projects.map((project) => (
             <tr key={project.id}>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <div className="relative aspect-video w-20 overflow-hidden rounded-md bg-surface-muted">
                   <SafeImage
                     src={project.thumbnailUrl}
@@ -77,21 +77,21 @@ export default function ProjectTable({ projects, onDelete }: ProjectTableProps) 
                   {project.slug}
                 </span>
               </th>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <Badge tone={projectBadge(project).tone}>{projectBadge(project).label}</Badge>
               </td>
-              <td className="px-4 py-2">
+              <td className="px-3 py-1.5">
                 <Badge tone={project.status === "current" ? "green" : "neutral"}>
                   {CONTENT_STATUS_LABELS[project.status]}
                 </Badge>
               </td>
-              <td className="px-4 py-2 whitespace-nowrap tabular-nums">
+              <td className="px-3 py-1.5 whitespace-nowrap tabular-nums">
                 {formatMonthPeriod(project.period)}
               </td>
-              <td className="px-4 py-2 whitespace-nowrap text-ink-muted tabular-nums">
+              <td className="px-3 py-1.5 whitespace-nowrap text-ink-muted tabular-nums">
                 {formatKstDateTime(new Date(project.updatedAt))}
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <Link
                   href={projectEditHref(project.id)}
                   aria-label={`${project.title} 수정`}
@@ -111,7 +111,7 @@ export default function ProjectTable({ projects, onDelete }: ProjectTableProps) 
                   </svg>
                 </Link>
               </td>
-              <td className="px-2 py-2 text-center">
+              <td className="px-2 py-1.5 text-center">
                 <button
                   type="button"
                   aria-label={`${project.title} 삭제`}

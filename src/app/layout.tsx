@@ -44,9 +44,10 @@ const googleSans = Google_Sans({
 /**
  * 전역 메타데이터 (IA 10-4). 페이지는 title 문자열만 주면 "{title} · GDG on Campus PKNU" 가 된다.
  * 파비콘 · 아이콘은 app/ 의 파일 규약(favicon.ico · icon.png · apple-icon.png)으로 자동 연결된다.
- * OG 이미지는 전 페이지 공통 1장(public/images/og-default.png, 1200×630)을 쓴다.
+ * OG 이미지는 전 페이지 공통 1장(public/images/og-gdgoc-pknu.png, 1200×630)을 쓴다 — 헤더 로고(심볼 + "GDGoC PKNU")를
+ * 같은 비율로 키워 그린 것. 바꿀 때는 파일 이름도 바꾼다 (같은 이름이면 메신저가 예전 미리보기를 캐시해 둔다).
  */
-const OG_IMAGE = { url: "/images/og-default.png", width: 1200, height: 630, alt: SITE.name };
+const OG_IMAGE = { url: "/images/og-gdgoc-pknu.png", width: 1200, height: 630, alt: SITE.name };
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.NEXT_PUBLIC_SITE_URL),

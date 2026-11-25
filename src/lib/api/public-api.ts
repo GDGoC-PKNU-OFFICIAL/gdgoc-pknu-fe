@@ -15,8 +15,9 @@ import { cache } from "react";
 
 import { PUBLIC_API_TIMEOUT_MS, REVALIDATE_SECONDS } from "@/constants/config";
 import { serverEnv } from "@/lib/env/server";
-import type { EventItem, Member, Project, SiteSetting, Study } from "@/types/api";
+import type { AboutContent, EventItem, Member, Project, SiteSetting, Study } from "@/types/api";
 
+import { ApiError } from "./api-error";
 import { requestJson } from "./http";
 
 function getPublic<T>(path: `/api/${string}`): Promise<T> {
@@ -40,3 +41,17 @@ export const getMembers = cache(() => getPublic<Member[]>("/api/members"));
 
 /** 모집 상태 배너 + 활동 통계 4개 */
 export const getSettings = cache(() => getPublic<SiteSetting>("/api/settings"));
+
+/**
+ * About 페이지 내용 (소개 · 활동 카드 · 규칙 · FAQ). 홈 What We Do 도 여기 활동 카드를 쓴다.
+ * 관리자가 아직 한 번도 저장하지 않았으면 404 → null. 부르는 쪽이 코드 기본 내용(DEFAULT_ABOUT)으로 그린다.
+ * 다른 실패는 그대로 throw 한다.
+ */
+export const getAbout = cache(async (): Promise<AboutContent | null> => {
+  try {
+    return await getPublic<AboutContent>("/api/about");
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+});
