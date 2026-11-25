@@ -65,6 +65,8 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
   twitter: { card: "summary_large_image", images: [OG_IMAGE] },
+  // Google Search Console 소유권 확인 (URL 접두어 https://gdgoc-pknu-web.vercel.app). 지우면 확인이 풀린다
+  verification: { google: "ySNIxDTR-mzGBxuIhtYp8BjCDSguV0uPfgwLD8D_zW4" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
